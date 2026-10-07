@@ -168,3 +168,17 @@ $$("form.js-contato").forEach(f => {
     } finally { btn.disabled = false; }
   });
 });
+
+/* ---------- lançamento estilo dossiê: entrada + máquina de escrever ---------- */
+$$(".seq").forEach(sec => {
+  const t = $(".type", sec), full = t ? t.dataset.text : "";
+  const start = () => {
+    sec.classList.add("on");
+    if (!t || reduce) return;
+    t.textContent = ""; t.classList.add("typing"); let i = 0;
+    setTimeout(function step() { i += 2; t.textContent = full.slice(0, i); if (i < full.length) setTimeout(step, 28); else setTimeout(() => t.classList.remove("typing"), 2400); }, 900);
+  };
+  if (!("IntersectionObserver" in window)) return start();
+  const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { start(); io.disconnect(); } }, { threshold: .15 });
+  io.observe(sec);
+});
