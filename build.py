@@ -408,10 +408,14 @@ if INI.get("hero_botao1_texto"):
     btns += f'<a class="btn solid" href="{esc(INI.get("hero_botao1_link", "#"))}">{esc(INI["hero_botao1_texto"])}</a>'
 if INI.get("hero_botao2_texto"):
     btns += f'<a class="btn" href="{esc(INI.get("hero_botao2_link", "#"))}">{esc(INI["hero_botao2_texto"])}</a>'
+HERO_CLS = "cheia" if INI.get("hero_enquadramento") == "cheia" else "lateral"
+if INI.get("hero_preto_branco"):
+    HERO_CLS += " pb"
+HERO_FOCO = {"topo": "0%", "centro": "50%", "baixo": "100%"}.get(INI.get("hero_foco") or "", "15%")
 corpo = "".join(SECOES[s["secao"]]() for s in INI.get("secoes") or [] if s.get("visivel", True) and s.get("secao") in SECOES)
 pages["index.html"] = head(G.get("seo_titulo", "Vinik"), G.get("seo_descricao", ""), path="", ld=[PERSON, WEBSITE]) + nav() + f"""<main>
 <section class="hero">
-  <div class="hero-img" role="img" aria-label="{esc(INI.get("hero_imagem_descricao", ""))}" style="background-image:url({esc(INI.get("hero_imagem", ""))})"></div>
+  <div class="hero-img {HERO_CLS}" role="img" aria-label="{esc(INI.get("hero_imagem_descricao", ""))}" style="background-image:url({esc(INI.get("hero_imagem", ""))});--foco:{HERO_FOCO}"></div>
   <div class="wrap">
     <h1 class="sr">Vinik, escritor</h1>
     <div class="hero-logo rise" aria-hidden="true"></div>

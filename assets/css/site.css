@@ -95,7 +95,12 @@ a{color:inherit}
 .hero{position:relative;min-height:min(820px,92vh);display:grid;align-items:end;isolation:isolate;overflow:hidden}
 .hero-img{position:absolute;inset:0;z-index:-2;background:#050505 url(../img/hero-retrato.jpg) right 20% top 0/auto 100% no-repeat;transform:scale(1.04);animation:drift 22s ease-in-out infinite alternate}
 .hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(11,12,10,.55) 0%,rgba(11,12,10,.15) 35%,rgba(11,12,10,.75) 72%,var(--night) 100%),radial-gradient(70% 60% at 70% 45%,transparent 30%,rgba(11,12,10,.65) 100%)}
-@media (max-width:860px){.hero-img{background-size:cover;background-position:62% 15%}}
+@media (min-width:861px){
+  .hero-img.lateral{left:auto;width:min(58%,980px);background-size:cover;background-position:center var(--foco,15%);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 38%);mask-image:linear-gradient(90deg,transparent 0,#000 38%)}
+  .hero-img.cheia{background-size:cover;background-position:center var(--foco,30%)}
+}
+.hero-img.pb{filter:grayscale(1) contrast(1.05)}
+@media (max-width:860px){.hero-img{background-size:cover;background-position:62% var(--foco,15%)}}
 @keyframes drift{to{transform:scale(1.1) translate(-1.5%,-1%)}}
 .hero .wrap{padding-block:120px clamp(40px,6vw,72px);display:grid;gap:26px}
 .hero-logo{width:min(560px,82vw);aspect-ratio:1008/276;background:url(../img/logo-vinik.png) left center/contain no-repeat;filter:drop-shadow(0 6px 30px rgba(0,0,0,.6))}

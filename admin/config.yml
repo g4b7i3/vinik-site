@@ -33,6 +33,9 @@ collections:
         fields:
           - { label: "Foto de fundo do topo", name: hero_imagem, widget: image }
           - { label: "Descrição da foto do topo (acessibilidade)", name: hero_imagem_descricao, widget: string, required: false }
+          - { label: "Foto do topo · formato no computador", name: hero_enquadramento, widget: select, required: false, default: "lateral", options: [{ label: "Lateral, à direita (foto em pé / vertical)", value: "lateral" }, { label: "Tela cheia (foto deitada / horizontal)", value: "cheia" }], hint: "No celular a foto sempre ocupa a tela inteira." }
+          - { label: "Foto do topo · ponto de foco", name: hero_foco, widget: select, required: false, default: "", options: [{ label: "Automático", value: "" }, { label: "Topo (rosto no alto da foto)", value: "topo" }, { label: "Centro", value: "centro" }, { label: "Embaixo", value: "baixo" }], hint: "Qual parte da foto fica sempre visível quando ela precisa ser cortada." }
+          - { label: "Foto do topo · preto e branco", name: hero_preto_branco, widget: boolean, required: false, default: false, hint: "Deixa a foto em preto e branco, combinando com o resto do site." }
           - { label: "Botão 1 · texto", name: hero_botao1_texto, widget: string, required: false }
           - { label: "Botão 1 · link", name: hero_botao1_link, widget: string, required: false, hint: "Ex.: #livros, 60-milhas.html ou um link completo" }
           - { label: "Botão 2 · texto", name: hero_botao2_texto, widget: string, required: false }
