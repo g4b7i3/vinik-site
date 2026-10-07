@@ -1,0 +1,81 @@
+# Painel de edição do site (Decap CMS)
+# Repositório do site no GitHub
+backend:
+  name: github
+  repo: g4b7i3/vinik-site
+  branch: main
+  base_url: https://api.netlify.com
+
+locale: pt
+media_folder: "assets/img/uploads"
+public_folder: "assets/img/uploads"
+site_url: https://vinikautor.com.br
+display_url: https://vinikautor.com.br
+
+collections:
+  - name: conteudo
+    label: Conteúdo do site
+    editor: { preview: false }
+    files:
+      - name: noticias
+        label: Notícias
+        file: content/noticias.json
+        fields:
+          - label: Notícias
+            name: posts
+            widget: list
+            summary: "{{fields.data}} · {{fields.titulo}}"
+            fields:
+              - { label: Título, name: titulo, widget: string }
+              - { label: Data, name: data, widget: datetime, format: "YYYY-MM-DD", date_format: "DD/MM/YYYY", time_format: false }
+              - { label: Imagem, name: imagem, widget: image, required: false }
+              - { label: Resumo (aparece no cartão), name: resumo, widget: text }
+              - { label: Texto completo, name: corpo, widget: text }
+
+      - name: avaliacoes
+        label: Avaliações dos leitores
+        file: content/avaliacoes.json
+        fields:
+          - label: Notas na Amazon
+            name: notas
+            widget: object
+            fields:
+              - label: 60 Milhas
+                name: "60 Milhas"
+                widget: object
+                fields:
+                  - { label: Média, name: media, widget: number, value_type: float, step: 0.1 }
+                  - { label: Total de avaliações, name: total, widget: number }
+              - label: Semente do Escárnio
+                name: "Semente do Escárnio"
+                widget: object
+                fields:
+                  - { label: Média, name: media, widget: number, value_type: float, step: 0.1 }
+                  - { label: Total de avaliações, name: total, widget: number }
+          - label: Avaliações
+            name: avaliacoes
+            widget: list
+            summary: "{{fields.livro}} · {{fields.nome}}"
+            fields:
+              - { label: Livro, name: livro, widget: select, options: ["60 Milhas", "Semente do Escárnio"] }
+              - { label: Nome do leitor, name: nome, widget: string }
+              - { label: Estrelas, name: estrelas, widget: number, min: 1, max: 5, default: 5 }
+              - { label: Título da avaliação, name: titulo, widget: string }
+              - { label: Data, name: data, widget: datetime, format: "YYYY-MM-DD", date_format: "DD/MM/YYYY", time_format: false }
+              - { label: Texto, name: texto, widget: text }
+
+      - name: premios
+        label: Prêmios e seleções
+        file: content/premios.json
+        fields:
+          - label: Prêmios
+            name: premios
+            widget: list
+            summary: "{{fields.ano}} · {{fields.titulo}}"
+            fields:
+              - { label: Ano, name: ano, widget: number }
+              - { label: Concurso ou prêmio, name: titulo, widget: string }
+              - { label: Instituição, name: instituicao, widget: string }
+              - { label: Resultado, name: resultado, widget: string }
+              - { label: Obra, name: obra, widget: string }
+              - { label: Descrição, name: descricao, widget: text }

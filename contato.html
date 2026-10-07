@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Contato com Vinik</title>
+<meta name="description" content="Fale com Vinik: eventos, entrevistas, clubes do livro e parcerias.">
+<meta name="theme-color" content="#0b0c0a">
+<meta property="og:title" content="Contato com Vinik">
+<meta property="og:description" content="Fale com Vinik: eventos, entrevistas, clubes do livro e parcerias.">
+<meta property="og:image" content="https://vinikautor.com.br/assets/img/livros-mato.jpg">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IM+Fell+English+SC&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Vinik — início"></a>
+    <button class="burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+    <ul class="menu" id="menu">
+      <li><a href="index.html">Início</a></li>
+      <li><a href="60-milhas.html">60 Milhas</a></li>
+      <li><a href="semente-do-escarnio.html">Semente do Escárnio</a></li>
+      <li><a href="noticias.html">Notícias</a></li>
+      <li><a href="sobre.html">Sobre</a></li>
+      <li><a href="contato.html">Contato</a></li>
+    </ul>
+  </div>
+</header>
+<main>
+<section class="sec">
+  <div class="wrap contact">
+    <div>
+      <p class="eyebrow">Contato</p>
+      <h1 class="h1" style="margin-top:12px">Vamos conversar.</h1>
+      <p class="lead muted" style="margin-top:18px">Eventos, entrevistas, clubes do livro, escolas e parcerias.</p>
+      <div class="copybox" style="margin-top:26px"><code>vinikautor@gmail.com</code><button class="btn" data-copy="vinikautor@gmail.com" style="padding:8px 14px">Copiar</button></div>
+      <div class="socials">
+        <a href="https://www.instagram.com/vinikescritor" target="_blank" rel="noopener"><b>Instagram</b><span>@vinikescritor</span></a>
+        <a href="https://www.tiktok.com/@vinikautor" target="_blank" rel="noopener"><b>TikTok</b><span>@vinikautor</span></a>
+        <a href="https://vinikautor.substack.com" target="_blank" rel="noopener"><b>Substack</b><span>vinikautor</span></a>
+      </div>
+    </div>
+    <form class="form signup" name="contato" method="POST" data-netlify="true" netlify-honeypot="empresa" style="grid-template-columns:minmax(0,1fr)">
+      <input type="hidden" name="form-name" value="contato">
+      <p hidden><label>Não preencha: <input name="empresa"></label></p>
+      <div class="field"><label for="c-nome">Nome</label><input id="c-nome" name="nome" required autocomplete="name"></div>
+      <div class="field"><label for="c-email">E-mail</label><input id="c-email" name="email" type="email" required autocomplete="email"></div>
+      <div class="field"><label for="c-assunto">Assunto</label><select id="c-assunto" name="assunto"><option>Evento ou palestra</option><option>Entrevista</option><option>Clube do livro ou escola</option><option>Parceria</option><option>Mensagem de leitor</option><option>Outro</option></select></div>
+      <div class="field"><label for="c-msg">Mensagem</label><textarea id="c-msg" name="mensagem" rows="6" required></textarea></div>
+      <div class="btns"><button class="btn solid" type="submit">Enviar mensagem</button></div>
+      <p class="form-note" role="status"></p>
+    </form>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <div>
+      <a class="brand" href="index.html" aria-label="Vinik — início"></a>
+    </div>
+    <div>
+      <h4>Livros</h4>
+      <ul>
+        <li><a href="60-milhas.html">60 Milhas – A história de Eddie</a></li>
+        <li><a href="semente-do-escarnio.html">Semente do Escárnio</a></li>
+        <li><a href="index.html#em-breve">Em breve</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Acompanhe</h4>
+      <ul>
+        <li><a href="https://www.instagram.com/vinikescritor" target="_blank" rel="noopener">Instagram · @vinikescritor</a></li>
+        <li><a href="https://www.tiktok.com/@vinikautor" target="_blank" rel="noopener">TikTok · @vinikautor</a></li>
+        <li><a href="https://vinikautor.substack.com" target="_blank" rel="noopener">Substack · vinikautor</a></li>
+        <li><a href="contato.html">vinikautor@gmail.com</a></li>
+      </ul>
+    </div>
+    <div class="legal"><span>© 2026 Vinik. Todos os direitos reservados.</span><span>São Luís · Maranhão</span></div>
+  </div>
+</footer>
+<script src="assets/js/site.js"></script>
+</body>
+</html>

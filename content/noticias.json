@@ -1,0 +1,25 @@
+{
+  "posts": [
+    {
+      "titulo": "O site está no ar",
+      "data": "2026-10-06",
+      "imagem": "assets/img/livros-mato.jpg",
+      "resumo": "Este é o novo endereço para acompanhar os livros, as avaliações dos leitores, os concursos e os próximos lançamentos.",
+      "corpo": "Este é o novo endereço para acompanhar os livros, as avaliações dos leitores, os concursos e os próximos lançamentos.\n\nAqui você encontra 60 Milhas e Semente do Escárnio, o book trailer e as primeiras informações sobre A Última Chance, a parte 2 de 60 Milhas, e O Flâneur de Santene. Os textos que publico no Substack também aparecem nesta página."
+    },
+    {
+      "titulo": "Conto selecionado no concurso “Memórias e Vozes do Maranhão”",
+      "data": "2026-10-06",
+      "imagem": "assets/img/retrato-escrevendo.jpg",
+      "resumo": "É disso que eu lembro foi selecionado na categoria Prosa do I Concurso Literário da Defensoria Pública do Estado do Maranhão.",
+      "corpo": "O conto É disso que eu lembro foi aprovado no I Concurso Literário “Memórias e Vozes do Maranhão”, da Defensoria Pública do Estado do Maranhão, e selecionado na categoria Prosa.\n\nNo conto, acompanhamos um jovem no exercício íntimo da escrita de uma carta, por meio da qual tenta compreender e, em certa medida, reconciliar-se com acontecimentos de seu passado recente."
+    },
+    {
+      "titulo": "Assista ao book trailer de 60 Milhas",
+      "data": "2026-10-06",
+      "imagem": "media/booktrailer_poster.jpg",
+      "resumo": "Um minuto da corrida de Eddie, com as avaliações dos leitores.",
+      "corpo": "O book trailer de 60 Milhas – A história de Eddie está na página do livro. Um minuto da corrida, com as palavras dos leitores que acompanharam Eddie até a linha de chegada."
+    }
+  ]
+}
