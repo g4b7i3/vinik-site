@@ -139,7 +139,8 @@ $$(".video").forEach(v => {
 /* ---------- inscrição (Substack) ---------- */
 $$("[data-substack]").forEach(box => {
   const url = box.dataset.substack;
-  if (LIVE) box.innerHTML = `<iframe src="${url}/embed" title="Inscrição no Substack de Vinik" style="width:100%;height:320px;border:1px solid var(--rule);border-radius:12px;background:#fff" frameborder="0" scrolling="no"></iframe>`;
+  // o quadro do Substack vem primeiro; o botão continua embaixo, para quem não vir o campo de e-mail
+  if (LIVE && url) box.insertAdjacentHTML("afterbegin", `<iframe src="${url}/embed" title="Inscrição no Substack de Vinik" style="width:100%;height:320px;border:1px solid var(--rule);border-radius:12px;background:#fff;margin-bottom:18px" frameborder="0" scrolling="no"></iframe>`);
 });
 
 /* ---------- copiar e-mail ---------- */
