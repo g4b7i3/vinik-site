@@ -3,6 +3,17 @@
 import json, os, re, shutil, glob, html as H
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+
+
+def _ver(rel):
+    # muda sempre que o arquivo muda: o navegador baixa a versão nova na hora
+    import hashlib
+    with open(os.path.join(ROOT, rel), "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()[:10]
+
+
+VER_CSS = _ver("assets/css/site.css")
+VER_JS = _ver("assets/js/site.js")
 OUT = os.path.join(ROOT, "public")
 SITE = "https://vinikautor.com.br"
 
@@ -121,7 +132,7 @@ def head(title, desc, book=None, og=None, path="", ld=None, noindex=False):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{FONTS}">
-<link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/site.css?v={VER_CSS}">
 <style>{cores}</style>
 {ldj}</head>
 <body>
@@ -162,7 +173,7 @@ def foot():
     <div class="legal"><span>{esc(G.get("rodape_direitos", ""))}</span><span>{esc(G.get("rodape_local", ""))}</span></div>
   </div>
 </footer>
-<script src="assets/js/site.js"></script>
+<script src="assets/js/site.js?v={VER_JS}"></script>
 </body>
 </html>
 """
