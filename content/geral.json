@@ -1,0 +1,22 @@
+{
+  "seo_titulo": "Vinik · Escritor | 60 Milhas e Semente do Escárnio",
+  "seo_descricao": "Site oficial de Vinik, escritor maranhense, autor de 60 Milhas e Semente do Escárnio. Livros, avaliações de leitores, notícias e os próximos lançamentos.",
+  "imagem_compartilhamento": "assets/img/livros-mato.jpg",
+  "autor_resumo": "Escritor e atleta maranhense, autor de 60 Milhas – A história de Eddie e Semente do Escárnio.",
+  "cor_amarela": "#f3e13a",
+  "cor_vermelha": "#d8322a",
+  "email": "vinikautor@gmail.com",
+  "instagram": "https://www.instagram.com/vinikescritor",
+  "instagram_nome": "@vinikescritor",
+  "tiktok": "https://www.tiktok.com/@vinikautor",
+  "tiktok_nome": "@vinikautor",
+  "substack": "https://vinikautor.substack.com",
+  "substack_nome": "vinikautor",
+  "letreiro": [
+    "Finalista do Concurso de Prosa e Poesia da Universidade Estadual do Maranhão",
+    "Selecionado no I Concurso Literário “Memórias e Vozes do Maranhão”, da Defensoria Pública do Estado do Maranhão",
+    "Mais de 4 mil livros vendidos"
+  ],
+  "rodape_direitos": "© 2026 Vinik. Todos os direitos reservados.",
+  "rodape_local": "São Luís · Maranhão"
+}

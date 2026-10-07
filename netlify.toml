@@ -1,5 +1,7 @@
+# A cada publicação a Netlify roda o build.py, que monta o site em public/
 [build]
-  publish = "."
+  command = "python3 build.py"
+  publish = "public"
   functions = "netlify/functions"
 
 [[redirects]]
@@ -20,3 +22,7 @@
   for = "/media/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+    Cache-Control = "no-cache"

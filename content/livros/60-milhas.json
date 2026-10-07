@@ -1,0 +1,66 @@
+{
+  "titulo": "60 Milhas",
+  "subtitulo": "A história de Eddie",
+  "endereco": "60-milhas",
+  "ordem": 1,
+  "visivel": true,
+  "menu": "60 Milhas",
+  "nome_avaliacoes": "60 Milhas",
+  "tema": "amarelo",
+  "rotulo_card": "Drama · 2024",
+  "linha_card": "A história de Eddie",
+  "rotulo_pagina": "Romance · drama · 2024",
+  "nota": 4.8,
+  "total_avaliacoes": 64,
+  "sinopse_curta": "Em 1946, um garoto de 16 anos vive uma realidade hostil em Florence, Oregon. Criado sob o domínio de um pai abusivo, Eddie e sua mãe sobrevivem à violência que atravessa suas vidas. Para ele, correr é o único escape, a única forma de vislumbrar um futuro melhor.",
+  "sinopse": "Em 1946, um garoto de 16 anos vive uma realidade hostil em Florence, Oregon. Criado sob o domínio de um pai abusivo, Eddie e sua mãe sobrevivem à violência que atravessa suas vidas. Para ele, correr é o único escape, a única forma de vislumbrar um futuro melhor.\n\nQuando uma corrida é anunciada com uma enorme premiação em dinheiro, Eddie enxerga a chance de mudar o próprio destino. Só que isso exigirá mais do que resistência física: terá de confrontar o passado e descobrir até onde está disposto a ir pela liberdade.",
+  "ficha": [
+    "Vinik. S",
+    "Florence, Oregon · 1946",
+    "E-book e impresso",
+    "14 × 21 cm"
+  ],
+  "amazon": "https://a.co/d/0529XXPd",
+  "uiclap": "https://loja.uiclap.com/titulo/ua71283",
+  "capa_frente": "assets/img/60-front.jpg",
+  "capa_verso": "assets/img/60-back.jpg",
+  "lombada": "assets/img/60-spine.jpg",
+  "angulo": -26,
+  "citacoes": [
+    {
+      "texto": "Um salto de fé diante das adversidades. Uma história emocionante de descobertas, triunfo e liberdade.",
+      "autor": "Kelly Kaliban, autora de *Entre Guerra*"
+    },
+    {
+      "texto": "60 Milhas é uma história sobre resistência, redenção e o poder do espírito humano para superar as adversidades mais sombrias, provando que a corrida mais importante é aquela que fazemos em busca de nós mesmos.",
+      "autor": "Chris Piloto, criadora do @loop.literario"
+    },
+    {
+      "texto": "Uma história incrível, que aborda a luta de um jovem para conseguir fazer o que ama. Emocionante!",
+      "autor": "Carol Scagliusi, criadora do @carolexploramundos"
+    }
+  ],
+  "trailer_mostrar": true,
+  "trailer_video": "media/booktrailer_60milhas.mp4",
+  "trailer_capa": "media/booktrailer_poster.jpg",
+  "trailer_rotulo": "Book trailer",
+  "trailer_titulo": "Assista à corrida.",
+  "trailer_texto": "Um minuto com Eddie, a floresta e as avaliações de quem já leu.",
+  "avaliacoes_titulo": "Quem correu com Eddie",
+  "extra_mostrar": true,
+  "extra_tipo": "foto_texto",
+  "extra_rotulo": "Do autor",
+  "extra_titulo": "Escrito por quem corre.",
+  "extra_texto": "Atleta e dez vezes medalhista estadual de atletismo, Vinik levou sua experiência para a ficção em uma história emocionante.",
+  "extra_foto": "assets/img/trilha-caderno.jpg",
+  "extra_foto_descricao": "Vinik anotando num caderno, numa trilha de mata",
+  "extra_botao_texto": "Sobre o autor",
+  "extra_botao_link": "sobre.html",
+  "extra_fotos": [],
+  "leia_tambem_botao": "Conheça a história de Eddie",
+  "seo_titulo": "60 Milhas – A história de Eddie · Vinik",
+  "seo_descricao": "60 Milhas, romance de Vinik: em 1946, um garoto de 16 anos vê numa corrida a chance de se libertar de um pai abusivo. Avaliações, book trailer e onde comprar.",
+  "isbn": "9786501209302",
+  "genero": "Romance; Drama",
+  "data_publicacao": "2024-11"
+}

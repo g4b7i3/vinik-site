@@ -1,0 +1,75 @@
+{
+  "titulo": "Semente do Escárnio",
+  "subtitulo": "",
+  "endereco": "semente-do-escarnio",
+  "ordem": 2,
+  "visivel": true,
+  "menu": "Semente do Escárnio",
+  "nome_avaliacoes": "Semente do Escárnio",
+  "tema": "vermelho",
+  "rotulo_card": "Suspense psicológico · 2026",
+  "linha_card": "Uma novela de Vinik",
+  "rotulo_pagina": "Novela · suspense psicológico · 2026",
+  "nota": 4.6,
+  "total_avaliacoes": 11,
+  "sinopse_curta": "Um crime brutal rompe a tranquilidade da N Street. Movido pela dor da perda da esposa e pelo dever, o detetive Steven vê-se envolvido em uma investigação que o coloca diante dos limites da mente humana. Um suspense psicológico em que o mal não surge por acaso; ele é cultivado.",
+  "sinopse": "Um crime brutal rompe a tranquilidade da N Street. Movido pela dor da perda da esposa e pelo dever, o detetive Steven vê-se envolvido em uma investigação que o coloca diante dos limites da mente humana. Um suspense psicológico em que o mal não surge por acaso; ele é cultivado.",
+  "ficha": [
+    "Vinik. S",
+    "Sacramento · N Street",
+    "E-book e impresso",
+    "14 × 21 cm"
+  ],
+  "amazon": "https://a.co/d/0crmXEVM",
+  "uiclap": "https://loja.uiclap.com/titulo/ua156542",
+  "capa_frente": "assets/img/semente-front.jpg",
+  "capa_verso": "assets/img/semente-back.jpg",
+  "lombada": "assets/img/semente-spine.jpg",
+  "angulo": 26,
+  "citacoes": [
+    {
+      "texto": "Em 60 Milhas, me emocionei; em Semente do Escárnio, fiquei impactado por um suspense denso e dramático.",
+      "autor": "@eduardopearljam"
+    },
+    {
+      "texto": "Com um suspense ágil, o autor revela que até os monstros possuem uma história.",
+      "autor": "@leitor_oculto"
+    }
+  ],
+  "trailer_mostrar": false,
+  "trailer_video": "",
+  "trailer_capa": "",
+  "trailer_rotulo": "",
+  "trailer_titulo": "",
+  "trailer_texto": "",
+  "avaliacoes_titulo": "Ninguém consegue parar de ler",
+  "extra_mostrar": true,
+  "extra_tipo": "galeria",
+  "extra_rotulo": "Atmosfera",
+  "extra_titulo": "O mal não surge por acaso.",
+  "extra_texto": "",
+  "extra_foto": "",
+  "extra_foto_descricao": "",
+  "extra_botao_texto": "",
+  "extra_botao_link": "",
+  "extra_fotos": [
+    {
+      "foto": "assets/img/mao-rosto.jpg",
+      "descricao": "Vinik cobrindo parte do rosto com a mão"
+    },
+    {
+      "foto": "assets/img/borrado-curvado.jpg",
+      "descricao": "Figura em movimento borrado diante de um foco de luz"
+    },
+    {
+      "foto": "assets/img/poltrona.jpg",
+      "descricao": "Vinik numa poltrona antiga, ao lado de um tinteiro e de um livro"
+    }
+  ],
+  "leia_tambem_botao": "Conheça o suspense",
+  "seo_titulo": "Semente do Escárnio · Vinik",
+  "seo_descricao": "Semente do Escárnio, suspense psicológico de Vinik: um crime brutal na N Street e um detetive diante dos limites da mente humana.",
+  "isbn": "",
+  "genero": "Novela; Suspense psicológico",
+  "data_publicacao": "2026"
+}

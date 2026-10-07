@@ -1,0 +1,83 @@
+{
+  "hero_imagem": "assets/img/hero-retrato.jpg",
+  "hero_imagem_descricao": "Vinik escrevendo, em preto e branco, com sombras de folhas",
+  "hero_botao1_texto": "Conheça os livros",
+  "hero_botao1_link": "#livros",
+  "hero_botao2_texto": "Ler as avaliações",
+  "hero_botao2_link": "#avaliacoes",
+  "numeros": [
+    {
+      "valor": "4.000+",
+      "estrelas": false,
+      "rotulo": "livros vendidos"
+    },
+    {
+      "valor": "4,8",
+      "estrelas": true,
+      "rotulo": "60 Milhas"
+    },
+    {
+      "valor": "4,6",
+      "estrelas": true,
+      "rotulo": "Semente do Escárnio"
+    }
+  ],
+  "secoes": [
+    {
+      "secao": "letreiro",
+      "visivel": true
+    },
+    {
+      "secao": "avaliacoes",
+      "visivel": true
+    },
+    {
+      "secao": "livros",
+      "visivel": true
+    },
+    {
+      "secao": "trailer",
+      "visivel": true
+    },
+    {
+      "secao": "premios",
+      "visivel": true
+    },
+    {
+      "secao": "autor",
+      "visivel": true
+    },
+    {
+      "secao": "lancamentos",
+      "visivel": true
+    },
+    {
+      "secao": "assinatura",
+      "visivel": true
+    },
+    {
+      "secao": "noticias",
+      "visivel": true
+    }
+  ],
+  "avaliacoes_rotulo": "Avaliações na Amazon",
+  "avaliacoes_titulo": "O que dizem os leitores",
+  "livros_rotulo": "Os livros",
+  "livros_titulo": "Duas histórias, dois mundos.",
+  "trailer_titulo": "60 Milhas em um minuto.",
+  "trailer_livro": "60-milhas",
+  "trailer_video": "media/booktrailer_60milhas.mp4",
+  "trailer_capa": "media/booktrailer_poster.jpg",
+  "premios_rotulo": "Prêmios e seleções",
+  "premios_titulo": "Reconhecimento",
+  "autor_foto": "assets/img/banquinho.jpg",
+  "autor_foto_descricao": "Vinik apoiado num banco alto, olhando para a câmera",
+  "autor_rotulo": "O autor",
+  "autor_titulo": "Gabriel Vinícius,\no Vinik.",
+  "autor_texto": "Nasceu no interior do Maranhão. Começou a escrever aos 12 anos, terminou o primeiro livro aos 18 e publicou aos 25. Escritor e atleta, foi dez vezes medalhista estadual no atletismo.\n\nPublicou de forma independente *60 Milhas – A história de Eddie* em novembro de 2024 e, em 2026, o suspense *Semente do Escárnio*. Somados, os livros já passam de 4 mil exemplares vendidos.",
+  "autor_destaque": "**60 Milhas** foi lido e apreciado por José Sarney, imortal da Academia Brasileira de Letras.",
+  "autor_botao": "Conheça a trajetória",
+  "noticias_rotulo": "Notícias",
+  "noticias_titulo": "Do caderno de Vinik",
+  "noticias_quantidade": 3
+}

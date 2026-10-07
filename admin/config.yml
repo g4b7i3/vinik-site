@@ -1,10 +1,14 @@
-# Painel de edição do site (Decap CMS)
-# Repositório do site no GitHub
+# Painel de edição do site (Decap CMS) — vinikautor.com.br/admin
 backend:
   name: github
   repo: g4b7i3/vinik-site
   branch: main
   base_url: https://api.netlify.com
+  commit_messages:
+    update: "Painel: atualiza {{slug}}"
+    create: "Painel: cria {{slug}}"
+    delete: "Painel: remove {{slug}}"
+    uploadMedia: "Painel: envia {{path}}"
 
 locale: pt
 media_folder: "assets/img/uploads"
@@ -12,70 +16,323 @@ public_folder: "assets/img/uploads"
 site_url: https://vinikautor.com.br
 display_url: https://vinikautor.com.br
 
+# Dica de formatação nos campos de texto: *itálico*  **negrito**  [texto](link)
+# Linha em branco = novo parágrafo.
+
 collections:
-  - name: conteudo
-    label: Conteúdo do site
+
+  # ------------------------------------------------------------------ PÁGINAS
+  - name: paginas
+    label: "Páginas"
     editor: { preview: false }
     files:
+
+      - name: inicio
+        label: "Página inicial"
+        file: content/inicio.json
+        fields:
+          - { label: "Foto de fundo do topo", name: hero_imagem, widget: image }
+          - { label: "Descrição da foto do topo (acessibilidade)", name: hero_imagem_descricao, widget: string, required: false }
+          - { label: "Botão 1 · texto", name: hero_botao1_texto, widget: string, required: false }
+          - { label: "Botão 1 · link", name: hero_botao1_link, widget: string, required: false, hint: "Ex.: #livros, 60-milhas.html ou um link completo" }
+          - { label: "Botão 2 · texto", name: hero_botao2_texto, widget: string, required: false }
+          - { label: "Botão 2 · link", name: hero_botao2_link, widget: string, required: false }
+          - label: "Números do topo"
+            name: numeros
+            widget: list
+            summary: "{{fields.valor}} · {{fields.rotulo}}"
+            fields:
+              - { label: "Número", name: valor, widget: string, hint: "Ex.: 4.000+ ou 4,8" }
+              - { label: "Mostrar estrelas", name: estrelas, widget: boolean, default: false }
+              - { label: "Legenda", name: rotulo, widget: string }
+          - label: "Seções (arraste para mudar a ordem; desligue para esconder)"
+            name: secoes
+            widget: list
+            summary: "{{fields.secao}}"
+            fields:
+              - label: "Seção"
+                name: secao
+                widget: select
+                options:
+                  - { label: "Letreiro amarelo de destaques", value: letreiro }
+                  - { label: "Avaliações dos leitores", value: avaliacoes }
+                  - { label: "Os livros", value: livros }
+                  - { label: "Book trailer", value: trailer }
+                  - { label: "Prêmios e seleções", value: premios }
+                  - { label: "O autor", value: autor }
+                  - { label: "Próximos lançamentos", value: lancamentos }
+                  - { label: "Assinatura (Substack)", value: assinatura }
+                  - { label: "Notícias", value: noticias }
+              - { label: "Mostrar no site", name: visivel, widget: boolean, default: true }
+          - { label: "Avaliações · rótulo", name: avaliacoes_rotulo, widget: string }
+          - { label: "Avaliações · título", name: avaliacoes_titulo, widget: string }
+          - { label: "Livros · rótulo", name: livros_rotulo, widget: string }
+          - { label: "Livros · título", name: livros_titulo, widget: string }
+          - { label: "Trailer · título", name: trailer_titulo, widget: string, required: false }
+          - { label: "Trailer · livro dos botões de compra", name: trailer_livro, widget: relation, collection: livros, value_field: endereco, search_fields: [titulo], display_fields: [titulo], required: false }
+          - { label: "Trailer · vídeo (mp4)", name: trailer_video, widget: file, required: false }
+          - { label: "Trailer · imagem de capa do vídeo", name: trailer_capa, widget: image, required: false }
+          - { label: "Prêmios · rótulo", name: premios_rotulo, widget: string }
+          - { label: "Prêmios · título", name: premios_titulo, widget: string }
+          - { label: "Autor · foto", name: autor_foto, widget: image }
+          - { label: "Autor · descrição da foto", name: autor_foto_descricao, widget: string, required: false }
+          - { label: "Autor · rótulo", name: autor_rotulo, widget: string }
+          - { label: "Autor · título", name: autor_titulo, widget: text, hint: "Use Enter para quebrar a linha" }
+          - { label: "Autor · texto", name: autor_texto, widget: text }
+          - { label: "Autor · frase em destaque", name: autor_destaque, widget: text, required: false }
+          - { label: "Autor · texto do botão", name: autor_botao, widget: string }
+          - { label: "Notícias · rótulo", name: noticias_rotulo, widget: string }
+          - { label: "Notícias · título", name: noticias_titulo, widget: string }
+          - { label: "Notícias · quantas aparecem na inicial", name: noticias_quantidade, widget: number, default: 3, min: 1, max: 12 }
+
+      - name: sobre
+        label: "Sobre"
+        file: content/sobre.json
+        fields:
+          - { label: "Rótulo", name: rotulo, widget: string }
+          - { label: "Título", name: titulo, widget: string }
+          - { label: "Texto", name: texto, widget: text }
+          - { label: "Foto principal", name: foto, widget: image }
+          - { label: "Descrição da foto", name: foto_descricao, widget: string, required: false }
+          - { label: "Trajetória · rótulo", name: trajetoria_rotulo, widget: string }
+          - { label: "Trajetória · título", name: trajetoria_titulo, widget: string }
+          - label: "Trajetória"
+            name: trajetoria
+            widget: list
+            summary: "{{fields.quando}} · {{fields.texto}}"
+            fields:
+              - { label: "Quando", name: quando, widget: string, hint: "Ex.: 2026, Nov 2024, 12 anos" }
+              - { label: "O que aconteceu", name: texto, widget: string }
+          - { label: "Trajetória · foto", name: trajetoria_foto, widget: image }
+          - { label: "Trajetória · descrição da foto", name: trajetoria_foto_descricao, widget: string, required: false }
+          - { label: "Galeria · rótulo", name: galeria_rotulo, widget: string }
+          - { label: "Galeria · título", name: galeria_titulo, widget: string }
+          - label: "Galeria de fotos"
+            name: galeria
+            widget: list
+            summary: "{{fields.descricao}}"
+            fields:
+              - { label: "Foto", name: foto, widget: image }
+              - { label: "Descrição", name: descricao, widget: string, required: false }
+          - { label: "Imprensa · rótulo", name: imprensa_rotulo, widget: string }
+          - { label: "Imprensa · título", name: imprensa_titulo, widget: string }
+          - { label: "Bio curta para divulgação", name: bio_curta, widget: text }
+          - label: "Fotos para imprensa"
+            name: imprensa_fotos
+            widget: list
+            summary: "{{fields.nome}}"
+            fields:
+              - { label: "Nome", name: nome, widget: string }
+              - { label: "Foto (prévia)", name: foto, widget: image }
+              - { label: "Foto em alta resolução", name: alta, widget: image, required: false }
+          - { label: "Texto do botão de convite", name: imprensa_botao, widget: string }
+          - { label: "SEO · título da aba", name: seo_titulo, widget: string }
+          - { label: "SEO · descrição para o Google", name: seo_descricao, widget: text }
+
+      - name: contato
+        label: "Contato"
+        file: content/contato.json
+        fields:
+          - { label: "Rótulo", name: rotulo, widget: string }
+          - { label: "Título", name: titulo, widget: string }
+          - { label: "Texto", name: texto, widget: text }
+          - { label: "Opções de assunto", name: assuntos, widget: list, field: { label: "Assunto", name: assunto, widget: string } }
+          - { label: "Texto do botão", name: botao, widget: string }
+          - { label: "Mensagem depois de enviar", name: mensagem_sucesso, widget: string }
+
+      - name: noticias_pagina
+        label: "Notícias (topo da página)"
+        file: content/noticias_pagina.json
+        fields:
+          - { label: "Rótulo", name: rotulo, widget: string }
+          - { label: "Título", name: titulo, widget: string }
+          - { label: "Texto", name: texto, widget: text }
+
+      - name: assinatura
+        label: "Assinatura (Substack)"
+        file: content/assinatura.json
+        fields:
+          - { label: "Selo", name: selo, widget: string, required: false, hint: "Deixe vazio para esconder" }
+          - { label: "Título", name: titulo, widget: string }
+          - { label: "Texto", name: texto, widget: text }
+          - { label: "Observação", name: nota, widget: string }
+          - { label: "Texto do botão", name: botao, widget: string }
+
+  # ------------------------------------------------------------------ LIVROS
+  - name: livros
+    label: "Livros"
+    label_singular: "livro"
+    folder: content/livros
+    extension: json
+    format: json
+    create: true
+    delete: true
+    slug: "{{fields.endereco}}"
+    identifier_field: titulo
+    summary: "{{fields.ordem}} · {{fields.titulo}}"
+    editor: { preview: false }
+    fields:
+      - { label: "Título", name: titulo, widget: string }
+      - { label: "Subtítulo", name: subtitulo, widget: string, required: false }
+      - { label: "Endereço da página", name: endereco, widget: string, pattern: ["^[a-z0-9-]+$", "Use só letras minúsculas, números e hífen"], hint: "Ex.: a-ultima-chance → vinikautor.com.br/a-ultima-chance.html. Não mude depois de publicado." }
+      - { label: "Ordem no site", name: ordem, widget: number, default: 3 }
+      - { label: "Mostrar no site", name: visivel, widget: boolean, default: true }
+      - { label: "Nome no menu", name: menu, widget: string, required: false }
+      - { label: "Cor do livro", name: tema, widget: select, options: [{ label: "Amarelo (estilo 60 Milhas)", value: amarelo }, { label: "Vermelho (estilo Semente)", value: vermelho }], default: amarelo }
+      - { label: "Nome nas avaliações", name: nome_avaliacoes, widget: string, hint: "Igual ao que você escolhe em Avaliações. Normalmente o título." }
+      - { label: "Rótulo no cartão da inicial", name: rotulo_card, widget: string, hint: "Ex.: Drama · 2024" }
+      - { label: "Linha do cartão", name: linha_card, widget: string, required: false, hint: "Ex.: Uma novela de Vinik" }
+      - { label: "Rótulo na página do livro", name: rotulo_pagina, widget: string, hint: "Ex.: Romance · drama · 2024" }
+      - { label: "Nota na Amazon", name: nota, widget: number, value_type: float, step: 0.1, required: false }
+      - { label: "Total de avaliações na Amazon", name: total_avaliacoes, widget: number, required: false }
+      - { label: "Sinopse curta (cartões)", name: sinopse_curta, widget: text }
+      - { label: "Sinopse completa (página do livro)", name: sinopse, widget: text }
+      - { label: "Ficha (linhas pequenas)", name: ficha, widget: list, field: { label: "Item", name: item, widget: string }, required: false }
+      - { label: "Link da Amazon", name: amazon, widget: string, required: false }
+      - { label: "Link da UICLAP", name: uiclap, widget: string, required: false }
+      - { label: "Capa (frente)", name: capa_frente, widget: image }
+      - { label: "Quarta capa (verso)", name: capa_verso, widget: image, required: false }
+      - { label: "Lombada", name: lombada, widget: image, required: false }
+      - { label: "Ângulo do livro 3D", name: angulo, widget: number, default: -26, hint: "Negativo vira para um lado, positivo para o outro" }
+      - label: "Frases de quem leu (citações)"
+        name: citacoes
+        widget: list
+        required: false
+        summary: "{{fields.autor}}"
+        fields:
+          - { label: "Frase", name: texto, widget: text }
+          - { label: "Quem disse", name: autor, widget: string }
+      - { label: "Trailer · mostrar", name: trailer_mostrar, widget: boolean, default: false }
+      - { label: "Trailer · vídeo (mp4)", name: trailer_video, widget: file, required: false }
+      - { label: "Trailer · capa do vídeo", name: trailer_capa, widget: image, required: false }
+      - { label: "Trailer · rótulo", name: trailer_rotulo, widget: string, required: false }
+      - { label: "Trailer · título", name: trailer_titulo, widget: string, required: false }
+      - { label: "Trailer · texto", name: trailer_texto, widget: text, required: false }
+      - { label: "Título da seção de avaliações", name: avaliacoes_titulo, widget: string, required: false }
+      - { label: "Bloco extra · mostrar", name: extra_mostrar, widget: boolean, default: false }
+      - { label: "Bloco extra · tipo", name: extra_tipo, widget: select, options: [{ label: "Foto + texto", value: foto_texto }, { label: "Galeria de fotos", value: galeria }], default: foto_texto }
+      - { label: "Bloco extra · rótulo", name: extra_rotulo, widget: string, required: false }
+      - { label: "Bloco extra · título", name: extra_titulo, widget: string, required: false }
+      - { label: "Bloco extra · texto", name: extra_texto, widget: text, required: false }
+      - { label: "Bloco extra · foto (tipo foto + texto)", name: extra_foto, widget: image, required: false }
+      - { label: "Bloco extra · descrição da foto", name: extra_foto_descricao, widget: string, required: false }
+      - { label: "Bloco extra · texto do botão", name: extra_botao_texto, widget: string, required: false }
+      - { label: "Bloco extra · link do botão", name: extra_botao_link, widget: string, required: false }
+      - label: "Bloco extra · fotos (tipo galeria)"
+        name: extra_fotos
+        widget: list
+        required: false
+        fields:
+          - { label: "Foto", name: foto, widget: image }
+          - { label: "Descrição", name: descricao, widget: string, required: false }
+      - { label: "Botão em “Leia também” nas outras páginas", name: leia_tambem_botao, widget: string, required: false }
+      - { label: "SEO · título da aba", name: seo_titulo, widget: string, required: false }
+      - { label: "SEO · descrição para o Google", name: seo_descricao, widget: text, required: false }
+      - { label: "ISBN", name: isbn, widget: string, required: false }
+      - { label: "Gênero (Google)", name: genero, widget: string, required: false }
+      - { label: "Data de publicação", name: data_publicacao, widget: string, required: false, hint: "Ex.: 2024-11 ou 2026" }
+
+  # ------------------------------------------------------------------ CONTEÚDO
+  - name: conteudo
+    label: "Conteúdo"
+    editor: { preview: false }
+    files:
+
+      - name: lancamentos
+        label: "Próximos lançamentos"
+        file: content/lancamentos.json
+        fields:
+          - label: "Lançamentos"
+            name: itens
+            widget: list
+            summary: "{{fields.titulo}} · {{fields.status}}"
+            fields:
+              - { label: "Mostrar no site", name: visivel, widget: boolean, default: true }
+              - { label: "Estilo", name: estilo, widget: select, options: [{ label: "Dossiê (arquivo secreto, com animação)", value: dossie }, { label: "Frases que aparecem uma a uma", value: frases }], default: frases }
+              - { label: "Âncora (sem espaços)", name: ancora, widget: string, hint: "Ex.: a-ultima-chance" }
+              - { label: "Título", name: titulo, widget: string }
+              - { label: "Rótulo acima do título", name: rotulo, widget: string, required: false }
+              - { label: "Status", name: status, widget: string, required: false, hint: "Ex.: Em breve, Pré-venda, Lançado" }
+              - { label: "Sinopse (estilo dossiê)", name: sinopse, widget: text, required: false }
+              - { label: "Frases (estilo frases)", name: frases, widget: list, required: false, field: { label: "Frase", name: frase, widget: string } }
+              - { label: "Faixa que passa no topo (estilo dossiê)", name: faixa, widget: string, required: false }
+              - { label: "Carimbo (estilo dossiê)", name: carimbo, widget: string, required: false }
+              - { label: "Ficha · texto (estilo dossiê)", name: ficha, widget: string, required: false }
+              - { label: "Ficha · situação (estilo dossiê)", name: ficha_status, widget: string, required: false }
+              - { label: "Imagem de fundo", name: imagem_fundo, widget: image, required: false }
+              - { label: "Botão · texto", name: botao_texto, widget: string, required: false }
+              - { label: "Botão · link", name: botao_link, widget: string, required: false, hint: "Na pré-venda, troque por link da Amazon" }
+              - { label: "Mostrar também na página do livro", name: livro_relacionado, widget: relation, collection: livros, value_field: endereco, search_fields: [titulo], display_fields: [titulo], required: false }
+
       - name: noticias
-        label: Notícias
+        label: "Notícias"
         file: content/noticias.json
         fields:
-          - label: Notícias
+          - label: "Notícias"
             name: posts
             widget: list
             summary: "{{fields.data}} · {{fields.titulo}}"
             fields:
-              - { label: Título, name: titulo, widget: string }
-              - { label: Data, name: data, widget: datetime, format: "YYYY-MM-DD", date_format: "DD/MM/YYYY", time_format: false }
-              - { label: Imagem, name: imagem, widget: image, required: false }
-              - { label: Resumo (aparece no cartão), name: resumo, widget: text }
-              - { label: Texto completo, name: corpo, widget: text }
+              - { label: "Título", name: titulo, widget: string }
+              - { label: "Data", name: data, widget: datetime, format: "YYYY-MM-DD", date_format: "DD/MM/YYYY", time_format: false }
+              - { label: "Imagem", name: imagem, widget: image, required: false }
+              - { label: "Resumo (aparece no cartão)", name: resumo, widget: text }
+              - { label: "Texto completo", name: corpo, widget: text }
 
       - name: avaliacoes
-        label: Avaliações dos leitores
+        label: "Avaliações dos leitores"
         file: content/avaliacoes.json
         fields:
-          - label: Notas na Amazon
-            name: notas
-            widget: object
-            fields:
-              - label: 60 Milhas
-                name: "60 Milhas"
-                widget: object
-                fields:
-                  - { label: Média, name: media, widget: number, value_type: float, step: 0.1 }
-                  - { label: Total de avaliações, name: total, widget: number }
-              - label: Semente do Escárnio
-                name: "Semente do Escárnio"
-                widget: object
-                fields:
-                  - { label: Média, name: media, widget: number, value_type: float, step: 0.1 }
-                  - { label: Total de avaliações, name: total, widget: number }
-          - label: Avaliações
+          - label: "Avaliações"
             name: avaliacoes
             widget: list
             summary: "{{fields.livro}} · {{fields.nome}}"
             fields:
-              - { label: Livro, name: livro, widget: select, options: ["60 Milhas", "Semente do Escárnio"] }
-              - { label: Nome do leitor, name: nome, widget: string }
-              - { label: Estrelas, name: estrelas, widget: number, min: 1, max: 5, default: 5 }
-              - { label: Título da avaliação, name: titulo, widget: string }
-              - { label: Data, name: data, widget: datetime, format: "YYYY-MM-DD", date_format: "DD/MM/YYYY", time_format: false }
-              - { label: Texto, name: texto, widget: text }
+              - { label: "Livro", name: livro, widget: relation, collection: livros, value_field: nome_avaliacoes, search_fields: [titulo], display_fields: [titulo] }
+              - { label: "Nome do leitor", name: nome, widget: string }
+              - { label: "Estrelas", name: estrelas, widget: number, min: 1, max: 5, default: 5 }
+              - { label: "Título da avaliação", name: titulo, widget: string }
+              - { label: "Data", name: data, widget: datetime, format: "YYYY-MM-DD", date_format: "DD/MM/YYYY", time_format: false }
+              - { label: "Texto", name: texto, widget: text }
 
       - name: premios
-        label: Prêmios e seleções
+        label: "Prêmios e seleções"
         file: content/premios.json
         fields:
-          - label: Prêmios
+          - label: "Prêmios"
             name: premios
             widget: list
             summary: "{{fields.ano}} · {{fields.titulo}}"
             fields:
-              - { label: Ano, name: ano, widget: number }
-              - { label: Concurso ou prêmio, name: titulo, widget: string }
-              - { label: Instituição, name: instituicao, widget: string }
-              - { label: Resultado, name: resultado, widget: string }
-              - { label: Obra, name: obra, widget: string }
-              - { label: Descrição, name: descricao, widget: text }
+              - { label: "Ano", name: ano, widget: number }
+              - { label: "Concurso ou prêmio", name: titulo, widget: string }
+              - { label: "Instituição", name: instituicao, widget: string }
+              - { label: "Resultado", name: resultado, widget: string }
+              - { label: "Obra", name: obra, widget: string }
+              - { label: "Descrição", name: descricao, widget: text }
+
+  # ------------------------------------------------------------------ CONFIGURAÇÕES
+  - name: config
+    label: "Configurações gerais"
+    editor: { preview: false }
+    files:
+      - name: geral
+        label: "Redes, cores, letreiro e rodapé"
+        file: content/geral.json
+        fields:
+          - { label: "Letreiro amarelo (destaques)", name: letreiro, widget: list, field: { label: "Frase", name: frase, widget: string } }
+          - { label: "Cor amarela (60 Milhas, botões)", name: cor_amarela, widget: color }
+          - { label: "Cor vermelha (Semente)", name: cor_vermelha, widget: color }
+          - { label: "E-mail", name: email, widget: string }
+          - { label: "Instagram · link", name: instagram, widget: string, required: false }
+          - { label: "Instagram · nome", name: instagram_nome, widget: string, required: false }
+          - { label: "TikTok · link", name: tiktok, widget: string, required: false }
+          - { label: "TikTok · nome", name: tiktok_nome, widget: string, required: false }
+          - { label: "Substack · link", name: substack, widget: string, required: false }
+          - { label: "Substack · nome", name: substack_nome, widget: string, required: false }
+          - { label: "Rodapé · direitos", name: rodape_direitos, widget: string }
+          - { label: "Rodapé · local", name: rodape_local, widget: string }
+          - { label: "Google · título do site", name: seo_titulo, widget: string }
+          - { label: "Google · descrição do site", name: seo_descricao, widget: text }
+          - { label: "Resumo do autor (Google)", name: autor_resumo, widget: text }
+          - { label: "Imagem ao compartilhar o link (WhatsApp etc.)", name: imagem_compartilhamento, widget: image }

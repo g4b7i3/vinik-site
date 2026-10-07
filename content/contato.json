@@ -1,0 +1,15 @@
+{
+  "rotulo": "Contato",
+  "titulo": "Vamos conversar.",
+  "texto": "Eventos, entrevistas, clubes do livro, escolas e parcerias.",
+  "assuntos": [
+    "Evento ou palestra",
+    "Entrevista",
+    "Clube do livro ou escola",
+    "Parceria",
+    "Mensagem de leitor",
+    "Outro"
+  ],
+  "botao": "Enviar mensagem",
+  "mensagem_sucesso": "Mensagem enviada. Vinik responde pelo e-mail que você informou."
+}

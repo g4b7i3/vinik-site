@@ -1,0 +1,102 @@
+{
+  "seo_titulo": "Sobre Vinik",
+  "seo_descricao": "Gabriel Vinícius, o Vinik: escritor e atleta maranhense, autor de 60 Milhas e Semente do Escárnio.",
+  "rotulo": "Sobre",
+  "titulo": "Gabriel Vinícius, o Vinik.",
+  "texto": "Vinik nasceu no interior do Maranhão. Criava mundos e personagens desde criança; começou a escrever aos 12 anos, terminou o primeiro livro aos 18 e publicou aos 25.\n\nÉ escritor e atleta, dez vezes medalhista estadual no atletismo. Graduado em Análise de Sistemas, cursa Educação Física e é ex-militar do Exército Brasileiro.\n\nPublicou de forma independente *60 Milhas – A história de Eddie* em novembro de 2024. O livro foi lido e apreciado por José Sarney, imortal da Academia Brasileira de Letras. Em 2026 veio o suspense *Semente do Escárnio*. Somados, os livros já passam de 4 mil exemplares vendidos.\n\nTem várias histórias em desenvolvimento e é caminhando que encontra ideias para escrever. Apaixonado por filosofia, acredita que todo ser humano deveria, ao menos uma vez na vida, ler Platão.",
+  "foto": "assets/img/aviao.jpg",
+  "foto_descricao": "Vinik lançando um avião de papel diante de um foco de luz",
+  "trajetoria_rotulo": "Trajetória",
+  "trajetoria_titulo": "Da primeira página aos leitores.",
+  "trajetoria": [
+    {
+      "quando": "12 anos",
+      "texto": "Começa a escrever."
+    },
+    {
+      "quando": "18 anos",
+      "texto": "Termina o primeiro livro."
+    },
+    {
+      "quando": "Nov 2024",
+      "texto": "Publica *60 Milhas – A história de Eddie* de forma independente."
+    },
+    {
+      "quando": "2026",
+      "texto": "Lança *Semente do Escárnio*. O conto *É disso que eu lembro* é selecionado no I Concurso Literário “Memórias e Vozes do Maranhão”."
+    },
+    {
+      "quando": "Em escrita",
+      "texto": "*A Última Chance*, a parte 2 de *60 Milhas*, e *O Flâneur de Santene*."
+    }
+  ],
+  "trajetoria_foto": "assets/img/maquina.jpg",
+  "trajetoria_foto_descricao": "Vinik datilografando numa máquina de escrever, ao lado de Plexus, de Henry Miller",
+  "galeria_rotulo": "Galeria",
+  "galeria_titulo": "Ensaio",
+  "galeria": [
+    {
+      "foto": "assets/img/leitura-cadeira.jpg",
+      "descricao": "Vinik lendo, apoiado no encosto de uma poltrona antiga"
+    },
+    {
+      "foto": "assets/img/borrado-bracos.jpg",
+      "descricao": "Vinik de braços abertos, com o rosto em movimento borrado"
+    },
+    {
+      "foto": "assets/img/banquinho.jpg",
+      "descricao": "Vinik apoiado num banco alto, olhando para a câmera"
+    },
+    {
+      "foto": "assets/img/buenos-aires-2.jpg",
+      "descricao": "Vinik diante de um pagode num jardim japonês"
+    },
+    {
+      "foto": "assets/img/poltrona.jpg",
+      "descricao": "Vinik numa poltrona antiga"
+    },
+    {
+      "foto": "assets/img/escalada.jpg",
+      "descricao": "Vinik rindo, como se escalasse a parede"
+    },
+    {
+      "foto": "assets/img/buenos-aires-1.jpg",
+      "descricao": "Vinik sorrindo num jardim florido"
+    },
+    {
+      "foto": "assets/img/mao-rosto.jpg",
+      "descricao": "Vinik cobrindo parte do rosto com a mão"
+    }
+  ],
+  "imprensa_rotulo": "Para imprensa e eventos",
+  "imprensa_titulo": "Kit de imprensa",
+  "bio_curta": "Gabriel Vinícius, o Vinik, é escritor e atleta maranhense. Autor de *60 Milhas – A história de Eddie* (2024) e do suspense *Semente do Escárnio* (2026), com mais de 4 mil livros vendidos. Foi finalista do Concurso de Prosa e Poesia da Universidade Estadual do Maranhão (UEMA). Teve o conto *É disso que eu lembro* selecionado no I Concurso Literário “Memórias e Vozes do Maranhão”, da Defensoria Pública do Estado do Maranhão.",
+  "imprensa_fotos": [
+    {
+      "nome": "Retrato escrevendo",
+      "foto": "assets/img/retrato-escrevendo.jpg",
+      "alta": "assets/img/press-retrato-escrevendo.jpg"
+    },
+    {
+      "nome": "Banco alto",
+      "foto": "assets/img/banquinho.jpg",
+      "alta": "assets/img/press-banquinho.jpg"
+    },
+    {
+      "nome": "Máquina de escrever",
+      "foto": "assets/img/maquina.jpg",
+      "alta": "assets/img/press-maquina.jpg"
+    },
+    {
+      "nome": "Poltrona",
+      "foto": "assets/img/poltrona.jpg",
+      "alta": "assets/img/press-poltrona.jpg"
+    },
+    {
+      "nome": "Movimento",
+      "foto": "assets/img/borrado-bracos.jpg",
+      "alta": "assets/img/press-borrado-bracos.jpg"
+    }
+  ],
+  "imprensa_botao": "Convidar para evento ou entrevista"
+}

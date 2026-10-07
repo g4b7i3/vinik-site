@@ -41,27 +41,30 @@ $$(".book").forEach(book => {
 (async () => {
   const root = $("[data-reviews]"); if (!root) return;
   let data; try { data = await getJSON("content/avaliacoes.json"); } catch { root.querySelector(".scene").innerHTML = `<p class="news-empty">Não foi possível carregar as avaliações agora.</p>`; return; }
-  const fixed = root.dataset.reviews; // "todos" | "60" | "semente"
-  const tag = r => r.livro.startsWith("60") ? "60" : "semente";
+  const fixed = root.dataset.reviews; // "todos" ou o nome do livro
+  let books = []; try { books = JSON.parse(root.dataset.books || "[]"); } catch { }
+  const bookOf = r => books.find(b => (r.livro || "") === b.k) || books.find(b => (r.livro || "").startsWith(b.k)) || null;
   const nome = n => (n === n.toUpperCase() && n.length > 3) ? n.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase()) : n.charAt(0).toUpperCase() + n.slice(1);
   const trecho = (t, max = 220) => { t = t.replace(/\s+/g, " ").trim(); if (t.length <= max) return { txt: t, cut: false }; const s = t.slice(0, max); const p = Math.max(s.lastIndexOf(". "), s.lastIndexOf("! "), s.lastIndexOf("? ")); return p > 90 ? { txt: s.slice(0, p + 1), cut: true } : { txt: s.slice(0, s.lastIndexOf(" ")) + "…", cut: true }; };
-  const ord = a => [...a].sort((x, y) => (y.estrelas - x.estrelas) || (y.texto.length - x.texto.length));
-  const A = ord(data.avaliacoes.filter(r => tag(r) === "60")), B = ord(data.avaliacoes.filter(r => tag(r) === "semente"));
-  const T = []; for (let i = 0; i < Math.max(A.length, B.length); i++) { if (A[i]) T.push(A[i]); if (B[i]) T.push(B[i]); }
-  const L = { todos: T, "60": A, semente: B };
+  const ord = a => [...a].sort((x, y) => (y.estrelas - x.estrelas) || ((y.texto || "").length - (x.texto || "").length));
+  const L = {};
+  books.forEach(b => { L[b.k] = ord(data.avaliacoes.filter(r => bookOf(r) === b)); });
+  const T = []; const mx = Math.max(0, ...books.map(b => L[b.k].length));
+  for (let i = 0; i < mx; i++) books.forEach(b => { if (L[b.k][i]) T.push(L[b.k][i]); });
+  L.todos = T;
   const scene = $(".scene", root), count = $(".count", root), bar = $(".bar i", root);
   let filtro = fixed === "todos" ? "todos" : fixed, idx = 0, dir = 1, paused = reduce, timer;
+  if (!L[filtro] || !L[filtro].length) { scene.innerHTML = `<p class="news-empty">Ainda não há avaliações aqui.</p>`; return; }
   const DUR = 8000;
   const stars = n => `<span class="stars" aria-label="${n} de 5 estrelas">${"★".repeat(n)}<span class="off">${"★".repeat(5 - n)}</span></span>`;
-  const livro = b => b === "60" ? "60 Milhas" : "Semente do Escárnio";
   function render() {
-    const r = L[filtro][idx]; if (!r) return; const b = tag(r), t = trecho(r.texto), cls = b === "60" ? "m" : "semente";
-    const who = `<div class="who"><b>${esc(nome(r.nome))}</b><small>${fmtData(r.data)} · avaliado na Amazon</small></div>`;
-    scene.innerHTML = `<div class="card enter" tabindex="0" role="button" aria-pressed="false" aria-label="Avaliação de ${esc(nome(r.nome))} sobre ${livro(b)}. Toque para ler completa." style="--dx:${dir * 40}px;--ry:${dir * -8}deg">
-      <article class="face front ${cls}"><div class="fc-top"><span class="seal">${livro(b)}</span>${stars(r.estrelas)}</div>
+    const r = L[filtro][idx]; if (!r) return; const bk = bookOf(r) || { t: r.livro, c: "m" }; const t = trecho(r.texto || ""), cls = bk.c;
+    const who = `<div class="who"><b>${esc(nome(r.nome || ""))}</b><small>${fmtData(r.data)} · avaliado na Amazon</small></div>`;
+    scene.innerHTML = `<div class="card enter" tabindex="0" role="button" aria-pressed="false" aria-label="Avaliação de ${esc(nome(r.nome || ""))} sobre ${esc(bk.t)}. Toque para ler completa." style="--dx:${dir * 40}px;--ry:${dir * -8}deg">
+      <article class="face front ${cls}"><div class="fc-top"><span class="seal">${esc(bk.t)}</span>${stars(r.estrelas)}</div>
         <div class="qmark" aria-hidden="true">“</div><h3 class="fc-title">${esc(r.titulo)}</h3><p class="fc-text">${esc(t.txt)}</p>
         <div class="fc-foot">${who}${t.cut ? `<span class="more">Ler completa ↻</span>` : ""}</div></article>
-      <article class="face back ${cls}" aria-hidden="true"><div class="fc-top"><span class="seal">${livro(b)}</span>${stars(r.estrelas)}</div>
+      <article class="face back ${cls}" aria-hidden="true"><div class="fc-top"><span class="seal">${esc(bk.t)}</span>${stars(r.estrelas)}</div>
         <h3 class="fc-title">${esc(r.titulo)}</h3><div class="full">${esc(r.texto)}</div>
         <div class="fc-foot">${who}<span class="more">Voltar ↺</span></div></article></div>`;
     const card = scene.firstElementChild;
@@ -77,15 +80,12 @@ $$(".book").forEach(book => {
   function pause(p) { paused = p; root.classList.toggle("paused", p); if (!p) { bar.classList.remove("run"); void bar.offsetWidth; if (!reduce) bar.classList.add("run"); schedule(); } }
   $(".next", root).onclick = () => { go(1); schedule(); };
   $(".prev", root).onclick = () => { go(-1); schedule(); };
-  $$(".tab", root).forEach(t => t.onclick = () => { $$(".tab", root).forEach(x => x.setAttribute("aria-selected", x === t)); filtro = t.dataset.f; idx = 0; dir = 1; render(); schedule(); });
+  $$(".tab", root).forEach(t => t.onclick = () => { if (!L[t.dataset.f] || !L[t.dataset.f].length) return; $$(".tab", root).forEach(x => x.setAttribute("aria-selected", x === t)); filtro = t.dataset.f; idx = 0; dir = 1; render(); schedule(); });
   scene.addEventListener("mouseenter", () => pause(true));
   scene.addEventListener("mouseleave", () => { if (!scene.querySelector(".flipped")) pause(false); });
   let x0 = null;
   scene.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
   scene.addEventListener("touchend", e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) { go(dx < 0 ? 1 : -1); schedule(); } });
-  // notas
-  const sc = $("[data-score]");
-  if (sc && data.notas) { const ks = fixed === "60" ? ["60 Milhas"] : fixed === "semente" ? ["Semente do Escárnio"] : Object.keys(data.notas); sc.innerHTML = ks.map(k => `<li><b>${data.notas[k].media.toLocaleString("pt-BR", { minimumFractionDigits: 1 })}</b><span class="s">★★★★★</span><span>${data.notas[k].total} avaliações · ${k}</span></li>`).join(""); }
   render(); schedule();
 })();
 
@@ -151,31 +151,20 @@ $$("[data-copy]").forEach(b => b.addEventListener("click", async () => {
 }));
 
 /* ---------- formulário de contato (Netlify Forms) ---------- */
-$$("form[data-netlify]").forEach(f => f.addEventListener("submit", async e => {
-  e.preventDefault();
-  const note = $(".form-note", f), btn = $("button[type=submit]", f);
-  if (!f.checkValidity()) { f.reportValidity(); return; }
-  btn.disabled = true; note.className = "form-note"; note.textContent = "Enviando…";
-  try {
-    const r = await fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams(new FormData(f)).toString() });
-    if (!r.ok) throw 0;
-    f.reset(); note.className = "form-note ok"; note.textContent = "Mensagem enviada. Vinik responde pelo e-mail que você informou.";
-  } catch {
-    note.className = "form-note err"; note.textContent = LIVE ? "Não foi possível enviar agora. Tente de novo ou escreva para vinikautor@gmail.com." : "O envio funciona quando o site estiver publicado. Por enquanto, escreva para vinikautor@gmail.com.";
-  } finally { btn.disabled = false; }
-}));
-
-/* A Última Chance: entrada + máquina de escrever */
-(function seqInit(){
-  const sec = document.querySelector(".seq"); if (!sec) return;
-  const t = sec.querySelector(".type"), full = t ? t.dataset.text : "";
-  const start = () => {
-    sec.classList.add("on");
-    if (!t || reduce) return;
-    t.textContent = ""; t.classList.add("typing"); let i = 0;
-    setTimeout(function step(){ i += 2; t.textContent = full.slice(0, i); if (i < full.length) setTimeout(step, 28); else setTimeout(() => t.classList.remove("typing"), 2400); }, 900);
-  };
-  if (!("IntersectionObserver" in window)) return start();
-  const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { start(); io.disconnect(); } }, { threshold: .3 });
-  io.observe(sec);
-})();
+$$("form.js-contato").forEach(f => {
+  const note = $(".form-note", f), okMsg = f.dataset.ok || "Mensagem enviada.";
+  if (/[?&]enviado=1/.test(location.search)) { note.className = "form-note ok"; note.textContent = okMsg; }
+  f.addEventListener("submit", async e => {
+    e.preventDefault();
+    const btn = $("button[type=submit]", f);
+    if (!f.checkValidity()) { f.reportValidity(); return; }
+    btn.disabled = true; note.className = "form-note"; note.textContent = "Enviando…";
+    try {
+      const r = await fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams(new FormData(f)).toString() });
+      if (!r.ok) throw 0;
+      f.reset(); note.className = "form-note ok"; note.textContent = okMsg;
+    } catch {
+      note.className = "form-note err"; note.textContent = LIVE ? "Não foi possível enviar agora. Tente de novo ou use o e-mail ao lado." : "O envio funciona quando o site estiver publicado.";
+    } finally { btn.disabled = false; }
+  });
+});

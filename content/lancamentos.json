@@ -1,0 +1,43 @@
+{
+  "itens": [
+    {
+      "visivel": true,
+      "estilo": "dossie",
+      "ancora": "a-ultima-chance",
+      "titulo": "A Última Chance",
+      "rotulo": "60 Milhas · parte 2",
+      "status": "Em breve",
+      "carimbo": "Confidencial",
+      "ficha": "Arquivo nº 1949",
+      "ficha_status": "Em andamento",
+      "sinopse": "Em 1949, Collier, um ultramaratonista afastado das competições, é recrutado para atravessar território soviético e localizar um desertor com segredos que podem mudar o rumo da Guerra Fria. Em uma missão mortal, ele enfrenta a corrida mais perigosa de sua vida.",
+      "faixa": "1949 · Guerra Fria · Território soviético · Um desertor · Segredos · Uma missão mortal · A corrida mais perigosa de sua vida",
+      "frases": [],
+      "imagem_fundo": "assets/img/ultima-chance-bg.jpg",
+      "botao_texto": "Quero ser avisado do lançamento",
+      "botao_link": "index.html#assine",
+      "livro_relacionado": "60-milhas"
+    },
+    {
+      "visivel": true,
+      "estilo": "frases",
+      "ancora": "em-breve",
+      "titulo": "O Flâneur de Santene.",
+      "rotulo": "Próxima obra · em escrita",
+      "status": "Em breve…",
+      "carimbo": "",
+      "ficha": "",
+      "ficha_status": "",
+      "sinopse": "",
+      "faixa": "",
+      "frases": [
+        "Um rapaz, cujo nome é desconhecido, vaga pelas ruas como um forasteiro inócuo.",
+        "Alguns o chamam de Flâneur."
+      ],
+      "imagem_fundo": "assets/img/borrado-bracos.jpg",
+      "botao_texto": "Quero ser avisado do lançamento",
+      "botao_link": "#assine",
+      "livro_relacionado": ""
+    }
+  ]
+}
