@@ -1,10 +1,10 @@
 /* Estúdio: guarda o app para abrir sem internet. Os livros ficam no IndexedDB, não aqui. */
-const VERSAO = 'estudio-v1';
+const VERSAO = 'estudio-v2';
 const BASE = new URL('./', self.location).pathname; // /estudo/
 const ARQUIVOS = ['', 'estudio.css', 'estudio.js', 'apps.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/apple-touch-icon.png',
   'lexico/', 'lexico/style.css', 'lexico/livros.css', 'lexico/livros.js',
-  'lexico/conteudo.js', 'lexico/academia.js', 'lexico/app.js',
+  'lexico/conteudo.js', 'lexico/academia.js', 'lexico/app.js', 'lexico/fontes.json',
   'microciclo/', 'quiz/', 'quiz/catalogo-base.json', 'quiz/countries.json', 'quiz/capas.json', 'quiz/assets/world.svg'].map(a => BASE + a);
 const LIVRES = [BASE + 'entrar', BASE + 'sair'];
 

@@ -27,3 +27,5 @@
   .top-actions{gap:8px}
   .date-top{display:none}
 }
+.fonte-link{display:inline-block;margin-top:8px;font-size:12.5px;font-weight:600;color:var(--terracotta);text-decoration:underline;text-underline-offset:3px}
+.fonte-bloco{margin:10px 0 0}

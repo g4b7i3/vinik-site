@@ -215,3 +215,26 @@
     });
   });
 })();
+
+/* Fontes: liga exercícios e lições à página do Othon mais próxima do tema (fontes.json só tem números de página).
+   Questões de vocabulário levam ao dicionário analógico. */
+(function () {
+  var mapa = {};
+  fetch('fontes.json').then(function (r) { return r.ok ? r.json() : {}; }).then(function (m) { mapa = m || {}; }).catch(function () {});
+  var chave = function (t) { return String(t || '').replace(/\s+/g, ' ').toLowerCase().normalize('NFD').replace(/[^\x00-\x7f]/g, '').trim().slice(0, 120); };
+  var link = function (href, txt) { return '<a class="fonte-link" href="' + href + '">' + txt + '</a>'; };
+  window.fonteOthon = function (tipo, valor, bloco) {
+    var p = mapa[tipo + (tipo === 'l:' ? valor : chave(valor))];
+    if (!p) return '';
+    return (bloco ? '<p class="fonte-bloco">' : ' ') + link('#leitor=othon:' + p, 'Ler sobre isso no Othon · pág. ' + p + ' do PDF') + (bloco ? '</p>' : '');
+  };
+  window.fonteQuestao = function (q) {
+    if (!q) return '';
+    var m = /^q(?:def|term)(v\d+)$/.exec(q.id || '');
+    if (m && window.LEXICO_CONTENT) {
+      var v = (window.LEXICO_CONTENT.vocab || []).filter(function (x) { return String(x.id) === m[1]; })[0];
+      if (v) return ' ' + link('#dicionario=' + encodeURIComponent(v.term), 'Procurar “' + v.term + '” no dicionário analógico');
+    }
+    return window.fonteOthon('q:', q.prompt);
+  };
+})();
