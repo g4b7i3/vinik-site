@@ -4,7 +4,7 @@ Página privada com os apps de estudo do Vinik. Não aparece no menu, no sitemap
 
 ## Como funciona
 - `estudo/` é copiado para o site pelo `build.py`.
-- `netlify/edge-functions/estudo-porteiro.js` pede a senha antes de entregar qualquer arquivo de `/estudo`. Depois de entrar, o aparelho fica liberado por um ano (ou até tocar em Sair).
+- `netlify/edge-functions/estudo-porteiro.js` pede a senha antes de entregar qualquer arquivo de `/estudo`. Depois de entrar, o aparelho fica liberado por 10 anos (ou até tocar em Sair); o acesso se renova a cada visita.
 - `estudo/apps.js` tem a lista de cards. Para fixar um link em todos os aparelhos, edite o `url` ali.
 - `estudo/lexico/` é o Léxico **sem os livros**. Este repositório é público, então os PDFs e o texto extraído deles não podem ficar aqui. Em cada aparelho, abra o Léxico, toque em **Livros neste aparelho** e escolha o arquivo `lexico-livros.json.gz` (e, se quiser, os dois PDFs). Ficam guardados só no navegador daquele aparelho.
 
