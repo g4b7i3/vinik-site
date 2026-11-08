@@ -189,19 +189,54 @@ try{const t=localStorage.getItem("mv_tab");if(t)tab=t}catch(e){}
 
 /* ---------- persistência ---------- */
 const syncEl=document.getElementById("sync");
-let saveT=null;
+/* Sincronização: o painel fica no aparelho e numa cópia no próprio site (Netlify Blobs do vinikautor.com.br),
+   protegida pela senha do Estúdio. Vale a última alteração. */
+const API="../api/estado?app=microciclo";
+let saveT=null, enviando=false;
+const getL=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}};
+const setL=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
 function save(){
   S.modelo=false;
-  try{localStorage.setItem("mv_estado",JSON.stringify(S));syncEl.textContent="Salvo neste aparelho"}
-  catch(e){syncEl.textContent="Não consegui salvar neste aparelho"}
+  setL("mv_estado",JSON.stringify(S)); setL("mv_sujo","1");
+  syncEl.textContent="Salvo neste aparelho…";
+  clearTimeout(saveT); saveT=setTimeout(enviar,800);
+}
+async function enviar(){
+  if(enviando){clearTimeout(saveT);saveT=setTimeout(enviar,800);return}
+  if(getL("mv_sujo","0")!=="1")return;
+  enviando=true;
+  try{
+    const r=await fetch(API,{method:"PUT",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({estado:S})});
+    if(r.status===401){syncEl.textContent="Salvo neste aparelho · entre de novo no Estúdio para sincronizar";return}
+    if(!r.ok)throw 0;
+    const d=await r.json(); setL("mv_em",String(d.em)); setL("mv_sujo","0");
+    syncEl.textContent="Sincronizado";
+  }catch(e){syncEl.textContent="Salvo neste aparelho · sincroniza quando houver internet"}
+  finally{enviando=false}
+}
+async function puxar(){
+  if(getL("mv_sujo","0")==="1"){await enviar();return}
+  try{
+    const r=await fetch(API,{credentials:"same-origin",cache:"no-store"});
+    if(!r.ok)throw r.status;
+    const d=await r.json();
+    if(d&&d.estado&&Number(d.em)>Number(getL("mv_em","0"))){
+      S=d.estado; setL("mv_estado",JSON.stringify(S)); setL("mv_em",String(d.em));
+      if(!document.querySelector("#view input:focus,#view select:focus"))render();
+    } else if((!d||!d.estado)&&S&&!S.modelo){ setL("mv_sujo","1"); await enviar(); return; }
+    syncEl.textContent=S.modelo?"Modelo inicial — edite à vontade":"Sincronizado";
+  }catch(e){ syncEl.textContent=e===401?"Salvo neste aparelho · entre de novo no Estúdio para sincronizar":"Salvo neste aparelho · sem conexão agora"; }
 }
 function local(){try{const s=localStorage.getItem("mv_estado");return s?JSON.parse(s):null}catch(e){return null}}
 
 async function boot(){
   S=local()||modelo();
   render();
-  syncEl.textContent=S.modelo?"Modelo inicial — edite à vontade":"Salvo neste aparelho";
+  syncEl.textContent="Sincronizando…";
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+  await puxar();
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")puxar()});
+  window.addEventListener("online",puxar);
 }
 
 /* ---------- cópia de segurança ---------- */
@@ -273,7 +308,7 @@ function vHoje(){
   ${vCopia()}
   </section>`;
 }
-function vCopia(){return `<div class="panel"><h2>Cópia de segurança</h2><p class="note">O painel fica guardado neste aparelho. Baixe uma cópia de vez em quando, e use-a para passar o painel para outro celular ou computador.</p><div class="copia"><button class="btn" data-act="baixar">Baixar cópia</button><label class="btn ghost" style="cursor:pointer">Restaurar cópia<input type="file" accept=".json,application/json" data-act="restaurar" hidden></label></div></div>`;}
+function vCopia(){return `<div class="panel"><h2>Cópia de segurança</h2><p class="note">O painel sincroniza sozinho entre os seus aparelhos. Se quiser uma cópia guardada fora do site, baixe aqui.</p><div class="copia"><button class="btn" data-act="baixar">Baixar cópia</button><label class="btn ghost" style="cursor:pointer">Restaurar cópia<input type="file" accept=".json,application/json" data-act="restaurar" hidden></label></div></div>`;}
 
 function tarefaHTML(p,t,mostrarProj){
   if(editT===t.id)return `<form class="edit" data-form="edittarefa" data-p="${p.id}" data-id="${t.id}"><input id="etT" value="${esc(t.txt)}" aria-label="Texto da tarefa" required>

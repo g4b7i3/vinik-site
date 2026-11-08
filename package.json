@@ -1,0 +1,8 @@
+{
+  "name": "vinik-site",
+  "private": true,
+  "description": "Site vinikautor.com.br. A dependência abaixo guarda os dados do Microciclo do Estúdio (Netlify Blobs).",
+  "dependencies": {
+    "@netlify/blobs": "10.7.13"
+  }
+}

@@ -16,3 +16,9 @@ python3 -c "import hashlib,secrets;s=input('nova senha: ');sal=secrets.token_hex
 ```
 
 Copie os dois valores para `SAL` e `RESUMO` em `netlify/edge-functions/estudo-porteiro.js` e publique. Todos os aparelhos terão de entrar de novo.
+
+## Sincronização do Microciclo
+- `netlify/functions/estudo-estado.mjs` guarda o painel no Netlify Blobs deste próprio site (loja `estudio`, chave `microciclo`). Não usa os bancos do Radar nem da Nexos.
+- O app salva primeiro no aparelho e envia a cópia ao site logo depois; ao abrir em outro aparelho, puxa a versão mais nova. Vale a última alteração.
+- A função confere o mesmo cookie do porteiro. Se trocar a senha, troque o `RESUMO` nos dois arquivos.
+- A dependência `@netlify/blobs` está no `package.json`; a Netlify instala sozinha a cada publicação.
