@@ -1,0 +1,3114 @@
+[
+ {
+  "id": "c1",
+  "title": "Dom Casmurro",
+  "author": "Machado de Assis",
+  "genre": "Romance psicológico",
+  "genres": [
+   "Romance psicológico"
+  ],
+  "year": 1899,
+  "synopsis": "Bentinho relembra sua vida com Capitu e tenta reconstruir as dúvidas que o consumiram.",
+  "cover": "",
+  "popularity": 150,
+  "source": "curado"
+ },
+ {
+  "id": "c2",
+  "title": "Memórias Póstumas de Brás Cubas",
+  "author": "Machado de Assis",
+  "genre": "Realismo",
+  "genres": [
+   "Realismo"
+  ],
+  "year": 1881,
+  "synopsis": "Um narrador que já morreu conta sua trajetória com ironia e sem compromisso com as convenções.",
+  "cover": "",
+  "popularity": 149,
+  "source": "curado"
+ },
+ {
+  "id": "c3",
+  "title": "Quincas Borba",
+  "author": "Machado de Assis",
+  "genre": "Realismo",
+  "genres": [
+   "Realismo"
+  ],
+  "year": 1891,
+  "synopsis": "Rubião herda fortuna e uma filosofia que o leva a enfrentar as contradições sociais.",
+  "cover": "",
+  "popularity": 148,
+  "source": "curado"
+ },
+ {
+  "id": "c4",
+  "title": "O Alienista",
+  "author": "Machado de Assis",
+  "genre": "Sátira",
+  "genres": [
+   "Sátira"
+  ],
+  "year": 1882,
+  "synopsis": "Um médico decide classificar a sanidade de uma cidade inteira.",
+  "cover": "",
+  "popularity": 147,
+  "source": "curado"
+ },
+ {
+  "id": "c5",
+  "title": "Helena",
+  "author": "Machado de Assis",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1876,
+  "synopsis": "Uma herança modifica as relações de uma família no Rio de Janeiro oitocentista.",
+  "cover": "",
+  "popularity": 146,
+  "source": "curado"
+ },
+ {
+  "id": "c6",
+  "title": "O Cortiço",
+  "author": "Aluísio Azevedo",
+  "genre": "Naturalismo",
+  "genres": [
+   "Naturalismo"
+  ],
+  "year": 1890,
+  "synopsis": "A vida de moradores de um cortiço revela conflitos sociais e relações de poder.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "c7",
+  "title": "O Mulato",
+  "author": "Aluísio Azevedo",
+  "genre": "Naturalismo",
+  "genres": [
+   "Naturalismo"
+  ],
+  "year": 1881,
+  "synopsis": "Um jovem enfrenta preconceitos raciais no Maranhão imperial.",
+  "cover": "",
+  "popularity": 144,
+  "source": "curado"
+ },
+ {
+  "id": "c8",
+  "title": "Iracema",
+  "author": "José de Alencar",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico"
+  ],
+  "year": 1865,
+  "synopsis": "O encontro entre uma indígena e um colonizador entrelaça amor e formação de um território.",
+  "cover": "",
+  "popularity": 143,
+  "source": "curado"
+ },
+ {
+  "id": "c9",
+  "title": "Senhora",
+  "author": "José de Alencar",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1875,
+  "synopsis": "Uma mulher rica desafia as regras sociais que associam casamento e dinheiro.",
+  "cover": "",
+  "popularity": 142,
+  "source": "curado"
+ },
+ {
+  "id": "c10",
+  "title": "O Guarani",
+  "author": "José de Alencar",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico"
+  ],
+  "year": 1857,
+  "synopsis": "Um jovem indígena procura proteger sua amada em meio às tensões coloniais.",
+  "cover": "",
+  "popularity": 141,
+  "source": "curado"
+ },
+ {
+  "id": "c11",
+  "title": "Vidas Secas",
+  "author": "Graciliano Ramos",
+  "genre": "Regionalismo",
+  "genres": [
+   "Regionalismo"
+  ],
+  "year": 1938,
+  "synopsis": "Uma família atravessa a seca nordestina em busca de sobrevivência e dignidade.",
+  "cover": "",
+  "popularity": 140,
+  "source": "curado"
+ },
+ {
+  "id": "c12",
+  "title": "São Bernardo",
+  "author": "Graciliano Ramos",
+  "genre": "Romance psicológico",
+  "genres": [
+   "Romance psicológico"
+  ],
+  "year": 1934,
+  "synopsis": "Um fazendeiro revisita a própria ascensão e suas relações marcadas pelo poder.",
+  "cover": "",
+  "popularity": 139,
+  "source": "curado"
+ },
+ {
+  "id": "c13",
+  "title": "Angústia",
+  "author": "Graciliano Ramos",
+  "genre": "Romance psicológico",
+  "genres": [
+   "Romance psicológico"
+  ],
+  "year": 1936,
+  "synopsis": "Um homem afunda em ressentimento, desejo e obsessão na vida urbana.",
+  "cover": "",
+  "popularity": 138,
+  "source": "curado"
+ },
+ {
+  "id": "c14",
+  "title": "Capitães da Areia",
+  "author": "Jorge Amado",
+  "genre": "Romance social",
+  "genres": [
+   "Romance social"
+  ],
+  "year": 1937,
+  "synopsis": "Um grupo de meninos de rua enfrenta privações e constrói laços em Salvador.",
+  "cover": "",
+  "popularity": 137,
+  "source": "curado"
+ },
+ {
+  "id": "c15",
+  "title": "Gabriela, Cravo e Canela",
+  "author": "Jorge Amado",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1958,
+  "synopsis": "Uma mulher transforma a rotina e as relações de uma cidade do cacau.",
+  "cover": "",
+  "popularity": 136,
+  "source": "curado"
+ },
+ {
+  "id": "c16",
+  "title": "Dona Flor e Seus Dois Maridos",
+  "author": "Jorge Amado",
+  "genre": "Realismo mágico",
+  "genres": [
+   "Realismo mágico"
+  ],
+  "year": 1966,
+  "synopsis": "Uma mulher viúva vê seu passado amoroso voltar de maneira inesperada.",
+  "cover": "",
+  "popularity": 135,
+  "source": "curado"
+ },
+ {
+  "id": "c17",
+  "title": "Grande Sertão: Veredas",
+  "author": "João Guimarães Rosa",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1956,
+  "synopsis": "Um ex-jagunço revive conflitos, amores e questões morais do sertão.",
+  "cover": "",
+  "popularity": 134,
+  "source": "curado"
+ },
+ {
+  "id": "c18",
+  "title": "Sagarana",
+  "author": "João Guimarães Rosa",
+  "genre": "Contos",
+  "genres": [
+   "Contos"
+  ],
+  "year": 1946,
+  "synopsis": "Narrativas do sertão exploram escolhas humanas, violência e linguagem popular.",
+  "cover": "",
+  "popularity": 133,
+  "source": "curado"
+ },
+ {
+  "id": "c19",
+  "title": "A Hora da Estrela",
+  "author": "Clarice Lispector",
+  "genre": "Romance psicológico",
+  "genres": [
+   "Romance psicológico"
+  ],
+  "year": 1977,
+  "synopsis": "A vida de uma jovem nordestina é apresentada por um narrador inquieto.",
+  "cover": "",
+  "popularity": 132,
+  "source": "curado"
+ },
+ {
+  "id": "c20",
+  "title": "Perto do Coração Selvagem",
+  "author": "Clarice Lispector",
+  "genre": "Romance psicológico",
+  "genres": [
+   "Romance psicológico"
+  ],
+  "year": 1943,
+  "synopsis": "Uma mulher examina suas sensações e memórias em busca de si mesma.",
+  "cover": "",
+  "popularity": 131,
+  "source": "curado"
+ },
+ {
+  "id": "c21",
+  "title": "Laços de Família",
+  "author": "Clarice Lispector",
+  "genre": "Contos",
+  "genres": [
+   "Contos"
+  ],
+  "year": 1960,
+  "synopsis": "Encontros cotidianos revelam tensões e rupturas íntimas.",
+  "cover": "",
+  "popularity": 130,
+  "source": "curado"
+ },
+ {
+  "id": "c22",
+  "title": "A Paixão Segundo G.H.",
+  "author": "Clarice Lispector",
+  "genre": "Ficção existencial",
+  "genres": [
+   "Ficção existencial"
+  ],
+  "year": 1964,
+  "synopsis": "Uma experiência num quarto desencadeia uma transformação interior perturbadora.",
+  "cover": "",
+  "popularity": 129,
+  "source": "curado"
+ },
+ {
+  "id": "c23",
+  "title": "Quarto de Despejo",
+  "author": "Carolina Maria de Jesus",
+  "genre": "Diário literário",
+  "genres": [
+   "Diário literário"
+  ],
+  "year": 1960,
+  "synopsis": "Uma mulher registra o cotidiano da favela, a fome e a luta por sobrevivência.",
+  "cover": "",
+  "popularity": 128,
+  "source": "curado"
+ },
+ {
+  "id": "c24",
+  "title": "Ponciá Vicêncio",
+  "author": "Conceição Evaristo",
+  "genre": "Romance",
+  "genres": [
+   "Romance",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2003,
+  "synopsis": "Uma mulher reconstrói sua identidade a partir das marcas da família e da ancestralidade.",
+  "cover": "",
+  "popularity": 127,
+  "source": "curado"
+ },
+ {
+  "id": "c25",
+  "title": "Olhos d'Água",
+  "author": "Conceição Evaristo",
+  "genre": "Contos",
+  "genres": [
+   "Contos",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2014,
+  "synopsis": "Histórias de mulheres negras revelam memórias, violências e solidariedades.",
+  "cover": "",
+  "popularity": 126,
+  "source": "curado"
+ },
+ {
+  "id": "c26",
+  "title": "Torto Arado",
+  "author": "Itamar Vieira Junior",
+  "genre": "Romance",
+  "genres": [
+   "Romance",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2019,
+  "synopsis": "Duas irmãs enfrentam a história de trabalho, terra e resistência de uma comunidade.",
+  "cover": "",
+  "popularity": 125,
+  "source": "curado"
+ },
+ {
+  "id": "c27",
+  "title": "Salvar o Fogo",
+  "author": "Itamar Vieira Junior",
+  "genre": "Romance",
+  "genres": [
+   "Romance",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2023,
+  "synopsis": "Vidas de uma comunidade rural se entrelaçam em conflitos de fé e pertencimento.",
+  "cover": "",
+  "popularity": 124,
+  "source": "curado"
+ },
+ {
+  "id": "c28",
+  "title": "O Avesso da Pele",
+  "author": "Jeferson Tenório",
+  "genre": "Romance",
+  "genres": [
+   "Romance",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2020,
+  "synopsis": "Um filho investiga a história do pai e as marcas do racismo.",
+  "cover": "",
+  "popularity": 123,
+  "source": "curado"
+ },
+ {
+  "id": "c29",
+  "title": "Estela sem Deus",
+  "author": "Jeferson Tenório",
+  "genre": "Romance",
+  "genres": [
+   "Romance",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2018,
+  "synopsis": "Uma jovem enfrenta perdas e procura sentido para a vida em transformação.",
+  "cover": "",
+  "popularity": 122,
+  "source": "curado"
+ },
+ {
+  "id": "c30",
+  "title": "Pequeno Manual Antirracista",
+  "author": "Djamila Ribeiro",
+  "genre": "Ensaio",
+  "genres": [
+   "Ensaio"
+  ],
+  "year": 2019,
+  "synopsis": "Uma reflexão sobre atitudes para enfrentar o racismo no cotidiano.",
+  "cover": "",
+  "popularity": 121,
+  "source": "curado"
+ },
+ {
+  "id": "c31",
+  "title": "Um Defeito de Cor",
+  "author": "Ana Maria Gonçalves",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2006,
+  "synopsis": "Uma mulher africana narra sua travessia, suas perdas e a busca por liberdade.",
+  "cover": "",
+  "popularity": 120,
+  "source": "curado"
+ },
+ {
+  "id": "c32",
+  "title": "O Filho Eterno",
+  "author": "Cristovão Tezza",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2007,
+  "synopsis": "Um pai enfrenta expectativas e conflitos íntimos diante do nascimento do filho.",
+  "cover": "",
+  "popularity": 119,
+  "source": "curado"
+ },
+ {
+  "id": "c33",
+  "title": "Leite Derramado",
+  "author": "Chico Buarque",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2009,
+  "synopsis": "Um homem idoso revisita o passado e as mudanças de sua família.",
+  "cover": "",
+  "popularity": 118,
+  "source": "curado"
+ },
+ {
+  "id": "c34",
+  "title": "Budapeste",
+  "author": "Chico Buarque",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2003,
+  "synopsis": "Um escritor de discursos busca outra vida pela linguagem e pela identidade.",
+  "cover": "",
+  "popularity": 117,
+  "source": "curado"
+ },
+ {
+  "id": "c35",
+  "title": "Nove Noites",
+  "author": "Bernardo Carvalho",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2002,
+  "synopsis": "Uma investigação literária examina a morte de um antropólogo no Brasil.",
+  "cover": "",
+  "popularity": 116,
+  "source": "curado"
+ },
+ {
+  "id": "c36",
+  "title": "O Sol na Cabeça",
+  "author": "Geovani Martins",
+  "genre": "Contos",
+  "genres": [
+   "Contos",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2018,
+  "synopsis": "Contos retratam juventudes, tensões e afetos nas periferias cariocas.",
+  "cover": "",
+  "popularity": 115,
+  "source": "curado"
+ },
+ {
+  "id": "c37",
+  "title": "A Resistência",
+  "author": "Julián Fuks",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2015,
+  "synopsis": "Um narrador investiga a história do irmão adotivo e o exílio familiar.",
+  "cover": "",
+  "popularity": 114,
+  "source": "curado"
+ },
+ {
+  "id": "c38",
+  "title": "O Peso do Pássaro Morto",
+  "author": "Aline Bei",
+  "genre": "Romance",
+  "genres": [
+   "Romance",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2017,
+  "synopsis": "Uma mulher atravessa perdas e mudanças ao longo da vida.",
+  "cover": "",
+  "popularity": 113,
+  "source": "curado"
+ },
+ {
+  "id": "c39",
+  "title": "Vista Chinesa",
+  "author": "Tatiana Salem Levy",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2021,
+  "synopsis": "Uma mulher tenta lidar com a violência sofrida e reconstruir a existência.",
+  "cover": "",
+  "popularity": 112,
+  "source": "curado"
+ },
+ {
+  "id": "c40",
+  "title": "A Vida Invisível de Eurídice Gusmão",
+  "author": "Martha Batalha",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2016,
+  "synopsis": "Uma mulher busca realizar suas ambições diante das restrições de seu tempo.",
+  "cover": "",
+  "popularity": 111,
+  "source": "curado"
+ },
+ {
+  "id": "c41",
+  "title": "Com Armas Sonolentas",
+  "author": "Carola Saavedra",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2018,
+  "synopsis": "Três gerações de mulheres se conectam por histórias de separação e memória.",
+  "cover": "",
+  "popularity": 110,
+  "source": "curado"
+ },
+ {
+  "id": "c42",
+  "title": "O Conto da Aia",
+  "author": "Margaret Atwood",
+  "genre": "Distopia",
+  "genres": [
+   "Distopia"
+  ],
+  "year": 1985,
+  "synopsis": "Uma mulher narra o cotidiano sob um regime que controla os corpos femininos.",
+  "cover": "",
+  "popularity": 109,
+  "source": "curado"
+ },
+ {
+  "id": "c43",
+  "title": "1984",
+  "author": "George Orwell",
+  "genre": "Distopia",
+  "genres": [
+   "Distopia"
+  ],
+  "year": 1949,
+  "synopsis": "Um homem vive sob vigilância num estado totalitário que pretende controlar até a memória.",
+  "cover": "",
+  "popularity": 108,
+  "source": "curado"
+ },
+ {
+  "id": "c44",
+  "title": "A Revolução dos Bichos",
+  "author": "George Orwell",
+  "genre": "Sátira",
+  "genres": [
+   "Sátira"
+  ],
+  "year": 1945,
+  "synopsis": "Animais assumem uma fazenda e veem seus ideais serem corrompidos.",
+  "cover": "",
+  "popularity": 107,
+  "source": "curado"
+ },
+ {
+  "id": "c45",
+  "title": "Admirável Mundo Novo",
+  "author": "Aldous Huxley",
+  "genre": "Distopia",
+  "genres": [
+   "Distopia"
+  ],
+  "year": 1932,
+  "synopsis": "Uma sociedade ordenada pela tecnologia troca autonomia por estabilidade.",
+  "cover": "",
+  "popularity": 106,
+  "source": "curado"
+ },
+ {
+  "id": "c46",
+  "title": "Fahrenheit 451",
+  "author": "Ray Bradbury",
+  "genre": "Ficção científica",
+  "genres": [
+   "Ficção científica"
+  ],
+  "year": 1953,
+  "synopsis": "Um bombeiro dedicado a destruir livros começa a questionar seu papel.",
+  "cover": "",
+  "popularity": 105,
+  "source": "curado"
+ },
+ {
+  "id": "c47",
+  "title": "Duna",
+  "author": "Frank Herbert",
+  "genre": "Ficção científica",
+  "genres": [
+   "Ficção científica"
+  ],
+  "year": 1965,
+  "synopsis": "A disputa por um planeta desértico envolve poder, religião e ecologia.",
+  "cover": "",
+  "popularity": 104,
+  "source": "curado"
+ },
+ {
+  "id": "c48",
+  "title": "Fundação",
+  "author": "Isaac Asimov",
+  "genre": "Ficção científica",
+  "genres": [
+   "Ficção científica"
+  ],
+  "year": 1951,
+  "synopsis": "Cientistas tentam preservar conhecimento diante do declínio de um império galáctico.",
+  "cover": "",
+  "popularity": 103,
+  "source": "curado"
+ },
+ {
+  "id": "c49",
+  "title": "Eu, Robô",
+  "author": "Isaac Asimov",
+  "genre": "Ficção científica",
+  "genres": [
+   "Ficção científica"
+  ],
+  "year": 1950,
+  "synopsis": "Contos exploram os dilemas criados pelo convívio entre pessoas e robôs.",
+  "cover": "",
+  "popularity": 102,
+  "source": "curado"
+ },
+ {
+  "id": "c50",
+  "title": "Frankenstein",
+  "author": "Mary Shelley",
+  "genre": "Terror gótico",
+  "genres": [
+   "Terror gótico"
+  ],
+  "year": 1818,
+  "synopsis": "Um cientista cria vida e confronta as consequências de sua ambição.",
+  "cover": "",
+  "popularity": 101,
+  "source": "curado"
+ },
+ {
+  "id": "c51",
+  "title": "Drácula",
+  "author": "Bram Stoker",
+  "genre": "Terror gótico",
+  "genres": [
+   "Terror gótico"
+  ],
+  "year": 1897,
+  "synopsis": "Um conde misterioso espalha o medo entre aqueles que cruzam seu caminho.",
+  "cover": "",
+  "popularity": 100,
+  "source": "curado"
+ },
+ {
+  "id": "c52",
+  "title": "O Médico e o Monstro",
+  "author": "Robert Louis Stevenson",
+  "genre": "Terror gótico",
+  "genres": [
+   "Terror gótico"
+  ],
+  "year": 1886,
+  "synopsis": "Um experimento revela o confronto entre faces opostas da personalidade humana.",
+  "cover": "",
+  "popularity": 99,
+  "source": "curado"
+ },
+ {
+  "id": "c53",
+  "title": "O Retrato de Dorian Gray",
+  "author": "Oscar Wilde",
+  "genre": "Romance gótico",
+  "genres": [
+   "Romance gótico"
+  ],
+  "year": 1890,
+  "synopsis": "Um jovem vê sua aparência permanecer intacta enquanto um retrato registra sua decadência.",
+  "cover": "",
+  "popularity": 98,
+  "source": "curado"
+ },
+ {
+  "id": "c54",
+  "title": "Orgulho e Preconceito",
+  "author": "Jane Austen",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1813,
+  "synopsis": "Uma jovem perspicaz enfrenta convenções sociais, orgulho e mal-entendidos amorosos.",
+  "cover": "",
+  "popularity": 97,
+  "source": "curado"
+ },
+ {
+  "id": "c55",
+  "title": "Razão e Sensibilidade",
+  "author": "Jane Austen",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1811,
+  "synopsis": "Duas irmãs lidam de maneiras diferentes com o amor e as pressões familiares.",
+  "cover": "",
+  "popularity": 96,
+  "source": "curado"
+ },
+ {
+  "id": "c56",
+  "title": "Emma",
+  "author": "Jane Austen",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1815,
+  "synopsis": "Uma jovem gosta de interferir na vida amorosa dos outros e aprende com seus equívocos.",
+  "cover": "",
+  "popularity": 95,
+  "source": "curado"
+ },
+ {
+  "id": "c57",
+  "title": "Jane Eyre",
+  "author": "Charlotte Brontë",
+  "genre": "Romance gótico",
+  "genres": [
+   "Romance gótico"
+  ],
+  "year": 1847,
+  "synopsis": "Uma jovem enfrenta privações e reivindica independência emocional e moral.",
+  "cover": "",
+  "popularity": 94,
+  "source": "curado"
+ },
+ {
+  "id": "c58",
+  "title": "O Morro dos Ventos Uivantes",
+  "author": "Emily Brontë",
+  "genre": "Romance gótico",
+  "genres": [
+   "Romance gótico"
+  ],
+  "year": 1847,
+  "synopsis": "Um amor intenso e destrutivo atravessa gerações numa propriedade isolada.",
+  "cover": "",
+  "popularity": 93,
+  "source": "curado"
+ },
+ {
+  "id": "c59",
+  "title": "Crime e Castigo",
+  "author": "Fiódor Dostoiévski",
+  "genre": "Romance psicológico",
+  "genres": [
+   "Romance psicológico"
+  ],
+  "year": 1866,
+  "synopsis": "Um estudante comete um crime e enfrenta o peso de suas próprias justificativas.",
+  "cover": "",
+  "popularity": 92,
+  "source": "curado"
+ },
+ {
+  "id": "c60",
+  "title": "Os Irmãos Karamázov",
+  "author": "Fiódor Dostoiévski",
+  "genre": "Romance filosófico",
+  "genres": [
+   "Romance filosófico"
+  ],
+  "year": 1880,
+  "synopsis": "Uma família vive conflitos de fé, culpa e moralidade.",
+  "cover": "",
+  "popularity": 91,
+  "source": "curado"
+ },
+ {
+  "id": "c61",
+  "title": "O Idiota",
+  "author": "Fiódor Dostoiévski",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1869,
+  "synopsis": "Um homem de bondade incomum desafia a sociedade ao seu redor.",
+  "cover": "",
+  "popularity": 90,
+  "source": "curado"
+ },
+ {
+  "id": "c62",
+  "title": "Anna Kariênina",
+  "author": "Liev Tolstói",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1878,
+  "synopsis": "Uma mulher questiona as convenções sociais enquanto procura viver um amor proibido.",
+  "cover": "",
+  "popularity": 89,
+  "source": "curado"
+ },
+ {
+  "id": "c63",
+  "title": "Guerra e Paz",
+  "author": "Liev Tolstói",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico"
+  ],
+  "year": 1869,
+  "synopsis": "Famílias russas vivem amores, conflitos e mudanças durante as guerras napoleônicas.",
+  "cover": "",
+  "popularity": 88,
+  "source": "curado"
+ },
+ {
+  "id": "c64",
+  "title": "A Metamorfose",
+  "author": "Franz Kafka",
+  "genre": "Ficção existencial",
+  "genres": [
+   "Ficção existencial"
+  ],
+  "year": 1915,
+  "synopsis": "Um homem desperta transformado e encontra a hostilidade crescente da família.",
+  "cover": "",
+  "popularity": 87,
+  "source": "curado"
+ },
+ {
+  "id": "c65",
+  "title": "O Processo",
+  "author": "Franz Kafka",
+  "genre": "Ficção existencial",
+  "genres": [
+   "Ficção existencial"
+  ],
+  "year": 1925,
+  "synopsis": "Um homem é processado sem conhecer a acusação e enfrenta uma burocracia opressiva.",
+  "cover": "",
+  "popularity": 86,
+  "source": "curado"
+ },
+ {
+  "id": "c66",
+  "title": "O Estrangeiro",
+  "author": "Albert Camus",
+  "genre": "Ficção existencial",
+  "genres": [
+   "Ficção existencial"
+  ],
+  "year": 1942,
+  "synopsis": "Um homem indiferente às convenções sociais é confrontado com o absurdo da existência.",
+  "cover": "",
+  "popularity": 85,
+  "source": "curado"
+ },
+ {
+  "id": "c67",
+  "title": "A Peste",
+  "author": "Albert Camus",
+  "genre": "Romance filosófico",
+  "genres": [
+   "Romance filosófico"
+  ],
+  "year": 1947,
+  "synopsis": "Uma cidade isolada por uma epidemia enfrenta medo e solidariedade.",
+  "cover": "",
+  "popularity": 84,
+  "source": "curado"
+ },
+ {
+  "id": "c68",
+  "title": "Cem Anos de Solidão",
+  "author": "Gabriel García Márquez",
+  "genre": "Realismo mágico",
+  "genres": [
+   "Realismo mágico"
+  ],
+  "year": 1967,
+  "synopsis": "A história de uma família acompanha gerações de uma cidade imaginária.",
+  "cover": "",
+  "popularity": 83,
+  "source": "curado"
+ },
+ {
+  "id": "c69",
+  "title": "O Amor nos Tempos do Cólera",
+  "author": "Gabriel García Márquez",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1985,
+  "synopsis": "Dois antigos amantes atravessam décadas de espera e mudanças.",
+  "cover": "",
+  "popularity": 82,
+  "source": "curado"
+ },
+ {
+  "id": "c70",
+  "title": "A Casa dos Espíritos",
+  "author": "Isabel Allende",
+  "genre": "Realismo mágico",
+  "genres": [
+   "Realismo mágico"
+  ],
+  "year": 1982,
+  "synopsis": "A saga de uma família mistura acontecimentos políticos e elementos fantásticos.",
+  "cover": "",
+  "popularity": 81,
+  "source": "curado"
+ },
+ {
+  "id": "c71",
+  "title": "O Pequeno Príncipe",
+  "author": "Antoine de Saint-Exupéry",
+  "genre": "Fábula",
+  "genres": [
+   "Fábula"
+  ],
+  "year": 1943,
+  "synopsis": "Um visitante de outro planeta conversa sobre amizade e aquilo que importa.",
+  "cover": "",
+  "popularity": 80,
+  "source": "curado"
+ },
+ {
+  "id": "c72",
+  "title": "O Hobbit",
+  "author": "J. R. R. Tolkien",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 1937,
+  "synopsis": "Um hobbit embarca numa aventura inesperada ao lado de anões e de um mago.",
+  "cover": "",
+  "popularity": 79,
+  "source": "curado"
+ },
+ {
+  "id": "c73",
+  "title": "A Sociedade do Anel",
+  "author": "J. R. R. Tolkien",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 1954,
+  "synopsis": "Companheiros se unem numa missão para impedir o avanço de uma força sombria.",
+  "cover": "",
+  "popularity": 78,
+  "source": "curado"
+ },
+ {
+  "id": "c74",
+  "title": "Harry Potter e a Pedra Filosofal",
+  "author": "J. K. Rowling",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 1997,
+  "synopsis": "Um menino descobre o mundo da magia e encontra amigos e perigos numa escola especial.",
+  "cover": "",
+  "popularity": 77,
+  "source": "curado"
+ },
+ {
+  "id": "c75",
+  "title": "Jogos Vorazes",
+  "author": "Suzanne Collins",
+  "genre": "Distopia",
+  "genres": [
+   "Distopia"
+  ],
+  "year": 2008,
+  "synopsis": "Uma adolescente participa de uma competição mortal organizada pelo poder político.",
+  "cover": "",
+  "popularity": 76,
+  "source": "curado"
+ },
+ {
+  "id": "c76",
+  "title": "A Culpa é das Estrelas",
+  "author": "John Green",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2012,
+  "synopsis": "Dois jovens encontram amor e humor enquanto lidam com a doença.",
+  "cover": "",
+  "popularity": 75,
+  "source": "curado"
+ },
+ {
+  "id": "c77",
+  "title": "A Menina que Roubava Livros",
+  "author": "Markus Zusak",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico"
+  ],
+  "year": 2005,
+  "synopsis": "Uma menina se apega a palavras e livros na Alemanha durante a Segunda Guerra.",
+  "cover": "",
+  "popularity": 74,
+  "source": "curado"
+ },
+ {
+  "id": "c78",
+  "title": "O Nome da Rosa",
+  "author": "Umberto Eco",
+  "genre": "Mistério",
+  "genres": [
+   "Mistério"
+  ],
+  "year": 1980,
+  "synopsis": "Mortes intrigantes acontecem num mosteiro medieval e desafiam um monge investigador.",
+  "cover": "",
+  "popularity": 73,
+  "source": "curado"
+ },
+ {
+  "id": "c79",
+  "title": "O Código Da Vinci",
+  "author": "Dan Brown",
+  "genre": "Thriller",
+  "genres": [
+   "Thriller"
+  ],
+  "year": 2003,
+  "synopsis": "Um crime desencadeia uma investigação cheia de enigmas ligados à arte e à religião.",
+  "cover": "",
+  "popularity": 72,
+  "source": "curado"
+ },
+ {
+  "id": "c80",
+  "title": "E Não Sobrou Nenhum",
+  "author": "Agatha Christie",
+  "genre": "Policial",
+  "genres": [
+   "Policial"
+  ],
+  "year": 1939,
+  "synopsis": "Dez desconhecidos são reunidos numa ilha e começam a morrer misteriosamente.",
+  "cover": "",
+  "popularity": 71,
+  "source": "curado"
+ },
+ {
+  "id": "c81",
+  "title": "Assassinato no Expresso do Oriente",
+  "author": "Agatha Christie",
+  "genre": "Policial",
+  "genres": [
+   "Policial"
+  ],
+  "year": 1934,
+  "synopsis": "Um detetive investiga um assassinato ocorrido durante uma viagem de trem.",
+  "cover": "",
+  "popularity": 70,
+  "source": "curado"
+ },
+ {
+  "id": "c82",
+  "title": "O Assassinato de Roger Ackroyd",
+  "author": "Agatha Christie",
+  "genre": "Policial",
+  "genres": [
+   "Policial"
+  ],
+  "year": 1926,
+  "synopsis": "Um detetive tenta explicar uma morte cercada por segredos e suspeitas.",
+  "cover": "",
+  "popularity": 69,
+  "source": "curado"
+ },
+ {
+  "id": "c83",
+  "title": "O Cão dos Baskerville",
+  "author": "Arthur Conan Doyle",
+  "genre": "Policial",
+  "genres": [
+   "Policial"
+  ],
+  "year": 1902,
+  "synopsis": "Sherlock Holmes investiga uma lenda assustadora ligada a uma família inglesa.",
+  "cover": "",
+  "popularity": 68,
+  "source": "curado"
+ },
+ {
+  "id": "c84",
+  "title": "O Chamado de Cthulhu",
+  "author": "H. P. Lovecraft",
+  "genre": "Terror cósmico",
+  "genres": [
+   "Terror cósmico"
+  ],
+  "year": 1928,
+  "synopsis": "Documentos e relatos revelam indícios de uma presença ancestral aterrorizante.",
+  "cover": "",
+  "popularity": 67,
+  "source": "curado"
+ },
+ {
+  "id": "c85",
+  "title": "It: A Coisa",
+  "author": "Stephen King",
+  "genre": "Terror",
+  "genres": [
+   "Terror"
+  ],
+  "year": 1986,
+  "synopsis": "Amigos de infância enfrentam uma ameaça que retorna à sua cidade.",
+  "cover": "",
+  "popularity": 66,
+  "source": "curado"
+ },
+ {
+  "id": "c86",
+  "title": "O Iluminado",
+  "author": "Stephen King",
+  "genre": "Terror",
+  "genres": [
+   "Terror"
+  ],
+  "year": 1977,
+  "synopsis": "Uma família isolada num hotel vive acontecimentos perturbadores.",
+  "cover": "",
+  "popularity": 65,
+  "source": "curado"
+ },
+ {
+  "id": "c87",
+  "title": "Misery: Louca Obsessão",
+  "author": "Stephen King",
+  "genre": "Thriller psicológico",
+  "genres": [
+   "Thriller psicológico"
+  ],
+  "year": 1987,
+  "synopsis": "Um escritor acidentado fica à mercê de uma admiradora obsessiva.",
+  "cover": "",
+  "popularity": 64,
+  "source": "curado"
+ },
+ {
+  "id": "c88",
+  "title": "O Sol é para Todos",
+  "author": "Harper Lee",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1960,
+  "synopsis": "Uma criança observa preconceitos e injustiças numa cidade do sul dos Estados Unidos.",
+  "cover": "",
+  "popularity": 63,
+  "source": "curado"
+ },
+ {
+  "id": "c89",
+  "title": "As Aventuras de Huckleberry Finn",
+  "author": "Mark Twain",
+  "genre": "Aventura",
+  "genres": [
+   "Aventura"
+  ],
+  "year": 1884,
+  "synopsis": "Um garoto percorre o rio Mississippi e questiona valores ao redor.",
+  "cover": "",
+  "popularity": 62,
+  "source": "curado"
+ },
+ {
+  "id": "c90",
+  "title": "Moby Dick",
+  "author": "Herman Melville",
+  "genre": "Aventura",
+  "genres": [
+   "Aventura"
+  ],
+  "year": 1851,
+  "synopsis": "Um capitão dedica uma viagem marítima à perseguição de uma baleia.",
+  "cover": "",
+  "popularity": 61,
+  "source": "curado"
+ },
+ {
+  "id": "c91",
+  "title": "As Mil e Uma Noites",
+  "author": "Anônimo",
+  "genre": "Contos",
+  "genres": [
+   "Contos"
+  ],
+  "year": 800,
+  "synopsis": "Uma narradora constrói histórias sucessivas para adiar sua sentença.",
+  "cover": "",
+  "popularity": 60,
+  "source": "curado"
+ },
+ {
+  "id": "c92",
+  "title": "A Ilíada",
+  "author": "Homero",
+  "genre": "Épico",
+  "genres": [
+   "Épico"
+  ],
+  "year": -750,
+  "synopsis": "A ira de um guerreiro transforma os rumos de uma guerra antiga.",
+  "cover": "",
+  "popularity": 59,
+  "source": "curado"
+ },
+ {
+  "id": "c93",
+  "title": "A Odisseia",
+  "author": "Homero",
+  "genre": "Épico",
+  "genres": [
+   "Épico"
+  ],
+  "year": -700,
+  "synopsis": "Um herói atravessa muitos obstáculos para voltar para casa.",
+  "cover": "",
+  "popularity": 58,
+  "source": "curado"
+ },
+ {
+  "id": "c94",
+  "title": "A Divina Comédia",
+  "author": "Dante Alighieri",
+  "genre": "Épico",
+  "genres": [
+   "Épico"
+  ],
+  "year": 1321,
+  "synopsis": "Um viajante percorre reinos sobrenaturais refletindo sobre a condição humana.",
+  "cover": "",
+  "popularity": 57,
+  "source": "curado"
+ },
+ {
+  "id": "c95",
+  "title": "Hamlet",
+  "author": "William Shakespeare",
+  "genre": "Teatro",
+  "genres": [
+   "Teatro"
+  ],
+  "year": 1603,
+  "synopsis": "Um príncipe busca a verdade sobre a morte do pai e pondera sobre sua vingança.",
+  "cover": "",
+  "popularity": 56,
+  "source": "curado"
+ },
+ {
+  "id": "c96",
+  "title": "Romeu e Julieta",
+  "author": "William Shakespeare",
+  "genre": "Teatro",
+  "genres": [
+   "Teatro"
+  ],
+  "year": 1597,
+  "synopsis": "Dois jovens se apaixonam apesar da rivalidade entre suas famílias.",
+  "cover": "",
+  "popularity": 55,
+  "source": "curado"
+ },
+ {
+  "id": "c97",
+  "title": "Macbeth",
+  "author": "William Shakespeare",
+  "genre": "Teatro",
+  "genres": [
+   "Teatro"
+  ],
+  "year": 1606,
+  "synopsis": "Um general se deixa dominar pela ambição e pelas consequências de uma profecia.",
+  "cover": "",
+  "popularity": 54,
+  "source": "curado"
+ },
+ {
+  "id": "c98",
+  "title": "Sonetos",
+  "author": "William Shakespeare",
+  "genre": "Poesia",
+  "genres": [
+   "Poesia"
+  ],
+  "year": 1609,
+  "synopsis": "Poemas examinam amor, tempo, beleza e mortalidade.",
+  "cover": "",
+  "popularity": 53,
+  "source": "curado"
+ },
+ {
+  "id": "c99",
+  "title": "A Terra Desolada",
+  "author": "T. S. Eliot",
+  "genre": "Poesia",
+  "genres": [
+   "Poesia"
+  ],
+  "year": 1922,
+  "synopsis": "Um poema modernista organiza fragmentos sobre cultura e desencanto.",
+  "cover": "",
+  "popularity": 52,
+  "source": "curado"
+ },
+ {
+  "id": "c100",
+  "title": "Mensagem",
+  "author": "Fernando Pessoa",
+  "genre": "Poesia",
+  "genres": [
+   "Poesia"
+  ],
+  "year": 1934,
+  "synopsis": "Poemas revisitavam mitos e símbolos da história portuguesa.",
+  "cover": "",
+  "popularity": 51,
+  "source": "curado"
+ },
+ {
+  "id": "c101",
+  "title": "Livro do Desassossego",
+  "author": "Fernando Pessoa",
+  "genre": "Prosa poética",
+  "genres": [
+   "Prosa poética"
+  ],
+  "year": 1982,
+  "synopsis": "Fragmentos introspectivos exploram solidão, rotina e consciência.",
+  "cover": "",
+  "popularity": 50,
+  "source": "curado"
+ },
+ {
+  "id": "c102",
+  "title": "Alguma Poesia",
+  "author": "Carlos Drummond de Andrade",
+  "genre": "Poesia",
+  "genres": [
+   "Poesia"
+  ],
+  "year": 1930,
+  "synopsis": "Poemas modernistas observam a vida e as contradições humanas.",
+  "cover": "",
+  "popularity": 49,
+  "source": "curado"
+ },
+ {
+  "id": "c103",
+  "title": "Morte e Vida Severina",
+  "author": "João Cabral de Melo Neto",
+  "genre": "Poesia",
+  "genres": [
+   "Poesia"
+  ],
+  "year": 1955,
+  "synopsis": "Um retirante atravessa o sertão e encontra vidas marcadas pela pobreza.",
+  "cover": "",
+  "popularity": 48,
+  "source": "curado"
+ },
+ {
+  "id": "c104",
+  "title": "Ou Isto ou Aquilo",
+  "author": "Cecília Meireles",
+  "genre": "Poesia infantil",
+  "genres": [
+   "Poesia infantil"
+  ],
+  "year": 1964,
+  "synopsis": "Poemas brincam com escolhas, sons e observações do cotidiano.",
+  "cover": "",
+  "popularity": 47,
+  "source": "curado"
+ },
+ {
+  "id": "c105",
+  "title": "Romanceiro da Inconfidência",
+  "author": "Cecília Meireles",
+  "genre": "Poesia",
+  "genres": [
+   "Poesia"
+  ],
+  "year": 1953,
+  "synopsis": "Poemas revisitam acontecimentos e personagens de um movimento colonial.",
+  "cover": "",
+  "popularity": 46,
+  "source": "curado"
+ },
+ {
+  "id": "c106",
+  "title": "A Bolsa Amarela",
+  "author": "Lygia Bojunga",
+  "genre": "Infantojuvenil",
+  "genres": [
+   "Infantojuvenil"
+  ],
+  "year": 1976,
+  "synopsis": "Uma menina guarda numa bolsa seus desejos e conflitos.",
+  "cover": "",
+  "popularity": 45,
+  "source": "curado"
+ },
+ {
+  "id": "c107",
+  "title": "O Meu Pé de Laranja Lima",
+  "author": "José Mauro de Vasconcelos",
+  "genre": "Infantojuvenil",
+  "genres": [
+   "Infantojuvenil"
+  ],
+  "year": 1968,
+  "synopsis": "Um menino encontra afeto e imaginação em meio às dificuldades da infância.",
+  "cover": "",
+  "popularity": 44,
+  "source": "curado"
+ },
+ {
+  "id": "c108",
+  "title": "60 Milhas – A História de Eddie",
+  "author": "Vinik S.",
+  "genre": "Drama psicológico",
+  "genres": [
+   "Drama psicológico",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2025,
+  "synopsis": "Em 1946, no Oregon, um adolescente enfrenta uma corrida de sessenta milhas em busca de salvação para si e a mãe.",
+  "cover": "",
+  "popularity": 43,
+  "source": "curado"
+ },
+ {
+  "id": "c109",
+  "title": "Semente do Escárnio",
+  "author": "Vinik S.",
+  "genre": "Suspense policial",
+  "genres": [
+   "Suspense policial",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": 2025,
+  "synopsis": "Em Sacramento, uma investigação policial envolve o detetive Steven e uma ameaça que se aproxima.",
+  "cover": "",
+  "popularity": 42,
+  "source": "curado"
+ },
+ {
+  "id": "brcont0",
+  "title": "Eu te Serviria Meu Coração com Vinho Branco",
+  "author": "Rute Ferreira",
+  "genre": "Contos",
+  "genres": [
+   "Contos",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Coletânea de narrativas com elementos fantásticos e reflexões sobre experiências humanas.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "brcont1",
+  "title": "Terra Batida",
+  "author": "Rute Ferreira",
+  "genre": "Romance",
+  "genres": [
+   "Romance",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Em uma comunidade costeira do Maranhão, histórias de perdas e disputas pela terra revelam conflitos coletivos.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "brcont2",
+  "title": "Bordado em Ponto Corrente",
+  "author": "Rute Ferreira",
+  "genre": "Romance",
+  "genres": [
+   "Romance",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Numa comunidade brasileira, acontecimentos que cercam a morte de uma jovem trazem à tona segredos e dores.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "brcont3",
+  "title": "A Urdidura da Matéria",
+  "author": "Rute Ferreira",
+  "genre": "Contos",
+  "genres": [
+   "Contos",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Narrativas que exploram luto, relações humanas, solidão e outras experiências da vida.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "brcont4",
+  "title": "Suicidas",
+  "author": "Raphael Montes",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "A morte de jovens em uma casa dá origem a uma investigação repleta de descobertas inquietantes.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "brcont5",
+  "title": "Dias Perfeitos",
+  "author": "Raphael Montes",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "A obsessão de um jovem por uma mulher desencadeia uma viagem de consequências assustadoras.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "brcont6",
+  "title": "Jantar Secreto",
+  "author": "Raphael Montes",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Jovens que precisam pagar o aluguel passam a organizar jantares clandestinos e se envolvem em crimes.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "brcont7",
+  "title": "Uma Mulher no Escuro",
+  "author": "Raphael Montes",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Uma mulher marcada por uma tragédia na infância volta a enfrentar ameaças.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "brcont8",
+  "title": "Uma Família Feliz",
+  "author": "Raphael Montes",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Uma família aparentemente perfeita esconde segredos e tensões perigosas.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "brcont9",
+  "title": "A Oitava Garota",
+  "author": "Willian Bezerra",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Thriller psicológico de investigação e horror.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "brcont10",
+  "title": "Debaixo do Meu Jardim",
+  "author": "Willian Bezerra",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Um drama psicológico sobre trauma, memória e redenção.",
+  "cover": "",
+  "popularity": 145,
+  "source": "curado"
+ },
+ {
+  "id": "br-curated-0",
+  "title": "Vínculo Velado",
+  "author": "Junio R.",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Um jovem tenta descobrir a verdade sobre a morte da mãe enquanto segredos ameaçam sua segurança.",
+  "cover": "",
+  "popularity": 15400,
+  "source": "curado"
+ },
+ {
+  "id": "br-curated-1",
+  "title": "Para Elisa",
+  "author": "Roberto Denser",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Depoimentos reconstroem o fim misterioso de uma poeta conhecida.",
+  "cover": "",
+  "popularity": 15400,
+  "source": "curado"
+ },
+ {
+  "id": "br-curated-2",
+  "title": "Carnificinas",
+  "author": "Roberto Denser",
+  "genre": "Terror",
+  "genres": [
+   "Terror",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Contos de horror entre violência, humor sombrio e elementos sobrenaturais.",
+  "cover": "",
+  "popularity": 15400,
+  "source": "curado"
+ },
+ {
+  "id": "br-curated-3",
+  "title": "Colapso",
+  "author": "Roberto Denser",
+  "genre": "Terror",
+  "genres": [
+   "Terror",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Um romance de horror e sobrevivência durante o colapso social.",
+  "cover": "",
+  "popularity": 15400,
+  "source": "curado"
+ },
+ {
+  "id": "br-curated-4",
+  "title": "Cordão de Aço Não Arrebenta Fácil",
+  "author": "Bruno Gil Gonzalez",
+  "genre": "Romance",
+  "genres": [
+   "Romance",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Cristina, enfermeira que sonha ser médica, enfrenta abandono familiar e problemas do pai.",
+  "cover": "",
+  "popularity": 15400,
+  "source": "curado"
+ },
+ {
+  "id": "br-curated-5",
+  "title": "Enfim, Imperatriz",
+  "author": "Maria Fernanda Elias Maglio",
+  "genre": "Contos",
+  "genres": [
+   "Contos",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Obra da literatura brasileira contemporânea.",
+  "cover": "",
+  "popularity": 15400,
+  "source": "curado"
+ },
+ {
+  "id": "br-curated-6",
+  "title": "Sutura",
+  "author": "Roberta Barbosa",
+  "genre": "Romance",
+  "genres": [
+   "Romance",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Romance brasileiro contemporâneo.",
+  "cover": "",
+  "popularity": 15400,
+  "source": "curado"
+ },
+ {
+  "id": "br-curated-7",
+  "title": "A Sombra da Mentira",
+  "author": "Rodrigo Sena Magalhães",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Romance brasileiro de entretenimento.",
+  "cover": "",
+  "popularity": 15400,
+  "source": "curado"
+ },
+ {
+  "id": "br-curated-8",
+  "title": "Lição de Anatomia",
+  "author": "Enéias Tavares",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Ficção fantástica de autoria brasileira.",
+  "cover": "",
+  "popularity": 15400,
+  "source": "curado"
+ },
+ {
+  "id": "br-curated-9",
+  "title": "Ultra Carnem II",
+  "author": "Cesar Bravo",
+  "genre": "Terror",
+  "genres": [
+   "Terror",
+   "Literatura brasileira contemporânea"
+  ],
+  "year": null,
+  "synopsis": "Ficção brasileira de terror.",
+  "cover": "",
+  "popularity": 15400,
+  "source": "curado"
+ },
+ {
+  "id": "p1",
+  "title": "O Senhor dos Anéis: As Duas Torres",
+  "author": "J. R. R. Tolkien",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 1954,
+  "synopsis": "A sociedade se divide: enquanto uns enfrentam exércitos em Rohan, dois hobbits seguem rumo a Mordor guiados por uma criatura traiçoeira.",
+  "cover": "",
+  "popularity": 100,
+  "source": "curado"
+ },
+ {
+  "id": "p2",
+  "title": "O Senhor dos Anéis: O Retorno do Rei",
+  "author": "J. R. R. Tolkien",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 1955,
+  "synopsis": "A guerra pela Terra-média chega ao auge enquanto o portador do Anel se aproxima da Montanha da Perdição.",
+  "cover": "",
+  "popularity": 100,
+  "source": "curado"
+ },
+ {
+  "id": "p3",
+  "title": "Harry Potter e a Câmara Secreta",
+  "author": "J. K. Rowling",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 1998,
+  "synopsis": "No segundo ano em Hogwarts, alunos aparecem petrificados e uma antiga câmara escondida no castelo volta a ser aberta.",
+  "cover": "",
+  "popularity": 99,
+  "source": "curado"
+ },
+ {
+  "id": "p4",
+  "title": "Harry Potter e o Prisioneiro de Azkaban",
+  "author": "J. K. Rowling",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 1999,
+  "synopsis": "Um prisioneiro perigoso foge de Azkaban e parece estar atrás de um jovem bruxo.",
+  "cover": "",
+  "popularity": 99,
+  "source": "curado"
+ },
+ {
+  "id": "p5",
+  "title": "Harry Potter e o Cálice de Fogo",
+  "author": "J. K. Rowling",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 2000,
+  "synopsis": "Um torneio entre escolas de magia coloca um aluno em provas mortais e anuncia o retorno de um antigo inimigo.",
+  "cover": "",
+  "popularity": 98,
+  "source": "curado"
+ },
+ {
+  "id": "p6",
+  "title": "As Crônicas de Nárnia: O Leão, a Feiticeira e o Guarda-Roupa",
+  "author": "C. S. Lewis",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 1950,
+  "synopsis": "Quatro irmãos atravessam um guarda-roupa e chegam a um reino congelado por uma feiticeira.",
+  "cover": "",
+  "popularity": 98,
+  "source": "curado"
+ },
+ {
+  "id": "p7",
+  "title": "A Guerra dos Tronos",
+  "author": "George R. R. Martin",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 1996,
+  "synopsis": "Famílias nobres disputam o Trono de Ferro enquanto uma ameaça antiga desperta além da Muralha.",
+  "cover": "",
+  "popularity": 97,
+  "source": "curado"
+ },
+ {
+  "id": "p8",
+  "title": "O Nome do Vento",
+  "author": "Patrick Rothfuss",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 2007,
+  "synopsis": "Um estalajadeiro discreto revela ser uma figura lendária e começa a contar a verdadeira história de sua vida.",
+  "cover": "",
+  "popularity": 97,
+  "source": "curado"
+ },
+ {
+  "id": "p9",
+  "title": "Percy Jackson e o Ladrão de Raios",
+  "author": "Rick Riordan",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 2005,
+  "synopsis": "Um garoto descobre ser filho de um deus grego e é acusado de roubar o raio de Zeus.",
+  "cover": "",
+  "popularity": 96,
+  "source": "curado"
+ },
+ {
+  "id": "p10",
+  "title": "Crepúsculo",
+  "author": "Stephenie Meyer",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2005,
+  "synopsis": "Uma adolescente se muda para uma cidade chuvosa e se apaixona por um colega misterioso que esconde um segredo sobrenatural.",
+  "cover": "",
+  "popularity": 96,
+  "source": "curado"
+ },
+ {
+  "id": "p11",
+  "title": "Divergente",
+  "author": "Veronica Roth",
+  "genre": "Distopia",
+  "genres": [
+   "Distopia"
+  ],
+  "year": 2011,
+  "synopsis": "Numa Chicago dividida em facções, uma jovem descobre que não se encaixa em nenhuma e que isso a torna perigosa.",
+  "cover": "",
+  "popularity": 95,
+  "source": "curado"
+ },
+ {
+  "id": "p12",
+  "title": "O Doador de Memórias",
+  "author": "Lois Lowry",
+  "genre": "Distopia",
+  "genres": [
+   "Distopia"
+  ],
+  "year": 1993,
+  "synopsis": "Numa comunidade sem dor nem escolhas, um garoto é escolhido para guardar as lembranças de todo o passado.",
+  "cover": "",
+  "popularity": 95,
+  "source": "curado"
+ },
+ {
+  "id": "p13",
+  "title": "Laranja Mecânica",
+  "author": "Anthony Burgess",
+  "genre": "Distopia",
+  "genres": [
+   "Distopia"
+  ],
+  "year": 1962,
+  "synopsis": "Um jovem violento é submetido a um tratamento que pretende eliminar sua capacidade de escolher o mal.",
+  "cover": "",
+  "popularity": 94,
+  "source": "curado"
+ },
+ {
+  "id": "p14",
+  "title": "Ensaio sobre a Cegueira",
+  "author": "José Saramago",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1995,
+  "synopsis": "Uma epidemia de cegueira branca se espalha por uma cidade e expõe o que há de pior e de melhor nas pessoas.",
+  "cover": "",
+  "popularity": 94,
+  "source": "curado"
+ },
+ {
+  "id": "p15",
+  "title": "O Evangelho segundo Jesus Cristo",
+  "author": "José Saramago",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1991,
+  "synopsis": "A vida de Jesus é recontada de forma humana, com dúvidas, afetos e conflitos com Deus.",
+  "cover": "",
+  "popularity": 93,
+  "source": "curado"
+ },
+ {
+  "id": "p16",
+  "title": "Os Maias",
+  "author": "Eça de Queirós",
+  "genre": "Realismo",
+  "genres": [
+   "Realismo"
+  ],
+  "year": 1888,
+  "synopsis": "A decadência de uma família aristocrática de Lisboa culmina num amor proibido.",
+  "cover": "",
+  "popularity": 93,
+  "source": "curado"
+ },
+ {
+  "id": "p17",
+  "title": "O Primo Basílio",
+  "author": "Eça de Queirós",
+  "genre": "Realismo",
+  "genres": [
+   "Realismo"
+  ],
+  "year": 1878,
+  "synopsis": "Uma jovem casada se envolve com o primo durante a ausência do marido e passa a ser chantageada pela criada.",
+  "cover": "",
+  "popularity": 92,
+  "source": "curado"
+ },
+ {
+  "id": "p18",
+  "title": "Macunaíma",
+  "author": "Mário de Andrade",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1928,
+  "synopsis": "O herói sem nenhum caráter deixa a floresta e vai a São Paulo recuperar um amuleto perdido.",
+  "cover": "",
+  "popularity": 92,
+  "source": "curado"
+ },
+ {
+  "id": "p19",
+  "title": "Triste Fim de Policarpo Quaresma",
+  "author": "Lima Barreto",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1915,
+  "synopsis": "Um funcionário público nacionalista ao extremo vê seus projetos patrióticos fracassarem um a um.",
+  "cover": "",
+  "popularity": 91,
+  "source": "curado"
+ },
+ {
+  "id": "p20",
+  "title": "Menino do Engenho",
+  "author": "José Lins do Rego",
+  "genre": "Regionalismo",
+  "genres": [
+   "Regionalismo"
+  ],
+  "year": 1932,
+  "synopsis": "Um menino órfão cresce num engenho de açúcar da Paraíba, entre a casa-grande e o mundo dos trabalhadores.",
+  "cover": "",
+  "popularity": 91,
+  "source": "curado"
+ },
+ {
+  "id": "p21",
+  "title": "O Quinze",
+  "author": "Rachel de Queiroz",
+  "genre": "Regionalismo",
+  "genres": [
+   "Regionalismo"
+  ],
+  "year": 1930,
+  "synopsis": "A grande seca de 1915 obriga famílias cearenses a deixar tudo para trás em busca de sobrevivência.",
+  "cover": "",
+  "popularity": 90,
+  "source": "curado"
+ },
+ {
+  "id": "p22",
+  "title": "O Tempo e o Vento: O Continente",
+  "author": "Erico Verissimo",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico"
+  ],
+  "year": 1949,
+  "synopsis": "A saga de uma família gaúcha acompanha a formação do Rio Grande do Sul entre guerras e paixões.",
+  "cover": "",
+  "popularity": 90,
+  "source": "curado"
+ },
+ {
+  "id": "p23",
+  "title": "Incidente em Antares",
+  "author": "Erico Verissimo",
+  "genre": "Realismo mágico",
+  "genres": [
+   "Realismo mágico"
+  ],
+  "year": 1971,
+  "synopsis": "Durante uma greve de coveiros, sete mortos insepultos voltam para acertar contas com os vivos da cidade.",
+  "cover": "",
+  "popularity": 89,
+  "source": "curado"
+ },
+ {
+  "id": "p24",
+  "title": "Lavoura Arcaica",
+  "author": "Raduan Nassar",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1975,
+  "synopsis": "Um filho foge da rígida família de imigrantes libaneses e, ao voltar, revela uma paixão proibida.",
+  "cover": "",
+  "popularity": 89,
+  "source": "curado"
+ },
+ {
+  "id": "p25",
+  "title": "Feliz Ano Velho",
+  "author": "Marcelo Rubens Paiva",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1982,
+  "synopsis": "Um jovem fica tetraplégico após um mergulho e revisita a juventude, a família e a ditadura.",
+  "cover": "",
+  "popularity": 88,
+  "source": "curado"
+ },
+ {
+  "id": "p26",
+  "title": "A Moreninha",
+  "author": "Joaquim Manuel de Macedo",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1844,
+  "synopsis": "Num fim de semana numa ilha, um estudante aposta que não se apaixonará e encontra uma jovem encantadora.",
+  "cover": "",
+  "popularity": 88,
+  "source": "curado"
+ },
+ {
+  "id": "p27",
+  "title": "Memórias de um Sargento de Milícias",
+  "author": "Manuel Antônio de Almeida",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1854,
+  "synopsis": "As travessuras de um rapaz malandro no Rio de Janeiro do tempo do rei.",
+  "cover": "",
+  "popularity": 87,
+  "source": "curado"
+ },
+ {
+  "id": "p28",
+  "title": "Os Sertões",
+  "author": "Euclides da Cunha",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico"
+  ],
+  "year": 1902,
+  "synopsis": "Um relato monumental da terra, do homem e da guerra de Canudos no sertão baiano.",
+  "cover": "",
+  "popularity": 87,
+  "source": "curado"
+ },
+ {
+  "id": "p29",
+  "title": "Auto da Compadecida",
+  "author": "Ariano Suassuna",
+  "genre": "Teatro",
+  "genres": [
+   "Teatro"
+  ],
+  "year": 1955,
+  "synopsis": "Dois amigos espertos aprontam no sertão nordestino até serem julgados diante de Nossa Senhora.",
+  "cover": "",
+  "popularity": 86,
+  "source": "curado"
+ },
+ {
+  "id": "p30",
+  "title": "O Pagador de Promessas",
+  "author": "Dias Gomes",
+  "genre": "Teatro",
+  "genres": [
+   "Teatro"
+  ],
+  "year": 1960,
+  "synopsis": "Um homem simples carrega uma cruz até uma igreja de Salvador para cumprir uma promessa e é barrado pelo padre.",
+  "cover": "",
+  "popularity": 86,
+  "source": "curado"
+ },
+ {
+  "id": "p32",
+  "title": "O Grande Gatsby",
+  "author": "F. Scott Fitzgerald",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1925,
+  "synopsis": "Um milionário misterioso dá festas luxuosas em Long Island na esperança de reconquistar um amor do passado.",
+  "cover": "",
+  "popularity": 85,
+  "source": "curado"
+ },
+ {
+  "id": "p33",
+  "title": "O Apanhador no Campo de Centeio",
+  "author": "J. D. Salinger",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1951,
+  "synopsis": "Um adolescente expulso da escola vaga por Nova York durante três dias, em conflito com o mundo adulto.",
+  "cover": "",
+  "popularity": 84,
+  "source": "curado"
+ },
+ {
+  "id": "p34",
+  "title": "Ratos e Homens",
+  "author": "John Steinbeck",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1937,
+  "synopsis": "Dois trabalhadores itinerantes sonham com um pedaço de terra próprio durante a Grande Depressão.",
+  "cover": "",
+  "popularity": 84,
+  "source": "curado"
+ },
+ {
+  "id": "p35",
+  "title": "As Vinhas da Ira",
+  "author": "John Steinbeck",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1939,
+  "synopsis": "Uma família de agricultores expulsa de suas terras atravessa os Estados Unidos rumo à Califórnia.",
+  "cover": "",
+  "popularity": 83,
+  "source": "curado"
+ },
+ {
+  "id": "p36",
+  "title": "O Velho e o Mar",
+  "author": "Ernest Hemingway",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1952,
+  "synopsis": "Um velho pescador cubano trava uma longa luta solitária contra um peixe gigante.",
+  "cover": "",
+  "popularity": 83,
+  "source": "curado"
+ },
+ {
+  "id": "p37",
+  "title": "Por Quem os Sinos Dobram",
+  "author": "Ernest Hemingway",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1940,
+  "synopsis": "Um americano se junta a guerrilheiros na Guerra Civil Espanhola para explodir uma ponte.",
+  "cover": "",
+  "popularity": 82,
+  "source": "curado"
+ },
+ {
+  "id": "p38",
+  "title": "Lolita",
+  "author": "Vladimir Nabokov",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1955,
+  "synopsis": "Um professor narra, com linguagem sedutora e perturbadora, sua obsessão criminosa por uma menina.",
+  "cover": "",
+  "popularity": 82,
+  "source": "curado"
+ },
+ {
+  "id": "p39",
+  "title": "Madame Bovary",
+  "author": "Gustave Flaubert",
+  "genre": "Realismo",
+  "genres": [
+   "Realismo"
+  ],
+  "year": 1857,
+  "synopsis": "Entediada com o casamento no interior, uma mulher busca nos romances e nos amantes a vida que imagina.",
+  "cover": "",
+  "popularity": 81,
+  "source": "curado"
+ },
+ {
+  "id": "p40",
+  "title": "Os Miseráveis",
+  "author": "Victor Hugo",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico"
+  ],
+  "year": 1862,
+  "synopsis": "Um ex-condenado tenta recomeçar a vida enquanto é perseguido por um inspetor implacável.",
+  "cover": "",
+  "popularity": 81,
+  "source": "curado"
+ },
+ {
+  "id": "p41",
+  "title": "O Corcunda de Notre-Dame",
+  "author": "Victor Hugo",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico"
+  ],
+  "year": 1831,
+  "synopsis": "Na Paris medieval, o sineiro da catedral se apaixona por uma jovem cigana cobiçada por todos.",
+  "cover": "",
+  "popularity": 80,
+  "source": "curado"
+ },
+ {
+  "id": "p42",
+  "title": "O Conde de Monte Cristo",
+  "author": "Alexandre Dumas",
+  "genre": "Aventura",
+  "genres": [
+   "Aventura"
+  ],
+  "year": 1844,
+  "synopsis": "Traído e preso injustamente, um marinheiro foge, enriquece e planeja uma vingança meticulosa.",
+  "cover": "",
+  "popularity": 80,
+  "source": "curado"
+ },
+ {
+  "id": "p43",
+  "title": "Os Três Mosqueteiros",
+  "author": "Alexandre Dumas",
+  "genre": "Aventura",
+  "genres": [
+   "Aventura"
+  ],
+  "year": 1844,
+  "synopsis": "Um jovem gascão chega a Paris e se une a três mosqueteiros em intrigas da corte francesa.",
+  "cover": "",
+  "popularity": 79,
+  "source": "curado"
+ },
+ {
+  "id": "p44",
+  "title": "A Volta ao Mundo em 80 Dias",
+  "author": "Júlio Verne",
+  "genre": "Aventura",
+  "genres": [
+   "Aventura"
+  ],
+  "year": 1872,
+  "synopsis": "Um cavalheiro inglês aposta que conseguirá dar a volta ao planeta em oitenta dias.",
+  "cover": "",
+  "popularity": 79,
+  "source": "curado"
+ },
+ {
+  "id": "p45",
+  "title": "Vinte Mil Léguas Submarinas",
+  "author": "Júlio Verne",
+  "genre": "Ficção científica",
+  "genres": [
+   "Ficção científica"
+  ],
+  "year": 1870,
+  "synopsis": "Um professor é capturado por um capitão misterioso e viaja pelos oceanos a bordo de um submarino.",
+  "cover": "",
+  "popularity": 78,
+  "source": "curado"
+ },
+ {
+  "id": "p46",
+  "title": "A Ilha do Tesouro",
+  "author": "Robert Louis Stevenson",
+  "genre": "Aventura",
+  "genres": [
+   "Aventura"
+  ],
+  "year": 1883,
+  "synopsis": "Um garoto encontra o mapa de um tesouro e embarca numa viagem cheia de piratas.",
+  "cover": "",
+  "popularity": 78,
+  "source": "curado"
+ },
+ {
+  "id": "p47",
+  "title": "Robinson Crusoé",
+  "author": "Daniel Defoe",
+  "genre": "Aventura",
+  "genres": [
+   "Aventura"
+  ],
+  "year": 1719,
+  "synopsis": "Único sobrevivente de um naufrágio, um homem passa anos numa ilha deserta.",
+  "cover": "",
+  "popularity": 77,
+  "source": "curado"
+ },
+ {
+  "id": "p48",
+  "title": "As Viagens de Gulliver",
+  "author": "Jonathan Swift",
+  "genre": "Sátira",
+  "genres": [
+   "Sátira"
+  ],
+  "year": 1726,
+  "synopsis": "Um médico de navio visita terras de minúsculos homens, gigantes e cavalos racionais.",
+  "cover": "",
+  "popularity": 77,
+  "source": "curado"
+ },
+ {
+  "id": "p49",
+  "title": "Alice no País das Maravilhas",
+  "author": "Lewis Carroll",
+  "genre": "Literatura infantil",
+  "genres": [
+   "Literatura infantil"
+  ],
+  "year": 1865,
+  "synopsis": "Uma menina segue um coelho apressado e cai num mundo de lógica absurda.",
+  "cover": "",
+  "popularity": 76,
+  "source": "curado"
+ },
+ {
+  "id": "p50",
+  "title": "O Mágico de Oz",
+  "author": "L. Frank Baum",
+  "genre": "Literatura infantil",
+  "genres": [
+   "Literatura infantil"
+  ],
+  "year": 1900,
+  "synopsis": "Levada por um ciclone, uma menina do Kansas percorre uma estrada de tijolos amarelos em busca de ajuda para voltar.",
+  "cover": "",
+  "popularity": 76,
+  "source": "curado"
+ },
+ {
+  "id": "p51",
+  "title": "Peter Pan",
+  "author": "J. M. Barrie",
+  "genre": "Literatura infantil",
+  "genres": [
+   "Literatura infantil"
+  ],
+  "year": 1911,
+  "synopsis": "Um menino que se recusa a crescer leva três irmãos para a Terra do Nunca.",
+  "cover": "",
+  "popularity": 75,
+  "source": "curado"
+ },
+ {
+  "id": "p52",
+  "title": "Mulherzinhas",
+  "author": "Louisa May Alcott",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1868,
+  "synopsis": "Quatro irmãs crescem juntas na Nova Inglaterra enquanto o pai está na guerra.",
+  "cover": "",
+  "popularity": 75,
+  "source": "curado"
+ },
+ {
+  "id": "p54",
+  "title": "O Fantasma da Ópera",
+  "author": "Gaston Leroux",
+  "genre": "Terror gótico",
+  "genres": [
+   "Terror gótico"
+  ],
+  "year": 1910,
+  "synopsis": "Uma figura mascarada que vive sob a Ópera de Paris se apaixona por uma jovem cantora.",
+  "cover": "",
+  "popularity": 74,
+  "source": "curado"
+ },
+ {
+  "id": "p55",
+  "title": "Rebecca",
+  "author": "Daphne du Maurier",
+  "genre": "Suspense",
+  "genres": [
+   "Suspense"
+  ],
+  "year": 1938,
+  "synopsis": "Uma jovem recém-casada chega à mansão do marido e vive à sombra da primeira esposa dele.",
+  "cover": "",
+  "popularity": 73,
+  "source": "curado"
+ },
+ {
+  "id": "p56",
+  "title": "O Silêncio dos Inocentes",
+  "author": "Thomas Harris",
+  "genre": "Thriller",
+  "genres": [
+   "Thriller"
+  ],
+  "year": 1988,
+  "synopsis": "Uma agente do FBI pede ajuda a um psiquiatra canibal preso para capturar um assassino em série.",
+  "cover": "",
+  "popularity": 73,
+  "source": "curado"
+ },
+ {
+  "id": "p57",
+  "title": "Garota Exemplar",
+  "author": "Gillian Flynn",
+  "genre": "Thriller",
+  "genres": [
+   "Thriller"
+  ],
+  "year": 2012,
+  "synopsis": "No dia do quinto aniversário de casamento, uma mulher desaparece e o marido se torna o principal suspeito.",
+  "cover": "",
+  "popularity": 72,
+  "source": "curado"
+ },
+ {
+  "id": "p58",
+  "title": "A Garota no Trem",
+  "author": "Paula Hawkins",
+  "genre": "Thriller",
+  "genres": [
+   "Thriller"
+  ],
+  "year": 2015,
+  "synopsis": "Uma mulher que observa todos os dias uma casa pela janela do trem se envolve no desaparecimento de uma vizinha.",
+  "cover": "",
+  "popularity": 72,
+  "source": "curado"
+ },
+ {
+  "id": "p59",
+  "title": "Os Homens que Não Amavam as Mulheres",
+  "author": "Stieg Larsson",
+  "genre": "Policial",
+  "genres": [
+   "Policial"
+  ],
+  "year": 2005,
+  "synopsis": "Um jornalista e uma hacker investigam o desaparecimento de uma jovem de família rica, ocorrido quarenta anos antes.",
+  "cover": "",
+  "popularity": 71,
+  "source": "curado"
+ },
+ {
+  "id": "p60",
+  "title": "Anjos e Demônios",
+  "author": "Dan Brown",
+  "genre": "Thriller",
+  "genres": [
+   "Thriller"
+  ],
+  "year": 2000,
+  "synopsis": "Um simbologista corre contra o tempo no Vaticano para impedir um atentado de uma sociedade secreta.",
+  "cover": "",
+  "popularity": 71,
+  "source": "curado"
+ },
+ {
+  "id": "p61",
+  "title": "Carrie, a Estranha",
+  "author": "Stephen King",
+  "genre": "Terror",
+  "genres": [
+   "Terror"
+  ],
+  "year": 1974,
+  "synopsis": "Uma adolescente humilhada pelos colegas descobre ter poderes telecinéticos.",
+  "cover": "",
+  "popularity": 70,
+  "source": "curado"
+ },
+ {
+  "id": "p62",
+  "title": "O Exorcista",
+  "author": "William Peter Blatty",
+  "genre": "Terror",
+  "genres": [
+   "Terror"
+  ],
+  "year": 1971,
+  "synopsis": "Uma menina passa a apresentar comportamentos aterradores e sua mãe recorre a dois padres.",
+  "cover": "",
+  "popularity": 70,
+  "source": "curado"
+ },
+ {
+  "id": "p63",
+  "title": "O Bebê de Rosemary",
+  "author": "Ira Levin",
+  "genre": "Terror",
+  "genres": [
+   "Terror"
+  ],
+  "year": 1967,
+  "synopsis": "Uma jovem grávida desconfia que os vizinhos têm planos sinistros para seu filho.",
+  "cover": "",
+  "popularity": 69,
+  "source": "curado"
+ },
+ {
+  "id": "p64",
+  "title": "Neuromancer",
+  "author": "William Gibson",
+  "genre": "Ficção científica",
+  "genres": [
+   "Ficção científica"
+  ],
+  "year": 1984,
+  "synopsis": "Um hacker decadente é contratado para uma última invasão no ciberespaço.",
+  "cover": "",
+  "popularity": 69,
+  "source": "curado"
+ },
+ {
+  "id": "p65",
+  "title": "O Guia do Mochileiro das Galáxias",
+  "author": "Douglas Adams",
+  "genre": "Ficção científica",
+  "genres": [
+   "Ficção científica"
+  ],
+  "year": 1979,
+  "synopsis": "Segundos antes de a Terra ser demolida, um inglês é resgatado por um amigo que é, na verdade, um alienígena.",
+  "cover": "",
+  "popularity": 68,
+  "source": "curado"
+ },
+ {
+  "id": "p66",
+  "title": "Androides Sonham com Ovelhas Elétricas?",
+  "author": "Philip K. Dick",
+  "genre": "Ficção científica",
+  "genres": [
+   "Ficção científica"
+  ],
+  "year": 1968,
+  "synopsis": "Um caçador de recompensas persegue androides fugitivos numa Terra devastada.",
+  "cover": "",
+  "popularity": 68,
+  "source": "curado"
+ },
+ {
+  "id": "p67",
+  "title": "A Mão Esquerda da Escuridão",
+  "author": "Ursula K. Le Guin",
+  "genre": "Ficção científica",
+  "genres": [
+   "Ficção científica"
+  ],
+  "year": 1969,
+  "synopsis": "Um enviado humano tenta convencer um planeta gelado, cujos habitantes não têm gênero fixo, a se unir a uma aliança.",
+  "cover": "",
+  "popularity": 67,
+  "source": "curado"
+ },
+ {
+  "id": "p68",
+  "title": "O Caçador de Pipas",
+  "author": "Khaled Hosseini",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2003,
+  "synopsis": "Um homem volta ao Afeganistão para reparar uma traição cometida contra o amigo de infância.",
+  "cover": "",
+  "popularity": 67,
+  "source": "curado"
+ },
+ {
+  "id": "p69",
+  "title": "A Cidade do Sol",
+  "author": "Khaled Hosseini",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2007,
+  "synopsis": "Duas mulheres de gerações diferentes têm suas vidas unidas pela guerra e por um casamento opressor em Cabul.",
+  "cover": "",
+  "popularity": 66,
+  "source": "curado"
+ },
+ {
+  "id": "p70",
+  "title": "O Menino do Pijama Listrado",
+  "author": "John Boyne",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico"
+  ],
+  "year": 2006,
+  "synopsis": "O filho de um comandante nazista faz amizade com um menino do outro lado de uma cerca.",
+  "cover": "",
+  "popularity": 66,
+  "source": "curado"
+ },
+ {
+  "id": "p71",
+  "title": "A Sombra do Vento",
+  "author": "Carlos Ruiz Zafón",
+  "genre": "Mistério",
+  "genres": [
+   "Mistério"
+  ],
+  "year": 2001,
+  "synopsis": "Na Barcelona do pós-guerra, um menino descobre um livro esquecido e alguém que queima todos os exemplares do autor.",
+  "cover": "",
+  "popularity": 65,
+  "source": "curado"
+ },
+ {
+  "id": "p72",
+  "title": "Ensaio sobre a Lucidez",
+  "author": "José Saramago",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2004,
+  "synopsis": "Numa eleição, a maioria dos eleitores vota em branco e o governo reage como se fosse uma conspiração.",
+  "cover": "",
+  "popularity": 65,
+  "source": "curado"
+ },
+ {
+  "id": "p73",
+  "title": "O Alquimista",
+  "author": "Paulo Coelho",
+  "genre": "Fábula",
+  "genres": [
+   "Fábula"
+  ],
+  "year": 1988,
+  "synopsis": "Um jovem pastor andaluz atravessa o deserto em busca de um tesouro anunciado em sonho.",
+  "cover": "",
+  "popularity": 64,
+  "source": "curado"
+ },
+ {
+  "id": "p74",
+  "title": "Pedro Páramo",
+  "author": "Juan Rulfo",
+  "genre": "Realismo mágico",
+  "genres": [
+   "Realismo mágico"
+  ],
+  "year": 1955,
+  "synopsis": "Um homem chega a um povoado mexicano para encontrar o pai e descobre um lugar habitado por vozes de mortos.",
+  "cover": "",
+  "popularity": 64,
+  "source": "curado"
+ },
+ {
+  "id": "p75",
+  "title": "Ficções",
+  "author": "Jorge Luis Borges",
+  "genre": "Contos",
+  "genres": [
+   "Contos"
+  ],
+  "year": 1944,
+  "synopsis": "Contos labirínticos sobre bibliotecas infinitas, espelhos e realidades inventadas.",
+  "cover": "",
+  "popularity": 63,
+  "source": "curado"
+ },
+ {
+  "id": "p76",
+  "title": "O Túnel",
+  "author": "Ernesto Sabato",
+  "genre": "Romance psicológico",
+  "genres": [
+   "Romance psicológico"
+  ],
+  "year": 1948,
+  "synopsis": "Um pintor narra da prisão como chegou a matar a única pessoa que parecia compreendê-lo.",
+  "cover": "",
+  "popularity": 63,
+  "source": "curado"
+ },
+ {
+  "id": "p77",
+  "title": "Persépolis",
+  "author": "Marjane Satrapi",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2000,
+  "synopsis": "Em quadrinhos, uma menina cresce em Teerã durante a Revolução Islâmica e a guerra.",
+  "cover": "",
+  "popularity": 62,
+  "source": "curado"
+ },
+ {
+  "id": "p78",
+  "title": "Mrs. Dalloway",
+  "author": "Virginia Woolf",
+  "genre": "Romance psicológico",
+  "genres": [
+   "Romance psicológico"
+  ],
+  "year": 1925,
+  "synopsis": "Ao longo de um dia em Londres, uma mulher prepara uma festa enquanto pensamentos e memórias se cruzam.",
+  "cover": "",
+  "popularity": 62,
+  "source": "curado"
+ },
+ {
+  "id": "p79",
+  "title": "Ulisses",
+  "author": "James Joyce",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1922,
+  "synopsis": "Um único dia na vida de um homem comum em Dublin, contado em estilos radicalmente diferentes.",
+  "cover": "",
+  "popularity": 61,
+  "source": "curado"
+ },
+ {
+  "id": "p80",
+  "title": "Em Busca do Tempo Perdido: No Caminho de Swann",
+  "author": "Marcel Proust",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 1913,
+  "synopsis": "O sabor de um bolinho mergulhado no chá desperta lembranças da infância e de um amor ciumento.",
+  "cover": "",
+  "popularity": 61,
+  "source": "curado"
+ },
+ {
+  "id": "p81",
+  "title": "O Diário de Anne Frank",
+  "author": "Anne Frank",
+  "genre": "Diário literário",
+  "genres": [
+   "Diário literário"
+  ],
+  "year": 1947,
+  "synopsis": "Escondida com a família num anexo em Amsterdã, uma adolescente registra medos, sonhos e a convivência durante a ocupação nazista.",
+  "cover": "",
+  "popularity": 60,
+  "source": "curado"
+ },
+ {
+  "id": "p82",
+  "title": "A Insustentável Leveza do Ser",
+  "author": "Milan Kundera",
+  "genre": "Romance filosófico",
+  "genres": [
+   "Romance filosófico"
+  ],
+  "year": 1984,
+  "synopsis": "Dois casais vivem amores e escolhas em Praga durante e depois da invasão soviética.",
+  "cover": "",
+  "popularity": 60,
+  "source": "curado"
+ },
+ {
+  "id": "p83",
+  "title": "O Leopardo",
+  "author": "Giuseppe Tomasi di Lampedusa",
+  "genre": "Romance histórico",
+  "genres": [
+   "Romance histórico"
+  ],
+  "year": 1958,
+  "synopsis": "Um príncipe siciliano observa o declínio da aristocracia durante a unificação da Itália.",
+  "cover": "",
+  "popularity": 59,
+  "source": "curado"
+ },
+ {
+  "id": "p84",
+  "title": "Siddhartha",
+  "author": "Hermann Hesse",
+  "genre": "Romance filosófico",
+  "genres": [
+   "Romance filosófico"
+  ],
+  "year": 1922,
+  "synopsis": "Um jovem indiano abandona o conforto em busca da iluminação.",
+  "cover": "",
+  "popularity": 59,
+  "source": "curado"
+ },
+ {
+  "id": "p85",
+  "title": "O Lobo da Estepe",
+  "author": "Hermann Hesse",
+  "genre": "Romance psicológico",
+  "genres": [
+   "Romance psicológico"
+  ],
+  "year": 1927,
+  "synopsis": "Um intelectual solitário dividido entre o homem e a fera encontra um teatro mágico.",
+  "cover": "",
+  "popularity": 58,
+  "source": "curado"
+ },
+ {
+  "id": "p86",
+  "title": "Coraline",
+  "author": "Neil Gaiman",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 2002,
+  "synopsis": "Uma menina encontra uma porta para uma casa idêntica à sua, onde uma outra mãe tem botões no lugar dos olhos.",
+  "cover": "",
+  "popularity": 58,
+  "source": "curado"
+ },
+ {
+  "id": "p87",
+  "title": "Extraordinário",
+  "author": "R. J. Palacio",
+  "genre": "Infantojuvenil",
+  "genres": [
+   "Infantojuvenil"
+  ],
+  "year": 2012,
+  "synopsis": "Um garoto com uma síndrome facial frequenta a escola pela primeira vez.",
+  "cover": "",
+  "popularity": 57,
+  "source": "curado"
+ },
+ {
+  "id": "p88",
+  "title": "A Seleção",
+  "author": "Kiera Cass",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2012,
+  "synopsis": "Trinta e cinco jovens competem pelo coração de um príncipe, e uma delas não queria estar ali.",
+  "cover": "",
+  "popularity": 57,
+  "source": "curado"
+ },
+ {
+  "id": "p89",
+  "title": "É Assim que Acaba",
+  "author": "Colleen Hoover",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2016,
+  "synopsis": "Uma jovem se apaixona por um neurocirurgião e percebe sinais que lembram a história de seus pais.",
+  "cover": "",
+  "popularity": 56,
+  "source": "curado"
+ },
+ {
+  "id": "p90",
+  "title": "Os Sete Maridos de Evelyn Hugo",
+  "author": "Taylor Jenkins Reid",
+  "genre": "Romance",
+  "genres": [
+   "Romance"
+  ],
+  "year": 2017,
+  "synopsis": "Uma lendária estrela de Hollywood escolhe uma jornalista desconhecida para contar a verdade sobre sua vida.",
+  "cover": "",
+  "popularity": 56,
+  "source": "curado"
+ },
+ {
+  "id": "p91",
+  "title": "Verity",
+  "author": "Colleen Hoover",
+  "genre": "Thriller",
+  "genres": [
+   "Thriller"
+  ],
+  "year": 2018,
+  "synopsis": "Contratada para terminar a série de uma autora acamada, uma escritora encontra um manuscrito aterrador.",
+  "cover": "",
+  "popularity": 55,
+  "source": "curado"
+ },
+ {
+  "id": "p92",
+  "title": "A Biblioteca da Meia-Noite",
+  "author": "Matt Haig",
+  "genre": "Fantasia",
+  "genres": [
+   "Fantasia"
+  ],
+  "year": 2020,
+  "synopsis": "Entre a vida e a morte, uma mulher encontra uma biblioteca onde cada livro é uma vida que ela poderia ter vivido.",
+  "cover": "",
+  "popularity": 55,
+  "source": "curado"
+ }
+]

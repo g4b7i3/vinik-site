@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f3f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121614" media="(prefers-color-scheme: dark)">
+<title>Microciclo do Vinik</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Estúdio">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+.voltar{display:inline-flex;align-items:center;gap:4px;margin-bottom:10px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--ink);text-decoration:none;font:700 12.5px var(--body)}
+.copia{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: planilha de microciclo de treinador — abas no topo, volume semanal por área como barras de carga, blocos por dia */
+:root{
+  --bg:#f3f5f1; --surface:#ffffff; --ink:#1b211d; --muted:#5f6b63; --line:#d9dfd8; --accent:#0f6b4f;
+  --a-treino:#c4561d; --a-facul:#2b5fa8; --a-escrita:#8a2f4e; --a-leitura:#3d7a2e; --a-codigo:#6a3fa0; --a-proprio:#b8860b; --a-pessoal:#5b6670; --a-teal:#147a80; --a-rosa:#c2417a;
+  --display:"Bricolage Grotesque",system-ui,sans-serif; --body:"Atkinson Hyperlegible",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121614; --surface:#1b201d; --ink:#e8ede9; --muted:#9aa69e; --line:#2e3631; --accent:#4cc39a;
+  --a-treino:#f0834a; --a-facul:#6b9cec; --a-escrita:#d9739a; --a-leitura:#82c46e; --a-codigo:#a988e0; --a-proprio:#e0b443; --a-pessoal:#9aa6b0; --a-teal:#4fc1c6; --a-rosa:#ee7fae; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1b201d; --ink:#e8ede9; --muted:#9aa69e; --line:#2e3631; --accent:#4cc39a;
+  --a-treino:#f0834a; --a-facul:#6b9cec; --a-escrita:#d9739a; --a-leitura:#82c46e; --a-codigo:#a988e0; --a-proprio:#e0b443; --a-pessoal:#9aa6b0; --a-teal:#4fc1c6; --a-rosa:#ee7fae; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,6vw,36px);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.date{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.sync{font-size:12px;color:var(--muted);margin-top:2px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding-block:12px;margin-top:8px;border-bottom:1px solid var(--line)}
+nav button{flex:0 0 auto;font:700 14px var(--body);color:var(--muted);background:transparent;border:1px solid transparent;border-radius:999px;padding:7px 14px;cursor:pointer}
+nav button[aria-selected="true"]{color:var(--bg);background:var(--ink)}
+nav button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section{display:grid;gap:18px;padding-top:18px}
+h2{font-family:var(--display);font-weight:700;font-size:20px;margin:0;letter-spacing:-.01em}
+h3{font-family:var(--display);font-weight:700;font-size:16px;margin:0}
+.label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.muted{color:var(--muted)}
+.note{font-size:13px;color:var(--muted)}
+input,select{font:15px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;min-width:0}
+input[type=time]{font-family:var(--mono);font-size:14px}
+.grow{flex:1 1 160px}
+.btn{font:700 14px var(--body);border-radius:7px;padding:8px 14px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.icon{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:6px;line-height:1}
+.icon:hover{color:var(--ink)}
+.dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:var(--c)}
+/* Hoje */
+.agenda{display:grid;gap:0}
+.slot{display:grid;grid-template-columns:auto 4px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.slot:first-child{border-top:none}
+.slot .t{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;width:92px}
+.slot .bar{align-self:stretch;background:var(--c);border-radius:2px}
+.slot.done .txt{text-decoration:line-through;color:var(--muted)}
+.slot.now{background:color-mix(in srgb,var(--accent) 9%,transparent);margin-inline:-16px;padding-inline:16px}
+.chk{width:22px;height:22px;border-radius:6px;border:2px solid var(--line);background:transparent;cursor:pointer;display:grid;place-items:center;color:var(--bg);font-size:13px;padding:0}
+.chk.on{background:var(--accent);border-color:var(--accent)}
+.task{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.task:first-child{border-top:none}
+.task.done .tx{text-decoration:line-through;color:var(--muted)}
+.tx{min-width:0;overflow-wrap:anywhere}
+.tag{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.tag.late{color:#c0392b}
+.star{color:var(--muted)} .star.on{color:var(--a-proprio)}
+/* Carga */
+.load{display:grid;gap:8px}
+.lrow{display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:center;font-size:14px}
+.track{height:10px;background:color-mix(in srgb,var(--line) 70%,transparent);border-radius:5px;overflow:hidden}
+.fill{height:100%;background:var(--c);border-radius:5px}
+.hrs{font-family:var(--mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+/* Semana */
+.week{display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));gap:8px;overflow-x:auto;padding-bottom:6px}
+.day{display:grid;gap:6px;align-content:start;min-width:0}
+.day h3{font-size:14px;padding:4px 2px;border-bottom:2px solid var(--line)}
+.day.today h3{border-color:var(--accent);color:var(--accent)}
+.blk{border-left:4px solid var(--c);background:var(--surface);border-radius:0 6px 6px 0;padding:6px 8px;font-size:13px;cursor:pointer;text-align:left;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--ink);font-family:var(--body);width:100%}
+.blk b{display:block;font-family:var(--mono);font-weight:500;font-size:11px;color:var(--muted)}
+.blk.sel{outline:2px solid var(--c)}
+.wrapx{overflow-x:auto}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px}
+.legend span{display:flex;align-items:center;gap:6px}
+/* Projetos */
+.proj{display:grid;gap:10px}
+.proj-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.proj-head input.name{font:700 17px var(--display);border:1px solid transparent;background:transparent;padding:4px 6px;flex:1 1 180px}
+.proj-head input.name:hover{border-color:var(--line)}
+.progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--c)}
+/* Leitura */
+.book{display:grid;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+.book:first-child{border-top:none}
+.book .pg{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pginput{width:84px;font-family:var(--mono)}
+.empty{padding:14px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:14px}
+.big{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
+.edit{display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.edit input{background:var(--surface)}
+.tx.click{cursor:pointer}
+.dayv{width:80px;font-family:var(--mono);text-align:right;padding:4px 6px}
+.arow{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center}
+@media (max-width:520px){.lrow{grid-template-columns:90px 1fr 42px}.slot .t{width:auto}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <a class="voltar" href="../">‹ Estúdio</a>
+  <header>
+    <div>
+      <h1>Microciclo do Vinik</h1>
+      <div class="sync" id="sync">Carregando…</div>
+    </div>
+    <div class="date" id="date"></div>
+  </header>
+  <nav role="tablist" id="tabs">
+    <button role="tab" data-tab="hoje" aria-selected="true">Hoje</button>
+    <button role="tab" data-tab="semana" aria-selected="false">Semana</button>
+    <button role="tab" data-tab="projetos" aria-selected="false">Projetos</button>
+    <button role="tab" data-tab="leitura" aria-selected="false">Leitura e escrita</button>
+  </nav>
+  <main id="view"></main>
+</div>
+
+<script>
+const DEF_AREAS={
+  treino:{nome:"Alunos",c:"--a-treino"},
+  facul:{nome:"Faculdade",c:"--a-facul"},
+  escrita:{nome:"Escrita",c:"--a-escrita"},
+  leitura:{nome:"Leitura",c:"--a-leitura"},
+  codigo:{nome:"Programação",c:"--a-codigo"},
+  proprio:{nome:"Meu treino",c:"--a-proprio"},
+  pessoal:{nome:"Pessoal",c:"--a-pessoal"}
+};
+const CORES={"--a-treino":"Laranja","--a-facul":"Azul","--a-escrita":"Vinho","--a-leitura":"Verde","--a-codigo":"Roxo","--a-proprio":"Mostarda","--a-pessoal":"Cinza","--a-teal":"Azul-petróleo","--a-rosa":"Rosa"};
+let AREAS=JSON.parse(JSON.stringify(DEF_AREAS));
+function prep(){if(!S.areas)S.areas=JSON.parse(JSON.stringify(DEF_AREAS));if(!S.areas.pessoal)S.areas.pessoal={nome:"Pessoal",c:"--a-pessoal"};AREAS=S.areas}
+const DIAS=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"];
+const DIAS_LONGO=["segunda","terça","quarta","quinta","sexta","sábado","domingo"];
+const uid=()=>Math.random().toString(36).slice(2,9);
+const pad=n=>String(n).padStart(2,"0");
+const hoje=new Date();
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const HOJE=iso(hoje);
+const DIA=(hoje.getDay()+6)%7;
+const mins=t=>{const[h,m]=t.split(":").map(Number);return h*60+m};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const cvar=a=>`--c:var(${(AREAS[a]||AREAS.pessoal).c})`;
+
+function modelo(){
+  const b=[];const add=(dias,ini,fim,area,txt)=>dias.forEach(d=>b.push({id:uid(),dia:d,ini,fim,area,txt}));
+  const util=[0,1,2,3,4];
+  add(util,"05:30","06:30","escrita","Sessão de escrita");
+  add(util,"06:30","09:30","treino","Atendimento e treinos de alunos");
+  add([0,2,4],"10:00","12:00","codigo","Projeto 1");
+  add([1,3],"10:00","12:00","codigo","Projeto 2");
+  add(util,"14:00","16:00","facul","Estudo da faculdade");
+  add(util,"16:30","19:30","treino","Atendimento e treinos de alunos");
+  add([1,3],"19:45","20:45","proprio","Força");
+  add([0,1,2,3,4,5,6],"21:00","22:00","leitura","Leitura");
+  add([5],"06:00","08:00","proprio","Longão");
+  add([5],"09:00","12:00","escrita","Escrita longa");
+  add([6],"09:00","10:00","pessoal","Revisar a semana e montar o próximo microciclo");
+  return {v:1,modelo:true,blocos:b,feitos:{},
+    projetos:[
+      {id:uid(),nome:"Projeto 1",area:"codigo",tarefas:[{id:uid(),txt:"Definir escopo e prazo final",feito:false,prazo:"",foco:true},{id:uid(),txt:"Listar as entregas da primeira semana",feito:false,prazo:"",foco:false}]},
+      {id:uid(),nome:"Projeto 2",area:"codigo",tarefas:[{id:uid(),txt:"Definir escopo e prazo final",feito:false,prazo:"",foco:true}]}
+    ],
+    livros:[],escrita:{meta:3000,reg:{}}};
+}
+
+let S=null, tab="hoje", selBloco=null, confirmar=null, ref=null, editT=null, editL=null;
+try{const t=localStorage.getItem("mv_tab");if(t)tab=t}catch(e){}
+
+/* ---------- persistência ---------- */
+const syncEl=document.getElementById("sync");
+let saveT=null;
+function save(){
+  S.modelo=false;
+  try{localStorage.setItem("mv_estado",JSON.stringify(S));syncEl.textContent="Salvo neste aparelho"}
+  catch(e){syncEl.textContent="Não consegui salvar neste aparelho"}
+}
+function local(){try{const s=localStorage.getItem("mv_estado");return s?JSON.parse(s):null}catch(e){return null}}
+
+async function boot(){
+  S=local()||modelo();
+  render();
+  syncEl.textContent=S.modelo?"Modelo inicial — edite à vontade":"Salvo neste aparelho";
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+}
+
+/* ---------- cópia de segurança ---------- */
+function baixarCopia(){
+  const blob=new Blob([JSON.stringify({formato:"microciclo",versao:1,salvo_em:new Date().toISOString(),estado:S},null,1)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="microciclo-"+HOJE+".json";
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+}
+function restaurarCopia(arq){
+  const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);const novo=d&&d.formato==="microciclo"?d.estado:d;
+      if(!novo||!Array.isArray(novo.blocos)||!Array.isArray(novo.projetos))throw 0;
+      if(!confirm("Trocar o painel deste aparelho pela cópia escolhida?"))return;
+      S=novo;save();render();syncEl.textContent="Cópia restaurada"}
+    catch(e){alert("Esse arquivo não é uma cópia do Microciclo.")}};
+  r.readAsText(arq);
+}
+
+/* ---------- render ---------- */
+document.getElementById("date").textContent=DIAS_LONGO[DIA]+", "+hoje.toLocaleDateString("pt-BR",{day:"2-digit",month:"long"});
+const view=document.getElementById("view");
+document.getElementById("tabs").addEventListener("click",e=>{
+  const b=e.target.closest("[data-tab]");if(!b)return;
+  tab=b.dataset.tab;selBloco=null;confirmar=null;editT=null;editL=null;
+  try{localStorage.setItem("mv_tab",tab)}catch(e){}
+  render();
+});
+function render(){
+  prep();
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
+  view.innerHTML=({hoje:vHoje,semana:vSemana,projetos:vProjetos,leitura:vLeitura})[tab]();
+}
+
+function horas(){
+  const h={};Object.keys(AREAS).forEach(k=>h[k]=0);
+  S.blocos.forEach(b=>{h[b.area]=(h[b.area]||0)+Math.max(0,mins(b.fim)-mins(b.ini))/60});
+  return h;
+}
+function vCarga(){
+  const h=horas();const max=Math.max(1,...Object.values(h));
+  const tot=Object.values(h).reduce((a,b)=>a+b,0);
+  return `<div class="panel"><div class="row" style="justify-content:space-between"><h2>Volume do microciclo</h2><span class="tag">${tot.toFixed(1).replace(".",",")} h/semana</span></div>
+  <div class="load">${Object.entries(AREAS).filter(([k])=>h[k]>0).map(([k,a])=>`<div class="lrow" style="${cvar(k)}"><span>${a.nome}</span><div class="track"><div class="fill" style="width:${(h[k]/max*100).toFixed(1)}%"></div></div><span class="hrs">${h[k].toFixed(1).replace(".",",")}h</span></div>`).join("")}</div>
+  <p class="note">Como na planilha de um atleta: se uma barra cresce demais, outra precisa ceder.</p></div>`;
+}
+
+function vHoje(){
+  const bl=S.blocos.filter(b=>b.dia===DIA).sort((a,b)=>mins(a.ini)-mins(b.ini));
+  const f=S.feitos[HOJE]||[];const agora=hoje.getHours()*60+hoje.getMinutes();
+  const foco=[];S.projetos.forEach(p=>p.tarefas.forEach(t=>{if(t.foco&&!t.feito)foco.push({p,t})}));
+  const prazo=[];S.projetos.forEach(p=>p.tarefas.forEach(t=>{if(t.prazo&&!t.feito)prazo.push({p,t})}));
+  prazo.sort((a,b)=>a.t.prazo.localeCompare(b.t.prazo));
+  const palavras=semanaPalavras();
+  return `<section>
+  <div class="panel"><div class="row" style="justify-content:space-between"><h2>Agenda de hoje</h2><span class="tag">${f.filter(id=>bl.some(b=>b.id===id)).length}/${bl.length} feitos</span></div>
+   ${bl.length?`<div class="agenda">${bl.map(b=>{const on=f.includes(b.id);const now=agora>=mins(b.ini)&&agora<mins(b.fim);
+     return `<div class="slot ${on?"done":""} ${now?"now":""}" style="${cvar(b.area)}"><span class="t">${b.ini}–${b.fim}</span><span class="bar"></span><span class="txt">${esc(b.txt)}<br><span class="note">${AREAS[b.area]?.nome||""}${now?" · agora":""}</span></span><button class="chk ${on?"on":""}" data-act="feito" data-id="${b.id}" aria-label="Marcar como feito">${on?"✓":""}</button></div>`}).join("")}</div>`
+   :`<div class="empty">Nada planejado para hoje. Monte os blocos na aba Semana.</div>`}
+  </div>
+  <div class="panel"><h2>Foco dos projetos</h2>
+   ${foco.length?`<div>${foco.map(({p,t})=>tarefaHTML(p,t,true)).join("")}</div>`:`<div class="empty">Marque com ★ as tarefas mais importantes na aba Projetos e elas aparecem aqui.</div>`}
+   ${prazo.length?`<div class="label">Próximos prazos</div><div>${prazo.slice(0,4).map(({p,t})=>tarefaHTML(p,t,true)).join("")}</div>`:""}
+  </div>
+  <div class="panel"><div class="row" style="justify-content:space-between"><h2>Escrita da semana</h2><span class="tag">${palavras.toLocaleString("pt-BR")} / ${S.escrita.meta.toLocaleString("pt-BR")} palavras</span></div>
+   <div class="progress" style="${cvar("escrita")}"><i style="width:${Math.min(100,palavras/S.escrita.meta*100).toFixed(1)}%"></i></div>
+   <form class="row" data-form="palavras"><input class="grow" id="palHoje" type="number" min="0" inputmode="numeric" placeholder="Palavras escritas hoje" aria-label="Palavras escritas hoje"><button class="btn">Registrar</button></form>
+  </div>
+  ${vCarga()}
+  ${vCopia()}
+  </section>`;
+}
+function vCopia(){return `<div class="panel"><h2>Cópia de segurança</h2><p class="note">O painel fica guardado neste aparelho. Baixe uma cópia de vez em quando, e use-a para passar o painel para outro celular ou computador.</p><div class="copia"><button class="btn" data-act="baixar">Baixar cópia</button><label class="btn ghost" style="cursor:pointer">Restaurar cópia<input type="file" accept=".json,application/json" data-act="restaurar" hidden></label></div></div>`;}
+
+function tarefaHTML(p,t,mostrarProj){
+  if(editT===t.id)return `<form class="edit" data-form="edittarefa" data-p="${p.id}" data-id="${t.id}"><input id="etT" value="${esc(t.txt)}" aria-label="Texto da tarefa" required>
+   <div class="row"><input type="date" id="etP" value="${t.prazo||""}" aria-label="Prazo"><button type="button" class="btn ghost" data-act="limpaprazo">Sem prazo</button>
+   <span class="row" style="margin-left:auto"><button class="btn">Salvar</button><button type="button" class="btn ghost" data-act="canceledit">Cancelar</button></span></div></form>`;
+  const late=t.prazo&&t.prazo<HOJE&&!t.feito;
+  const pz=t.prazo?new Date(t.prazo+"T12:00").toLocaleDateString("pt-BR",{day:"2-digit",month:"short"}):"";
+  return `<div class="task ${t.feito?"done":""}"><button class="chk ${t.feito?"on":""}" data-act="tarefa" data-p="${p.id}" data-id="${t.id}" aria-label="Concluir tarefa">${t.feito?"✓":""}</button>
+  <span class="tx click" data-act="editT" data-id="${t.id}" title="Toque para editar">${esc(t.txt)}${mostrarProj?`<br><span class="note">${esc(p.nome)}</span>`:""}</span>
+  <span class="tag ${late?"late":""}">${late?"atrasada · ":""}${pz}</span>
+  <span class="row" style="gap:0"><button class="icon star ${t.foco?"on":""}" data-act="foco" data-p="${p.id}" data-id="${t.id}" aria-label="Foco">★</button><button class="icon" data-act="editT" data-id="${t.id}" aria-label="Editar tarefa">✎</button>${mostrarProj?"":`<button class="icon" data-act="deltarefa" data-p="${p.id}" data-id="${t.id}" aria-label="Apagar tarefa">✕</button>`}</span></div>`;
+}
+
+function vSemana(){
+  const sel=S.blocos.find(b=>b.id===selBloco);
+  const opts=Object.entries(AREAS).map(([k,a])=>`<option value="${k}">${esc(a.nome)}</option>`).join("");
+  return `<section>
+  <div class="panel"><h2>Adicionar bloco</h2>
+   <form class="row" data-form="bloco">
+    <select id="bDia" aria-label="Dia">${DIAS.map((d,i)=>`<option value="${i}" ${i===DIA?"selected":""}>${d}</option>`).join("")}<option value="util">Seg a Sex</option><option value="todos">Todos os dias</option></select>
+    <input type="time" id="bIni" value="08:00" aria-label="Início"><input type="time" id="bFim" value="09:00" aria-label="Fim">
+    <select id="bArea" aria-label="Área">${opts}</select>
+    <input class="grow" id="bTxt" placeholder="O que é esse bloco?" aria-label="Descrição" required>
+    <button class="btn">Adicionar</button>
+   </form>
+   ${S.modelo?`<p class="note">Esta semana é um modelo inicial. Toque num bloco para editar ou apagar e monte a sua.</p>`:""}
+  </div>
+  ${sel?`<div class="panel" style="${cvar(sel.area)}"><div class="row"><span class="dot"></span><h2>Editar bloco</h2></div>
+   <form class="row" data-form="editbloco" data-id="${sel.id}">
+    <select id="eDia" aria-label="Dia">${DIAS.map((d,i)=>`<option value="${i}" ${i===sel.dia?"selected":""}>${d}</option>`).join("")}</select>
+    <input type="time" id="eIni" value="${sel.ini}" aria-label="Início"><input type="time" id="eFim" value="${sel.fim}" aria-label="Fim">
+    <select id="eArea" aria-label="Área">${Object.entries(AREAS).map(([k,a])=>`<option value="${k}" ${k===sel.area?"selected":""}>${esc(a.nome)}</option>`).join("")}</select>
+    <input class="grow" id="eTxt" value="${esc(sel.txt)}" aria-label="Descrição" required>
+    <button class="btn">Salvar</button>
+   </form>
+   <div class="row"><button class="btn ghost" data-act="dupbloco" data-id="${sel.id}">Repetir Seg–Sex</button><button class="btn ghost" data-act="delbloco" data-id="${sel.id}">Apagar bloco</button><button class="btn ghost" data-act="fechar">Fechar</button></div></div>`:""}
+  <div class="wrapx"><div class="week">${DIAS.map((d,i)=>`<div class="day ${i===DIA?"today":""}"><h3>${d}</h3>${
+     S.blocos.filter(b=>b.dia===i).sort((a,b)=>mins(a.ini)-mins(b.ini)).map(b=>`<button class="blk ${b.id===selBloco?"sel":""}" style="${cvar(b.area)}" data-act="selbloco" data-id="${b.id}"><b>${b.ini}–${b.fim}</b>${esc(b.txt)}</button>`).join("")||`<span class="note">Livre</span>`
+   }</div>`).join("")}</div></div>
+  ${vCarga()}
+  <div class="panel"><h2>Áreas</h2>
+   ${Object.entries(AREAS).map(([k,a])=>`<div class="arow" style="${cvar(k)}"><span class="dot"></span>
+    <input id="an-${k}" data-act="anome" data-k="${k}" value="${esc(a.nome)}" aria-label="Nome da área">
+    <select data-act="acor" data-k="${k}" aria-label="Cor da área">${Object.entries(CORES).map(([c,n])=>`<option value="${c}" ${c===a.c?"selected":""}>${n}</option>`).join("")}</select>
+    ${k==="pessoal"?`<span style="width:28px"></span>`:confirmar==="a:"+k?`<span class="row"><button class="btn" data-act="delarea" data-k="${k}">Apagar</button><button class="btn ghost" data-act="cancel">Não</button></span>`:`<button class="icon" data-act="askdel" data-p="a:${k}" aria-label="Apagar área">✕</button>`}</div>`).join("")}
+   ${confirmar&&confirmar.startsWith("a:")?`<p class="note">Os blocos e projetos dessa área passam para “${esc(AREAS.pessoal.nome)}”.</p>`:""}
+   <form class="row" data-form="area"><input class="grow" id="novaArea" placeholder="Nova área (ex.: Fotografia)" aria-label="Nova área" required><select id="novaCor" aria-label="Cor">${Object.entries(CORES).map(([c,n])=>`<option value="${c}">${n}</option>`).join("")}</select><button class="btn">Criar área</button></form>
+  </div>
+  </section>`;
+}
+
+function vProjetos(){
+  const opts=sel=>Object.entries(AREAS).map(([k,a])=>`<option value="${k}" ${k===sel?"selected":""}>${esc(a.nome)}</option>`).join("");
+  return `<section>
+  ${S.projetos.map(p=>{const n=p.tarefas.length,f=p.tarefas.filter(t=>t.feito).length;
+   return `<div class="panel proj" style="${cvar(p.area)}">
+    <div class="proj-head"><span class="dot"></span><input class="name" id="pn-${p.id}" data-act="nome" data-p="${p.id}" value="${esc(p.nome)}" aria-label="Nome do projeto">
+     <select data-act="area" data-p="${p.id}" aria-label="Área do projeto">${opts(p.area)}</select>
+     ${confirmar===p.id?`<button class="btn" data-act="delproj" data-p="${p.id}">Apagar mesmo</button><button class="btn ghost" data-act="cancel">Não</button>`:`<button class="icon" data-act="askdel" data-p="${p.id}" aria-label="Apagar projeto">✕</button>`}</div>
+    <div class="row" style="justify-content:space-between"><span class="note">${f} de ${n} tarefas</span></div>
+    <div class="progress"><i style="width:${n?f/n*100:0}%"></i></div>
+    <div>${p.tarefas.length?p.tarefas.slice().sort((a,b)=>a.feito-b.feito).map(t=>tarefaHTML(p,t,false)).join(""):`<div class="empty">Sem tarefas ainda.</div>`}</div>
+    <form class="row" data-form="tarefa" data-p="${p.id}"><input class="grow" id="nt-${p.id}" placeholder="Nova tarefa" aria-label="Nova tarefa" required><input type="date" id="np-${p.id}" aria-label="Prazo"><button class="btn">Adicionar</button></form>
+   </div>`}).join("")}
+  <form class="panel row" data-form="projeto"><input class="grow" id="novoProj" placeholder="Nome do novo projeto (cliente, livro, curso…)" aria-label="Novo projeto" required><button class="btn">Criar projeto</button></form>
+  </section>`;
+}
+
+function semanaPalavras(){
+  const ini=new Date(hoje);ini.setDate(hoje.getDate()-DIA);const k=iso(ini);
+  return Object.entries(S.escrita.reg).filter(([d])=>d>=k&&d<=HOJE).reduce((a,[,v])=>a+v,0);
+}
+function vLeitura(){
+  const sem=semanaPalavras();
+  const ult=[];for(let i=6;i>=0;i--){const d=new Date(hoje);d.setDate(hoje.getDate()-i);ult.push([d,S.escrita.reg[iso(d)]||0])}
+  const mx=Math.max(1,...ult.map(x=>x[1]));
+  return `<section>
+  <div class="panel"><h2>Lendo agora</h2>
+   ${S.livros.length?`<div>${S.livros.map(l=>{const pc=l.total?Math.min(100,l.pag/l.total*100):0;
+    if(editL===l.id)return `<form class="edit book" data-form="editlivro" data-id="${l.id}"><input id="elT" value="${esc(l.titulo)}" aria-label="Título" required><input id="elA" value="${esc(l.autor)}" placeholder="Autor" aria-label="Autor">
+     <div class="row"><label class="note" for="elP">Total de páginas</label><input id="elP" type="number" min="1" value="${l.total}" class="pginput" inputmode="numeric" required><span class="row" style="margin-left:auto"><button class="btn">Salvar</button><button type="button" class="btn ghost" data-act="canceledit">Cancelar</button></span></div></form>`;
+    return `<div class="book" style="${cvar("leitura")}">
+    <div class="row" style="justify-content:space-between"><span><strong>${esc(l.titulo)}</strong>${l.autor?` <span class="muted">· ${esc(l.autor)}</span>`:""}</span>
+    ${confirmar===l.id?`<span class="row"><button class="btn" data-act="dellivro" data-id="${l.id}">Apagar</button><button class="btn ghost" data-act="cancel">Não</button></span>`:`<span class="row" style="gap:0"><button class="icon" data-act="editL" data-id="${l.id}" aria-label="Editar livro">✎</button><button class="icon" data-act="askdel" data-p="${l.id}" aria-label="Remover livro">✕</button></span>`}</div>
+    <div class="progress"><i style="width:${pc.toFixed(1)}%"></i></div>
+    <div class="row"><span class="pg">pág. ${l.pag} de ${l.total} · ${Math.round(pc)}%</span><span style="margin-left:auto" class="row"><label class="note" for="pg-${l.id}">Parei na</label><input class="pginput" id="pg-${l.id}" type="number" min="0" max="${l.total}" value="${l.pag}" data-act="pag" data-id="${l.id}" inputmode="numeric"></span></div>
+   </div>`}).join("")}</div>`:`<div class="empty">Nenhum livro em andamento. Adicione o que está lendo para acompanhar as páginas.</div>`}
+   <form class="row" data-form="livro"><input class="grow" id="lT" placeholder="Título" aria-label="Título" required><input class="grow" id="lA" placeholder="Autor" aria-label="Autor"><input id="lP" type="number" min="1" placeholder="Páginas" aria-label="Total de páginas" style="width:100px" required inputmode="numeric"><button class="btn">Adicionar</button></form>
+  </div>
+  <div class="panel" style="${cvar("escrita")}"><div class="row" style="justify-content:space-between;align-items:end"><div><div class="label">Palavras nesta semana</div><div class="big">${sem.toLocaleString("pt-BR")}</div></div>
+   <label class="row note" for="meta">Meta semanal <input id="meta" type="number" min="100" step="100" value="${S.escrita.meta}" data-act="meta" style="width:100px" inputmode="numeric"></label></div>
+   <div class="progress"><i style="width:${Math.min(100,sem/S.escrita.meta*100).toFixed(1)}%"></i></div>
+   <div class="label">Últimos 7 dias</div>
+   <div class="load">${ult.map(([d,v])=>`<div class="lrow"><span class="tag">${DIAS[(d.getDay()+6)%7]} ${pad(d.getDate())}</span><div class="track"><div class="fill" style="width:${(v/mx*100).toFixed(1)}%"></div></div><input class="dayv" id="dv-${iso(d)}" type="number" min="0" value="${v}" data-act="dia" data-d="${iso(d)}" aria-label="Palavras em ${pad(d.getDate())}" inputmode="numeric"></div>`).join("")}</div>
+   <form class="row" data-form="palavras"><input class="grow" id="palHoje" type="number" min="0" inputmode="numeric" placeholder="Palavras escritas hoje" aria-label="Palavras escritas hoje"><button class="btn">Registrar</button></form>
+   <p class="note">Registrar soma ao total de hoje. Para corrigir um dia, troque o número direto na lista.</p>
+  </div>
+  </section>`;
+}
+
+/* ---------- ações ---------- */
+const proj=id=>S.projetos.find(p=>p.id===id);
+view.addEventListener("click",e=>{
+  const el=e.target.closest("[data-act]");if(!el||el.tagName==="INPUT"||el.tagName==="SELECT")return;
+  const {act,id,p}=el.dataset;
+  switch(act){
+    case"feito":{const f=S.feitos[HOJE]||(S.feitos[HOJE]=[]);const i=f.indexOf(id);i<0?f.push(id):f.splice(i,1);
+      Object.keys(S.feitos).forEach(k=>{if(k<iso(new Date(hoje.getTime()-14*864e5)))delete S.feitos[k]});save();break}
+    case"tarefa":{const t=proj(p).tarefas.find(t=>t.id===id);t.feito=!t.feito;save();break}
+    case"foco":{const t=proj(p).tarefas.find(t=>t.id===id);t.foco=!t.foco;save();break}
+    case"deltarefa":{const pr=proj(p);pr.tarefas=pr.tarefas.filter(t=>t.id!==id);save();break}
+    case"selbloco":selBloco=selBloco===id?null:id;break;
+    case"fechar":selBloco=null;break;
+    case"delbloco":S.blocos=S.blocos.filter(b=>b.id!==id);selBloco=null;save();break;
+    case"dupbloco":{const b=S.blocos.find(b=>b.id===id);[0,1,2,3,4].forEach(d=>{if(!S.blocos.some(x=>x.dia===d&&x.ini===b.ini&&x.txt===b.txt))S.blocos.push({...b,id:uid(),dia:d})});selBloco=null;save();break}
+    case"askdel":confirmar=p;break;
+    case"cancel":confirmar=null;break;
+    case"delproj":S.projetos=S.projetos.filter(x=>x.id!==p);confirmar=null;save();break;
+    case"editT":editT=id;editL=null;break;
+    case"editL":editL=id;editT=null;break;
+    case"canceledit":editT=null;editL=null;break;
+    case"limpaprazo":{const i=document.getElementById("etP");if(i)i.value="";return}
+    case"delarea":{const k=el.dataset.k;S.blocos.forEach(b=>{if(b.area===k)b.area="pessoal"});S.projetos.forEach(x=>{if(x.area===k)x.area="pessoal"});delete S.areas[k];confirmar=null;save();break}
+    case"baixar":baixarCopia();return;
+    case"dellivro":S.livros=S.livros.filter(x=>x.id!==id);confirmar=null;save();break;
+    default:return;
+  }
+  render();
+});
+view.addEventListener("change",e=>{
+  const el=e.target;const {act,id,p}=el.dataset;
+  if(act==="restaurar"){if(el.files[0])restaurarCopia(el.files[0]);el.value="";return}
+  if(act==="nome"){proj(p).nome=el.value.trim()||"Sem nome";save();return}
+  if(act==="area"){proj(p).area=el.value;save();render();return}
+  if(act==="pag"){const l=S.livros.find(l=>l.id===id);l.pag=Math.max(0,Math.min(l.total,+el.value||0));save();render();return}
+  if(act==="anome"){S.areas[el.dataset.k].nome=el.value.trim()||"Sem nome";save();render();return}
+  if(act==="acor"){S.areas[el.dataset.k].c=el.value;save();render();return}
+  if(act==="dia"){const n=Math.max(0,+el.value||0);if(n)S.escrita.reg[el.dataset.d]=n;else delete S.escrita.reg[el.dataset.d];save();render();return}
+  if(act==="meta"){S.escrita.meta=Math.max(100,+el.value||3000);save();render();return}
+});
+view.addEventListener("submit",e=>{
+  e.preventDefault();const f=e.target;const v=id=>document.getElementById(id).value.trim();
+  switch(f.dataset.form){
+    case"bloco":{const ini=v("bIni"),fim=v("bFim");if(!v("bTxt")||mins(fim)<=mins(ini))return;
+      const d=v("bDia");const dias=d==="util"?[0,1,2,3,4]:d==="todos"?[0,1,2,3,4,5,6]:[+d];
+      dias.forEach(dia=>S.blocos.push({id:uid(),dia,ini,fim,area:v("bArea"),txt:v("bTxt")}));break}
+    case"tarefa":{const p=f.dataset.p;if(!v("nt-"+p))return;proj(p).tarefas.push({id:uid(),txt:v("nt-"+p),prazo:v("np-"+p),feito:false,foco:false});break}
+    case"editbloco":{const b=S.blocos.find(b=>b.id===f.dataset.id);const ini=v("eIni"),fim=v("eFim");if(!b||!v("eTxt")||mins(fim)<=mins(ini))return;
+      Object.assign(b,{dia:+v("eDia"),ini,fim,area:v("eArea"),txt:v("eTxt")});selBloco=null;break}
+    case"edittarefa":{const t=proj(f.dataset.p).tarefas.find(t=>t.id===f.dataset.id);if(!v("etT"))return;t.txt=v("etT");t.prazo=v("etP");editT=null;break}
+    case"editlivro":{const l=S.livros.find(l=>l.id===f.dataset.id);if(!v("elT")||!(+v("elP")>0))return;l.titulo=v("elT");l.autor=v("elA");l.total=+v("elP");l.pag=Math.min(l.pag,l.total);editL=null;break}
+    case"area":{const nome=v("novaArea");if(!nome)return;S.areas["x"+uid()]={nome,c:v("novaCor")};break}
+    case"projeto":if(!v("novoProj"))return;S.projetos.push({id:uid(),nome:v("novoProj"),area:"codigo",tarefas:[]});break;
+    case"livro":if(!v("lT")||!(+v("lP")>0))return;S.livros.push({id:uid(),titulo:v("lT"),autor:v("lA"),pag:0,total:+v("lP")});break;
+    case"palavras":{const n=+v("palHoje");if(!(n>0))return;S.escrita.reg[HOJE]=(S.escrita.reg[HOJE]||0)+n;break}
+    default:return;
+  }
+  save();render();
+});
+boot();
+</script>
+
+</body>
+</html>

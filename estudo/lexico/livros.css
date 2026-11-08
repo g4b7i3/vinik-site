@@ -1,0 +1,29 @@
+/* Acréscimos do Estúdio ao Léxico: volta ao Estúdio, carregar livros, instalação */
+.estudio-voltar{display:inline-flex;align-items:center;gap:4px;margin-right:14px;padding:6px 11px;border-radius:999px;border:1px solid var(--edge);background:#fff;color:var(--ink);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap}
+.estudio-voltar:hover{border-color:var(--clay)}
+.topbar{gap:10px}
+.breadcrumbs{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acervo-chip{border:1px solid var(--edge);background:#fff;border-radius:999px;padding:7px 13px;font-size:12px;font-weight:600;color:var(--mint);white-space:nowrap}
+.acervo-chip.falta{background:var(--pale);border-color:#e8cbbd;color:var(--terracotta)}
+.acervo{border:0;padding:0;border-radius:18px;max-width:min(460px,calc(100vw - 32px));width:100%;box-shadow:0 30px 80px rgba(20,28,34,.28);color:var(--ink);background:var(--paper)}
+.acervo::backdrop{background:rgba(23,33,42,.45)}
+.acervo-box{padding:22px 22px 18px;display:grid;gap:14px}
+.acervo-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.acervo-top h2{font-size:26px}
+.acervo-x{border:0;background:none;font-size:28px;line-height:1;color:var(--muted);padding:2px 6px}
+.acervo-txt{color:#4b5560;font-size:13.5px;margin:0}
+.acervo-lista{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.acervo-lista li{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--edge);border-radius:11px;padding:10px 12px;font-size:13px}
+.acervo-lista li span{width:18px;text-align:center;color:var(--muted);font-weight:800}
+.acervo-lista li.ok span{color:var(--mint)}
+.acervo-lista small{color:var(--muted);margin-left:auto}
+.acervo-btn{display:flex;justify-content:center;align-items:center;min-height:46px;border-radius:12px;background:var(--ink);color:#fff;font-weight:700;cursor:pointer}
+.acervo-btn:focus-within{outline:3px solid rgba(181,107,82,.4);outline-offset:2px}
+.acervo-status{min-height:1.2em;margin:0;font-size:12.5px;color:var(--terracotta)}
+.acervo-apagar{border:0;background:none;color:var(--muted);font-size:12px;text-decoration:underline;justify-self:center}
+@media (max-width:700px){
+  .estudio-voltar{margin-right:6px;padding:5px 9px}
+  .acervo-chip{padding:6px 10px;font-size:11px}
+  .top-actions{gap:8px}
+  .date-top{display:none}
+}

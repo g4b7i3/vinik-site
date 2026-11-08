@@ -1,0 +1,21 @@
+{
+  "id": "/estudo/",
+  "name": "Estúdio do Vinik",
+  "short_name": "Estúdio",
+  "description": "Léxico, quiz e Microciclo: os apps de estudo do Vinik.",
+  "lang": "pt-BR",
+  "start_url": "/estudo/",
+  "scope": "/estudo/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#12181e",
+  "theme_color": "#12181e",
+  "icons": [
+    { "src": "/estudo/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/estudo/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/estudo/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Léxico", "short_name": "Léxico", "url": "/estudo/lexico/", "icons": [{ "src": "/estudo/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

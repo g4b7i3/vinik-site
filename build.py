@@ -619,7 +619,7 @@ pages["404.html"] = head("Página não encontrada · Vinik", "Página não encon
 if os.path.isdir(OUT):
     shutil.rmtree(OUT)
 os.makedirs(OUT)
-for d in ("assets", "media", "admin", "content"):
+for d in ("assets", "media", "admin", "content", "estudo"):
     if os.path.isdir(os.path.join(ROOT, d)):
         shutil.copytree(os.path.join(ROOT, d), os.path.join(OUT, d))
 for name, doc in pages.items():

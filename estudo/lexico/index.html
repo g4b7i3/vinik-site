@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#171f26">
+<title>Léxico · Estúdio da Palavra</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Estúdio">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="livros.css">
+</head>
+<body>
+<div id="app" class="app-shell">
+  <aside class="sidebar" aria-label="Navegação principal">
+    <button class="brand" data-nav="inicio" aria-label="Ir para início"><span class="brand-mark">L<span class="brand-dot">.</span></span><span class="brand-copy"><strong>LÉXICO</strong><small>ESTÚDIO DA PALAVRA</small></span></button>
+    <div class="nav-eyebrow">SEU ESPAÇO</div>
+    <nav class="main-nav" id="main-nav">
+      <button class="nav-link active" data-nav="inicio"><span class="nav-ic">◫</span> Visão geral</button>
+      <button class="nav-link" data-nav="trilhas"><span class="nav-ic">▦</span> Minha aprendizagem</button>
+      <button class="nav-link" data-nav="praticar"><span class="nav-ic">✎</span> Exercícios</button>
+      <button class="nav-link" data-nav="dicionario"><span class="nav-ic">⌕</span> Dicionário analógico</button>
+      <button class="nav-link" data-nav="oficina"><span class="nav-ic">▤</span> Oficina de escrita</button>
+      <button class="nav-link" data-nav="oratória"><span class="nav-ic">◉</span> Expressão oral</button>
+      <button class="nav-link" data-nav="academia"><span class="nav-ic">▤</span> Programa avançado</button>
+      <button class="nav-link" data-nav="biblioteca"><span class="nav-ic">▧</span> Biblioteca integral</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="daily-card"><span class="tiny-label">META DO DIA</span><div class="daily-meta"><b id="side-goal-count">0 de 10</b><span>atividades</span></div><div class="progress-track"><div class="progress-fill" id="side-goal-progress"></div></div></div>
+      <div class="sidebar-source"><span class="status-dot"></span> Seus dados e os livros ficam só neste aparelho.</div>
+    </div>
+  </aside>
+  <div class="main-area">
+    <header class="topbar">
+      <div class="breadcrumbs"><span class="crumb-brand">LÉXICO</span><span class="slash">/</span><span id="breadcrumb-name">Visão geral</span></div>
+      <div class="top-actions"><span id="today-date" class="date-top"></span><button class="icon-btn" id="install-btn" title="Instalar aplicativo" hidden aria-label="Instalar app">↓</button><button class="avatar-btn" data-nav="progresso" title="Meu progresso" aria-label="Progresso">LV</button></div>
+    </header>
+    <main id="view" tabindex="-1" aria-live="polite"></main>
+    <footer class="footer">LÉXICO — ESTÚDIO DA PALAVRA <span>∙</span> Biblioteca pessoal e prática de escrita.</footer>
+  </div>
+  <nav class="mobile-nav" aria-label="Navegação móvel"><button data-nav="inicio" class="active"><span>◫</span>Início</button><button data-nav="trilhas"><span>▦</span>Trilhas</button><button data-nav="praticar"><span>✎</span>Praticar</button><button data-nav="dicionario"><span>⌕</span>Léxico</button><button data-nav="oficina"><span>▤</span>Escrever</button><button data-nav="academia"><span>▥</span>Curso</button><button data-nav="biblioteca"><span>▧</span>Livros</button></nav>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<dialog id="acervo" class="acervo" aria-labelledby="acervo-titulo">
+  <form method="dialog" class="acervo-box">
+    <div class="acervo-top"><h2 id="acervo-titulo">Livros neste aparelho</h2><button class="acervo-x" value="fechar" aria-label="Fechar">×</button></div>
+    <p class="acervo-txt">Os livros não ficam no site. Carregue aqui, uma vez em cada aparelho, o arquivo <b>lexico-livros.json.gz</b> e, se quiser ler a diagramação original, os dois PDFs. Tudo fica guardado só neste navegador.</p>
+    <ul class="acervo-lista" id="acervo-lista"></ul>
+    <label class="acervo-btn"><input type="file" id="acervo-arquivos" multiple accept=".gz,.json,.pdf,application/pdf,application/gzip,application/json,application/octet-stream" hidden>Escolher arquivos</label>
+    <p class="acervo-status" id="acervo-status" role="status"></p>
+    <button type="button" class="acervo-apagar" id="acervo-apagar">Apagar os livros deste aparelho</button>
+  </form>
+</dialog>
+<script src="livros.js"></script>
+</body>
+</html>
