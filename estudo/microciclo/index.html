@@ -102,6 +102,12 @@ input[type=time]{font-family:var(--mono);font-size:14px}
 .proj-head input.name:hover{border-color:var(--line)}
 .progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
 .progress i{display:block;height:100%;background:var(--c)}
+/* Dia típico */
+.tip{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.tip:first-child{border-top:none}
+.tip .dot{align-self:center}
+.tip .meta{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;text-align:right}
+.tip .note{grid-column:2 / -1}
 /* Leitura */
 .book{display:grid;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
 .book:first-child{border-top:none}
@@ -304,9 +310,33 @@ function vHoje(){
    <div class="progress" style="${cvar("escrita")}"><i style="width:${Math.min(100,palavras/S.escrita.meta*100).toFixed(1)}%"></i></div>
    <form class="row" data-form="palavras"><input class="grow" id="palHoje" type="number" min="0" inputmode="numeric" placeholder="Palavras escritas hoje" aria-label="Palavras escritas hoje"><button class="btn">Registrar</button></form>
   </div>
+  ${vDiaTipico()}
   ${vCarga()}
   ${vCopia()}
   </section>`;
+}
+/* ---------- dia típico (referência) ---------- */
+const DIA_TIPICO=[
+  {nome:"Sono",meta:"8h",c:"--a-pessoal",fonte:"7 a 9 h para adultos (American Academy of Sleep Medicine); quem treina corrida fica no meio ou acima disso."},
+  {nome:"Escrita",meta:"1h30",c:"--a-escrita",areas:["escrita"],fonte:"Boice: sessões diárias de 30 a 60 min produzem mais que blocos longos esporádicos."},
+  {nome:"Leitura",meta:"40 min a 1h",c:"--a-leitura",areas:["leitura"],fonte:"40 min por dia dão uns 25 livros de 300 páginas por ano."},
+  {nome:"Estudo",meta:"1h",c:"--a-facul",areas:["facul"],fonte:"Efeito de espaçamento: 1 h por dia rende mais que 7 h no domingo."},
+  {nome:"Trabalho",meta:"4 a 5h",c:"--a-treino",areas:["treino","codigo"],fonte:"Só umas 2 h com concentração de verdade. Teto de trabalho profundo somado: 4 h por dia (Ericsson)."},
+  {nome:"Meu treino",meta:"o seu",c:"--a-proprio",areas:["proprio"]},
+  {nome:"Filmes e séries",meta:"1h30 a 2h",c:"--a-rosa",fonte:"Bem-estar sobe até 2 h de tempo livre por dia e cai depois de 5 h (Sharif, Mogilner e Hershfield, 2021)."},
+  {nome:"Refeições, deslocamento, imprevistos",meta:"3 a 4h",c:"--a-teal",fonte:"A sobra que faz o dia fechar sem aperto."}
+];
+function vDiaTipico(){
+  const h=horas();
+  const fmt=x=>{const m=Math.round(x*60);return m<60?m+" min":Math.floor(m/60)+"h"+(m%60?pad(m%60):"")};
+  return `<div class="panel"><h2>Dia típico</h2>
+  <div>${DIA_TIPICO.map(d=>{
+    const ar=(d.areas||[]).filter(k=>AREAS[k]);
+    const sem=ar.length?ar.reduce((t,k)=>t+(h[k]||0),0)/7:null;
+    return `<div class="tip" style="--c:var(${d.c})"><span class="dot"></span><span>${d.nome}</span><span class="meta">${d.meta}</span>
+    ${d.fonte||sem!==null?`<span class="note">${d.fonte||""}${sem!==null?`${d.fonte?" ":""}Na sua semana: ${fmt(sem)} por dia, em média.`:""}</span>`:""}</div>`}).join("")}</div>
+  <div class="label">Dia ruim: versão mínima</div>
+  <p class="note">15 minutos de escrita e 10 páginas de leitura. Isso mantém a sequência. Um hábito leva em média 66 dias para virar automático (Lally, 2010), e faltar um dia não atrapalha; o que conta é repetir no mesmo horário.</p></div>`;
 }
 function vCopia(){return `<div class="panel"><h2>Cópia de segurança</h2><p class="note">O painel sincroniza sozinho entre os seus aparelhos. Se quiser uma cópia guardada fora do site, baixe aqui.</p><div class="copia"><button class="btn" data-act="baixar">Baixar cópia</button><label class="btn ghost" style="cursor:pointer">Restaurar cópia<input type="file" accept=".json,application/json" data-act="restaurar" hidden></label></div></div>`;}
 
