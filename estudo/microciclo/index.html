@@ -108,6 +108,14 @@ input[type=time]{font-family:var(--mono);font-size:14px}
 .tip .dot{align-self:center}
 .tip .meta{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;text-align:right}
 .tip .note{grid-column:2 / -1}
+.tip .tbar,.tip .chips{grid-column:2 / -1}
+.tip .meta b{font-weight:700;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+.chip{font:600 13px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer}
+.chip:disabled{opacity:.35;cursor:default}
+.tag.ok{color:var(--c)}
+details.note summary{cursor:pointer}
+details.note p{margin-top:6px}
 /* Leitura */
 .book{display:grid;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
 .book:first-child{border-top:none}
@@ -315,28 +323,44 @@ function vHoje(){
   ${vCopia()}
   </section>`;
 }
-/* ---------- dia típico (referência) ---------- */
+/* ---------- dia típico: metas e registro do que foi feito ---------- */
 const DIA_TIPICO=[
-  {nome:"Sono",meta:"8h",c:"--a-pessoal",fonte:"7 a 9 h para adultos (American Academy of Sleep Medicine); quem treina corrida fica no meio ou acima disso."},
-  {nome:"Escrita",meta:"1h30",c:"--a-escrita",areas:["escrita"],fonte:"Boice: sessões diárias de 30 a 60 min produzem mais que blocos longos esporádicos."},
-  {nome:"Leitura",meta:"40 min a 1h",c:"--a-leitura",areas:["leitura"],fonte:"40 min por dia dão uns 25 livros de 300 páginas por ano."},
-  {nome:"Estudo",meta:"1h",c:"--a-facul",areas:["facul"],fonte:"Efeito de espaçamento: 1 h por dia rende mais que 7 h no domingo."},
-  {nome:"Trabalho",meta:"4 a 5h",c:"--a-treino",areas:["treino","codigo"],fonte:"Só umas 2 h com concentração de verdade. Teto de trabalho profundo somado: 4 h por dia (Ericsson)."},
-  {nome:"Meu treino",meta:"o seu",c:"--a-proprio",areas:["proprio"]},
-  {nome:"Filmes e séries",meta:"1h30 a 2h",c:"--a-rosa",fonte:"Bem-estar sobe até 2 h de tempo livre por dia e cai depois de 5 h (Sharif, Mogilner e Hershfield, 2021)."},
-  {nome:"Refeições, deslocamento, imprevistos",meta:"3 a 4h",c:"--a-teal",fonte:"A sobra que faz o dia fechar sem aperto."}
+  {k:"sono",nome:"Sono",meta:"8h",min:480,c:"--a-pessoal"},
+  {k:"escrita",nome:"Escrita",meta:"1h30",min:90,c:"--a-escrita",areas:["escrita"],minimo:15},
+  {k:"leitura",nome:"Leitura",meta:"40 min a 1h",min:60,c:"--a-leitura",areas:["leitura"]},
+  {k:"estudo",nome:"Estudo",meta:"1h",min:60,c:"--a-facul",areas:["facul"]},
+  {k:"trabalho",nome:"Trabalho",meta:"4 a 5h",min:300,c:"--a-treino",areas:["treino","codigo"]},
+  {k:"treino",nome:"Meu treino",meta:"o planejado",c:"--a-proprio",areas:["proprio"]},
+  {k:"lazer",nome:"Filmes e séries",meta:"1h30 a 2h",min:120,c:"--a-rosa"},
+  {k:"sobra",nome:"Refeições, deslocamento, imprevistos",meta:"3 a 4h",c:"--a-teal",sem:true}
 ];
+const fmtM=m=>m<60?m+" min":Math.floor(m/60)+"h"+(m%60?pad(m%60):"");
+function metaTreino(){const m=S.blocos.filter(b=>b.dia===DIA&&b.area==="proprio").reduce((t,b)=>t+Math.max(0,mins(b.fim)-mins(b.ini)),0);return m||60}
 function vDiaTipico(){
-  const h=horas();
-  const fmt=x=>{const m=Math.round(x*60);return m<60?m+" min":Math.floor(m/60)+"h"+(m%60?pad(m%60):"")};
-  return `<div class="panel"><h2>Dia típico</h2>
+  const h=horas();const reg=(S.diario||{})[HOJE]||{};
+  const total=Object.values(reg).reduce((a,b)=>a+b,0);
+  return `<div class="panel"><div class="row" style="justify-content:space-between"><h2>Dia típico</h2><span class="tag">${fmtM(total)} registrados hoje</span></div>
+  <p class="note">Registre o que fez: cada toque soma tempo e a barra enche até a meta.</p>
   <div>${DIA_TIPICO.map(d=>{
-    const ar=(d.areas||[]).filter(k=>AREAS[k]);
-    const sem=ar.length?ar.reduce((t,k)=>t+(h[k]||0),0)/7:null;
-    return `<div class="tip" style="--c:var(${d.c})"><span class="dot"></span><span>${d.nome}</span><span class="meta">${d.meta}</span>
-    ${d.fonte||sem!==null?`<span class="note">${d.fonte||""}${sem!==null?`${d.fonte?" ":""}Na sua semana: ${fmt(sem)} por dia, em média.`:""}</span>`:""}</div>`}).join("")}</div>
+    if(d.sem)return `<div class="tip" style="--c:var(${d.c})"><span class="dot"></span><span>${d.nome}</span><span class="meta">${d.meta}</span><span class="note">A sobra que faz o dia fechar sem aperto.</span></div>`;
+    const alvo=d.k==="treino"?metaTreino():d.min;const feito=reg[d.k]||0;const pct=Math.min(100,feito/alvo*100);
+    const ar=(d.areas||[]).filter(k=>AREAS[k]);const sem=ar.length?ar.reduce((t,k)=>t+(h[k]||0),0)/7:null;
+    const ok=feito>=alvo, minimo=d.minimo&&feito>=d.minimo&&!ok;
+    return `<div class="tip" style="--c:var(${d.c})"><span class="dot"></span><span>${d.nome}</span><span class="meta">${feito?`<b>${fmtM(feito)}</b> / `:""}${d.k==="treino"?fmtM(alvo):d.meta}</span>
+    <div class="progress tbar"><i style="width:${pct.toFixed(1)}%"></i></div>
+    <div class="chips"><button class="chip" data-act="dmin" data-k="${d.k}" data-m="-15" aria-label="Tirar 15 minutos de ${d.nome}" ${feito?"":"disabled"}>−15</button><button class="chip" data-act="dmin" data-k="${d.k}" data-m="15">+15 min</button><button class="chip" data-act="dmin" data-k="${d.k}" data-m="30">+30 min</button><button class="chip" data-act="dmin" data-k="${d.k}" data-m="60">+1h</button>${ok?`<span class="tag ok">meta feita</span>`:minimo?`<span class="tag ok">mínimo feito</span>`:""}</div>
+    ${sem!==null?`<span class="note">Na sua semana: ${fmtM(Math.round(sem*60))} por dia, em média.</span>`:""}</div>`}).join("")}</div>
   <div class="label">Dia ruim: versão mínima</div>
-  <p class="note">15 minutos de escrita e 10 páginas de leitura. Isso mantém a sequência. Um hábito leva em média 66 dias para virar automático (Lally, 2010), e faltar um dia não atrapalha; o que conta é repetir no mesmo horário.</p></div>`;
+  <p class="note">15 minutos de escrita e 10 páginas de leitura. Isso mantém a sequência.</p>
+  <details class="note"><summary>De onde vêm os números</summary>
+  <p>Sono: 7 a 9 h para adultos (American Academy of Sleep Medicine); quem treina corrida fica no meio ou acima disso.</p>
+  <p>Escrita: Boice mostrou que sessões diárias de 30 a 60 min produzem mais que blocos longos esporádicos.</p>
+  <p>Leitura: 40 min por dia dão uns 25 livros de 300 páginas por ano.</p>
+  <p>Estudo: efeito de espaçamento; 1 h por dia rende mais que 7 h no domingo.</p>
+  <p>Trabalho: só umas 2 h com concentração de verdade. O teto de trabalho profundo somado fica em 4 h por dia (Ericsson, 1993).</p>
+  <p>Lazer: o bem-estar sobe até 2 h de tempo livre por dia e cai depois de 5 h (Sharif, Mogilner e Hershfield, 2021).</p>
+  <p>Hábito: leva em média 66 dias para virar automático, e faltar um dia não atrapalha; o que conta é repetir no mesmo horário (Lally, 2010).</p>
+  </details></div>`;
 }
 function vCopia(){return `<div class="panel"><h2>Cópia de segurança</h2><p class="note">O painel sincroniza sozinho entre os seus aparelhos. Se quiser uma cópia guardada fora do site, baixe aqui.</p><div class="copia"><button class="btn" data-act="baixar">Baixar cópia</button><label class="btn ghost" style="cursor:pointer">Restaurar cópia<input type="file" accept=".json,application/json" data-act="restaurar" hidden></label></div></div>`;}
 
@@ -447,6 +471,7 @@ view.addEventListener("click",e=>{
   switch(act){
     case"feito":{const f=S.feitos[HOJE]||(S.feitos[HOJE]=[]);const i=f.indexOf(id);i<0?f.push(id):f.splice(i,1);
       Object.keys(S.feitos).forEach(k=>{if(k<iso(new Date(hoje.getTime()-14*864e5)))delete S.feitos[k]});save();break}
+    case"dmin":{if(!S.diario)S.diario={};const r=S.diario[HOJE]||(S.diario[HOJE]={});const v=Math.max(0,(r[el.dataset.k]||0)+Number(el.dataset.m));if(v)r[el.dataset.k]=v;else delete r[el.dataset.k];Object.keys(S.diario).forEach(k=>{if(k<iso(new Date(hoje.getTime()-90*864e5)))delete S.diario[k]});save();break}
     case"tarefa":{const t=proj(p).tarefas.find(t=>t.id===id);t.feito=!t.feito;save();break}
     case"foco":{const t=proj(p).tarefas.find(t=>t.id===id);t.foco=!t.foco;save();break}
     case"deltarefa":{const pr=proj(p);pr.tarefas=pr.tarefas.filter(t=>t.id!==id);save();break}
