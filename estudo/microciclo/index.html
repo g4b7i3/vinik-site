@@ -40,6 +40,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
 header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px}
 h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,6vw,36px);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.marca{display:block;width:96px;height:27px;margin-bottom:6px;background:var(--ink);-webkit-mask:url(../icons/logo-vinik.png) left center/contain no-repeat;mask:url(../icons/logo-vinik.png) left center/contain no-repeat}
 .date{font-family:var(--mono);font-size:14px;color:var(--muted)}
 .sync{font-size:14px;color:var(--muted);margin-top:2px}
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding-block:12px;margin-top:8px;border-bottom:1px solid var(--line)}
@@ -193,7 +194,8 @@ details.note p{margin-top:6px}
   <a class="voltar" href="../">‹ Estúdio</a>
   <header>
     <div>
-      <h1>Microciclo do Vinik</h1>
+      <span class="marca" role="img" aria-label="Vinik"></span>
+      <h1>Microciclo</h1>
       <div class="sync" id="sync">Carregando…</div>
     </div>
     <div class="date" id="date"></div>

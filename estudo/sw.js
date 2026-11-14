@@ -1,8 +1,8 @@
 /* Estúdio: guarda o app para abrir sem internet. Os livros ficam no IndexedDB, não aqui. */
-const VERSAO = 'estudio-v4';
+const VERSAO = 'estudio-v5';
 const BASE = new URL('./', self.location).pathname; // /estudo/
 const ARQUIVOS = ['', 'estudio.css', 'estudio.js', 'apps.js', 'manifest.webmanifest',
-  'icons/icon-192.png', 'icons/apple-touch-icon.png',
+  'icons/icon-192.png', 'icons/apple-touch-icon.png', 'icons/logo-vinik.png', 'icons/badge-96.png',
   'lexico/', 'lexico/style.css', 'lexico/livros.css', 'lexico/livros.js',
   'lexico/conteudo.js', 'lexico/academia.js', 'lexico/app.js', 'lexico/fontes.json',
   'microciclo/', 'quiz/', 'quiz/catalogo-base.json', 'quiz/countries.json', 'quiz/capas.json', 'quiz/assets/world.svg'].map(a => BASE + a);
@@ -52,7 +52,7 @@ self.addEventListener('push', e => {
   try { d = e.data ? e.data.json() : {}; } catch (_) { d = { corpo: e.data ? e.data.text() : '' }; }
   e.waitUntil(self.registration.showNotification(d.titulo || 'Microciclo', {
     body: d.corpo || '', tag: d.tag || undefined, renotify: !!d.tag,
-    icon: BASE + 'icons/icon-192.png', badge: BASE + 'icons/icon-192.png',
+    icon: BASE + 'icons/icon-192.png', badge: BASE + 'icons/badge-96.png',
     data: { url: d.url || BASE + 'microciclo/' }
   }));
 });
