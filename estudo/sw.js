@@ -1,5 +1,5 @@
 /* Estúdio: guarda o app para abrir sem internet. Os livros ficam no IndexedDB, não aqui. */
-const VERSAO = 'estudio-v3';
+const VERSAO = 'estudio-v4';
 const BASE = new URL('./', self.location).pathname; // /estudo/
 const ARQUIVOS = ['', 'estudio.css', 'estudio.js', 'apps.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/apple-touch-icon.png',
@@ -29,6 +29,7 @@ self.addEventListener('fetch', e => {
   }
   if (url.origin !== location.origin || !url.pathname.startsWith(BASE)) return;
   if (LIVRES.some(p => url.pathname.startsWith(p))) return;
+  if (url.pathname.startsWith(BASE + 'api/')) return; // dados sempre da rede
 
   if (req.mode === 'navigate') {
     // rede primeiro (pega a versão nova e respeita a senha); sem internet, a cópia guardada

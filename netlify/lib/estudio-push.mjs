@@ -37,19 +37,26 @@ export async function guardarAssinaturas(lista) {
   await loja().setJSON("push-assinaturas", lista);
 }
 
-// envia para todos os aparelhos; tira da lista os que não existem mais
+// envia para todos os aparelhos; tira da lista os que não existem mais.
+// Devolve quantos receberam e o resultado de cada aparelho (para o teste mostrar o motivo de uma falha).
 export async function enviarTodos(aviso) {
   const lista = await assinaturas();
-  if (!lista.length) return 0;
+  if (!lista.length) return { enviados: 0, aparelhos: 0, falhas: [] };
   const k = await chaves();
   webpush.setVapidDetails("https://vinikautor.com.br", k.publicKey, k.privateKey);
   const corpo = JSON.stringify(aviso);
   const mortos = new Set();
+  const falhas = [];
   let enviados = 0;
   await Promise.all(lista.map(async (a) => {
-    try { await webpush.sendNotification(a.sub, corpo, { TTL: 3600, urgency: "normal" }); enviados++; }
-    catch (e) { if (e && (e.statusCode === 404 || e.statusCode === 410)) mortos.add(a.sub.endpoint); }
+    try { await webpush.sendNotification(a.sub, corpo, { TTL: 3600, urgency: "high" }); enviados++; }
+    catch (e) {
+      const st = e && e.statusCode;
+      if (st === 404 || st === 410) mortos.add(a.sub.endpoint);
+      falhas.push({ servico: new URL(a.sub.endpoint).hostname, status: st || 0, erro: String((e && (e.body || e.message)) || e).slice(0, 200) });
+      console.log("push falhou", st, e && (e.body || e.message));
+    }
   }));
   if (mortos.size) await guardarAssinaturas(lista.filter((a) => !mortos.has(a.sub.endpoint)));
-  return enviados;
+  return { enviados, aparelhos: lista.length, falhas };
 }

@@ -10,8 +10,8 @@ export default async (req) => {
   try { corpo = JSON.parse((await req.text()) || "{}"); } catch (_) { return json({ erro: "JSON inválido" }, 400); }
 
   if (req.method === "POST" && corpo.teste) {
-    const enviados = await enviarTodos({ titulo: "Microciclo", corpo: "Notificações funcionando neste aparelho.", tag: "teste", url: "/estudo/microciclo/" });
-    return json({ enviados });
+    const r = await enviarTodos({ titulo: "Microciclo", corpo: "Notificações funcionando.", tag: "teste", url: "/estudo/microciclo/" });
+    return json(r);
   }
   if (req.method === "POST") {
     const s = corpo.sub;

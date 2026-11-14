@@ -513,7 +513,7 @@ async function regSW(){if(!("serviceWorker"in navigator)||location.protocol!=="h
 async function checarPush(){
   if(!("serviceWorker"in navigator)||!("PushManager"in window)||!("Notification"in window)){pushEstado=ehIOS?"ios":"sem-suporte"}
   else if(Notification.permission==="denied")pushEstado="negado";
-  else{try{const r=await regSW();const s=r&&await r.pushManager.getSubscription();pushEstado=s?"ativo":"inativo"}catch(e){pushEstado="inativo"}}
+  else{try{const r=await regSW();const s=r&&await r.pushManager.getSubscription();pushEstado=s?"ativo":"inativo";if(s)enviarAssinatura().catch(()=>{})}catch(e){pushEstado="inativo"}}
   if(tab==="hoje"&&!document.querySelector("#view input:focus,#view select:focus"))render();
 }
 async function ativarPush(){
@@ -537,11 +537,27 @@ async function desativarPush(){
   }catch(e){}
   pushEstado="inativo";render();
 }
+let pushMsg="";
 async function testarPush(){
-  const el=document.getElementById("pushMsg");if(el)el.textContent="Enviando…";
-  try{const r=await fetch(PUSH,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({teste:true})});
-    const d=await r.json();if(el)el.textContent=r.ok?`Enviado para ${d.enviados} ${d.enviados===1?"aparelho":"aparelhos"}.`:"Não deu para enviar agora."}
-  catch(e){if(el)el.textContent="Sem conexão agora."}
+  pushMsg="Enviando…";render();
+  // 1) o próprio aparelho consegue mostrar uma notificação?
+  try{const r=await navigator.serviceWorker.ready;await r.showNotification("Microciclo",{body:"Teste deste aparelho.",tag:"teste-local",icon:"../icons/icon-192.png"})}
+  catch(e){pushMsg="Este aparelho não conseguiu mostrar a notificação ("+(e&&e.message||e)+"). Confira se as notificações do navegador ou do app estão liberadas nas configurações do celular.";render();return}
+  // 2) o site consegue mandar?
+  try{
+    await enviarAssinatura();
+    const r=await fetch(PUSH,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({teste:true})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)pushMsg="O site respondeu com erro "+r.status+(r.status===401?": entre de novo no Estúdio.":".");
+    else if(d.enviados)pushMsg=`Você deve receber duas notificações: uma do aparelho e outra do site (enviada para ${d.enviados} de ${d.aparelhos} ${d.aparelhos===1?"aparelho":"aparelhos"}). Se só a primeira chegou, me mande este texto.`;
+    else pushMsg="O site não conseguiu entregar: "+(d.falhas||[]).map(f=>`${f.servico} respondeu ${f.status||"sem código"} ${f.erro}`).join(" | ")+". Me mande este texto.";
+  }catch(e){pushMsg="Sem conexão com o site agora."}
+  render();
+}
+async function enviarAssinatura(){
+  const r=await regSW();const s=r&&await r.pushManager.getSubscription();if(!s)return false;
+  const ok=await fetch(PUSH,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({sub:s.toJSON(),aparelho:navigator.userAgent.slice(0,120)})});
+  return ok.ok;
 }
 function vNotif(){
   const n=notif();
@@ -553,7 +569,7 @@ function vNotif(){
   return `<div class="panel"><h2>Notificações</h2>
    <p class="note">${est}</p>
    <div class="row">${pushEstado==="ativo"?`<button class="btn" data-act="pushteste">Enviar teste</button><button class="btn ghost" data-act="pushoff">Desligar neste aparelho</button>`
-     :["inativo","erro"].includes(pushEstado)?`<button class="btn" data-act="pushon">Ativar neste aparelho</button>`:""}<span class="note" id="pushMsg"></span></div>
+     :["inativo","erro"].includes(pushEstado)?`<button class="btn" data-act="pushon">Ativar neste aparelho</button>`:""}</div>${pushMsg?`<p class="note" id="pushMsg">${esc(pushMsg)}</p>`:""}
    <div class="label">O que avisar (vale para todos os aparelhos)</div>
    <label class="row note"><input type="checkbox" data-act="nopt" data-k="blocos" ${n.blocos?"checked":""}> No começo de cada bloco da semana</label>
    <label class="row note"><input type="checkbox" data-act="nopt" data-k="lembrete" ${n.lembrete?"checked":""}> Lembrete para registrar o dia às <input type="time" data-act="nhora" value="${n.lembrete||"21:30"}" ${n.lembrete?"":"disabled"} aria-label="Horário do lembrete"></label>
