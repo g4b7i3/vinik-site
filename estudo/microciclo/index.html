@@ -115,6 +115,19 @@ input[type=time]{font-family:var(--mono);font-size:14px}
 .chip:disabled{opacity:.35;cursor:default}
 .tag.ok{color:var(--c)}
 details.note summary{cursor:pointer}
+.grade{border-collapse:separate;border-spacing:3px;width:100%;font-size:13px}
+.grade th{font-weight:600;text-align:left;font-size:12px;line-height:1.2}
+.grade thead th{text-align:center;font-family:var(--mono);font-weight:500;color:var(--muted)}
+.grade thead th .icon{font:inherit;color:inherit;padding:2px 4px}
+.grade thead th.hj{color:var(--accent)}
+.grade td{text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:-.02em;border-radius:5px;height:30px;min-width:30px;padding:0 1px;border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cdia{font-size:11px;color:var(--muted);text-align:center;font-family:var(--mono)}
+.cel{display:grid;gap:4px;padding:6px 4px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:500 13px var(--mono);cursor:pointer;text-align:center;position:relative}
+.cel i{display:block;height:4px;border-radius:2px;background:var(--accent);justify-self:start}
+.cel:disabled{opacity:.35;cursor:default}
+.cel.hj{border-color:var(--accent);color:var(--accent)}
+.icon:disabled{opacity:.3;cursor:default}
 details.note p{margin-top:6px}
 /* Leitura */
 .book{display:grid;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
@@ -147,6 +160,7 @@ details.note p{margin-top:6px}
     <button role="tab" data-tab="semana" aria-selected="false">Semana</button>
     <button role="tab" data-tab="projetos" aria-selected="false">Projetos</button>
     <button role="tab" data-tab="leitura" aria-selected="false">Leitura e escrita</button>
+    <button role="tab" data-tab="historico" aria-selected="false">Histórico</button>
   </nav>
   <main id="view"></main>
 </div>
@@ -200,6 +214,7 @@ function modelo(){
 
 let S=null, tab="hoje", selBloco=null, confirmar=null, ref=null, editT=null, editL=null;
 try{const t=localStorage.getItem("mv_tab");if(t)tab=t}catch(e){}
+function lerHash(){const h=location.hash.slice(1);if(h==="historico"){tab="historico";histSem=0}else{const m=h.match(/^mes-(\d{4}-\d{2})$/);if(m){tab="historico";histMes=m[1]}}}
 
 /* ---------- persistência ---------- */
 const syncEl=document.getElementById("sync");
@@ -244,7 +259,10 @@ async function puxar(){
 function local(){try{const s=localStorage.getItem("mv_estado");return s?JSON.parse(s):null}catch(e){return null}}
 
 async function boot(){
+  lerHash();
+  window.addEventListener("hashchange",()=>{lerHash();render()});
   S=local()||modelo();
+  checarPush();
   render();
   syncEl.textContent="Sincronizando…";
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
@@ -281,7 +299,7 @@ document.getElementById("tabs").addEventListener("click",e=>{
 function render(){
   prep();
   document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
-  view.innerHTML=({hoje:vHoje,semana:vSemana,projetos:vProjetos,leitura:vLeitura})[tab]();
+  view.innerHTML=({hoje:vHoje,semana:vSemana,projetos:vProjetos,leitura:vLeitura,historico:vHistorico}[tab]||vHoje)();
 }
 
 function horas(){
@@ -320,6 +338,7 @@ function vHoje(){
   </div>
   ${vDiaTipico()}
   ${vCarga()}
+  ${vNotif()}
   ${vCopia()}
   </section>`;
 }
@@ -335,15 +354,16 @@ const DIA_TIPICO=[
   {k:"sobra",nome:"Refeições, deslocamento, imprevistos",meta:"3 a 4h",c:"--a-teal",sem:true}
 ];
 const fmtM=m=>m<60?m+" min":Math.floor(m/60)+"h"+(m%60?pad(m%60):"");
-function metaTreino(){const m=S.blocos.filter(b=>b.dia===DIA&&b.area==="proprio").reduce((t,b)=>t+Math.max(0,mins(b.fim)-mins(b.ini)),0);return m||60}
+let regDia=HOJE;
 function vDiaTipico(){
-  const h=horas();const reg=(S.diario||{})[HOJE]||{};
+  const h=horas();const reg=(S.diario||{})[regDia]||{};
   const total=Object.values(reg).reduce((a,b)=>a+b,0);
-  return `<div class="panel"><div class="row" style="justify-content:space-between"><h2>Dia típico</h2><span class="tag">${fmtM(total)} registrados hoje</span></div>
+  return `<div class="panel" id="diatipico"><div class="row" style="justify-content:space-between"><h2>Dia típico</h2><span class="tag">${fmtM(total)} registrados</span></div>
+  <div class="row note"><label for="regDia">Registrando em</label><input type="date" id="regDia" data-act="regdia" value="${regDia}" max="${HOJE}">${regDia!==HOJE?`<button class="btn ghost" data-act="voltahoje">Voltar para hoje</button>`:""}</div>
   <p class="note">Registre o que fez: cada toque soma tempo e a barra enche até a meta.</p>
   <div>${DIA_TIPICO.map(d=>{
     if(d.sem)return `<div class="tip" style="--c:var(${d.c})"><span class="dot"></span><span>${d.nome}</span><span class="meta">${d.meta}</span><span class="note">A sobra que faz o dia fechar sem aperto.</span></div>`;
-    const alvo=d.k==="treino"?metaTreino():d.min;const feito=reg[d.k]||0;const pct=Math.min(100,feito/alvo*100);
+    const alvo=metaDe(d,regDia);const feito=reg[d.k]||0;const pct=Math.min(100,feito/alvo*100);
     const ar=(d.areas||[]).filter(k=>AREAS[k]);const sem=ar.length?ar.reduce((t,k)=>t+(h[k]||0),0)/7:null;
     const ok=feito>=alvo, minimo=d.minimo&&feito>=d.minimo&&!ok;
     return `<div class="tip" style="--c:var(${d.c})"><span class="dot"></span><span>${d.nome}</span><span class="meta">${feito?`<b>${fmtM(feito)}</b> / `:""}${d.k==="treino"?fmtM(alvo):d.meta}</span>
@@ -361,6 +381,114 @@ function vDiaTipico(){
   <p>Lazer: o bem-estar sobe até 2 h de tempo livre por dia e cai depois de 5 h (Sharif, Mogilner e Hershfield, 2021).</p>
   <p>Hábito: leva em média 66 dias para virar automático, e faltar um dia não atrapalha; o que conta é repetir no mesmo horário (Lally, 2010).</p>
   </details></div>`;
+}
+/* ---------- histórico: semana e mês ---------- */
+const ITENS=()=>DIA_TIPICO.filter(d=>!d.sem);
+const regDe=d=>(S.diario||{})[d]||{};
+const dataDe=s=>new Date(s+"T12:00");
+function metaDe(d,dIso){if(d.k!=="treino")return d.min;const wd=(dataDe(dIso).getDay()+6)%7;const m=S.blocos.filter(b=>b.dia===wd&&b.area==="proprio").reduce((t,b)=>t+Math.max(0,mins(b.fim)-mins(b.ini)),0);return m||60}
+const curto=m=>!m?"":m<60?String(m):Math.floor(m/60)+"h"+(m%60?pad(m%60):"");
+function cumprido(dIso){const r=regDe(dIso);const it=ITENS();return it.reduce((t,d)=>t+Math.min(1,(r[d.k]||0)/metaDe(d,dIso)),0)/it.length}
+let histSem=0, histMes=HOJE.slice(0,7);
+function resumo(dias){ // dias: lista de datas ISO já passadas
+  return ITENS().map(d=>{const tot=dias.reduce((t,x)=>t+(regDe(x)[d.k]||0),0);const meta=dias.reduce((t,x)=>t+metaDe(d,x),0);
+    const bateu=dias.filter(x=>(regDe(x)[d.k]||0)>=metaDe(d,x)).length;
+    return {d,tot,media:dias.length?Math.round(tot/dias.length):0,pct:meta?tot/meta*100:0,bateu}});
+}
+function tabelaResumo(dias){
+  return `<div>${resumo(dias).map(({d,tot,media,pct,bateu})=>`<div class="tip" style="--c:var(${d.c})"><span class="dot"></span><span>${d.nome}</span><span class="meta">${media?`<b>${fmtM(media)}</b>/dia`:"—"}</span>
+   <div class="progress tbar"><i style="width:${Math.min(100,pct).toFixed(1)}%"></i></div>
+   <span class="note">${Math.round(pct)}% da meta · bateu em ${bateu} de ${dias.length} dias · total ${tot?fmtM(tot):"0"}</span></div>`).join("")}</div>`;
+}
+function vHistorico(){
+  // semana
+  const seg=new Date(hoje);seg.setDate(hoje.getDate()-DIA+7*histSem);
+  const sem=[...Array(7)].map((_,i)=>{const x=new Date(seg);x.setDate(seg.getDate()+i);return iso(x)});
+  const semPass=sem.filter(x=>x<=HOJE);
+  const fmtD=s=>dataDe(s).toLocaleDateString("pt-BR",{day:"numeric",month:"short"}).replace(".","");
+  // mês
+  const [ano,mes]=histMes.split("-").map(Number);
+  const nDias=new Date(ano,mes,0).getDate();const prim=(new Date(ano,mes-1,1).getDay()+6)%7;
+  const diasMes=[...Array(nDias)].map((_,i)=>histMes+"-"+pad(i+1));const mesPass=diasMes.filter(x=>x<=HOJE);
+  const nomeMes=new Date(ano,mes-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+  const fechado=histMes<HOJE.slice(0,7);
+  return `<section>
+  <div class="panel"><div class="row" style="justify-content:space-between"><h2>Semana</h2>
+   <span class="row" style="gap:4px"><button class="icon" data-act="hsem" data-m="-1" aria-label="Semana anterior">‹</button><span class="tag">${fmtD(sem[0])} a ${fmtD(sem[6])}</span><button class="icon" data-act="hsem" data-m="1" aria-label="Próxima semana" ${histSem>=0?"disabled":""}>›</button></span></div>
+   <div class="wrapx"><table class="grade"><thead><tr><th></th>${sem.map((x,i)=>`<th class="${x===HOJE?"hj":""}"><button class="icon" data-act="irdia" data-d="${x}" ${x>HOJE?"disabled":""}>${DIAS[i]}<br>${dataDe(x).getDate()}</button></th>`).join("")}</tr></thead>
+   <tbody>${ITENS().map(d=>`<tr style="--c:var(${d.c})"><th>${d.nome}</th>${sem.map(x=>{const v=regDe(x)[d.k]||0;const p=Math.min(1,v/metaDe(d,x));
+     return `<td style="background:color-mix(in srgb,var(--c) ${Math.round(p*70)}%,transparent);${p>.55?"color:#fff":""}">${curto(v)}</td>`}).join("")}</tr>`).join("")}</tbody></table></div>
+   <p class="note">Minutos por dia; quanto mais forte a cor, mais perto da meta. Toque num dia para registrar nele.</p>
+   ${semPass.length?`<div class="label">Média da semana (${semPass.length} ${semPass.length>1?"dias":"dia"})</div>${tabelaResumo(semPass)}`:""}
+  </div>
+  <div class="panel"><div class="row" style="justify-content:space-between"><h2>Mês</h2>
+   <span class="row" style="gap:4px"><button class="icon" data-act="hmes" data-m="-1" aria-label="Mês anterior">‹</button><span class="tag">${nomeMes}</span><button class="icon" data-act="hmes" data-m="1" aria-label="Próximo mês" ${fechado?"":"disabled"}>›</button></span></div>
+   <div class="cal">${DIAS.map(d=>`<span class="cdia">${d}</span>`).join("")}${"<span></span>".repeat(prim)}${diasMes.map(x=>{const fut=x>HOJE;const c=fut?0:cumprido(x);
+     return `<button class="cel ${x===HOJE?"hj":""}" data-act="irdia" data-d="${x}" ${fut?"disabled":""}><span>${Number(x.slice(8))}</span><i style="width:${(c*100).toFixed(0)}%"></i></button>`}).join("")}</div>
+   <p class="note">A barrinha de cada dia mostra quanto das metas foi cumprido. Toque num dia para registrar nele.</p>
+   ${mesPass.length?`<div class="label">${fechado?"Fechamento do mês":"Média do mês até hoje"} (${mesPass.length} ${mesPass.length>1?"dias":"dia"})</div>${tabelaResumo(mesPass)}`:""}
+  </div>
+  </section>`;
+}
+
+/* ---------- notificações ---------- */
+const PUSH="../api/push";
+const NOTIF_PADRAO={blocos:true,lembrete:"21:30",semana:true,mes:true};
+const notif=()=>({...NOTIF_PADRAO,...(S.notif||{})});
+let pushEstado="verificando";
+const ehIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+function u8(b64){const p="=".repeat((4-b64.length%4)%4);const s=atob((b64+p).replace(/-/g,"+").replace(/_/g,"/"));return Uint8Array.from(s,c=>c.charCodeAt(0))}
+async function regSW(){if(!("serviceWorker"in navigator)||location.protocol!=="https:")return null;try{return await navigator.serviceWorker.register("../sw.js",{scope:"../"})}catch(e){return null}}
+async function checarPush(){
+  if(!("serviceWorker"in navigator)||!("PushManager"in window)||!("Notification"in window)){pushEstado=ehIOS?"ios":"sem-suporte"}
+  else if(Notification.permission==="denied")pushEstado="negado";
+  else{try{const r=await regSW();const s=r&&await r.pushManager.getSubscription();pushEstado=s?"ativo":"inativo"}catch(e){pushEstado="inativo"}}
+  if(tab==="hoje"&&!document.querySelector("#view input:focus,#view select:focus"))render();
+}
+async function ativarPush(){
+  pushEstado="ativando";render();
+  try{
+    if(await Notification.requestPermission()!=="granted"){pushEstado="negado";render();return}
+    const r=await regSW();await navigator.serviceWorker.ready;
+    const k=await fetch(PUSH,{credentials:"same-origin",cache:"no-store"});if(!k.ok)throw 0;
+    const {chave}=await k.json();
+    let s=await r.pushManager.getSubscription();if(!s)s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(chave)});
+    const ok=await fetch(PUSH,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({sub:s.toJSON(),aparelho:navigator.userAgent.slice(0,120)})});
+    if(!ok.ok)throw 0;
+    if(!S.notif){S.notif={...NOTIF_PADRAO};save()}
+    pushEstado="ativo";
+  }catch(e){pushEstado="erro"}
+  render();
+}
+async function desativarPush(){
+  try{const r=await regSW();const s=r&&await r.pushManager.getSubscription();
+    if(s){await fetch(PUSH,{method:"DELETE",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({endpoint:s.endpoint})}).catch(()=>{});await s.unsubscribe()}
+  }catch(e){}
+  pushEstado="inativo";render();
+}
+async function testarPush(){
+  const el=document.getElementById("pushMsg");if(el)el.textContent="Enviando…";
+  try{const r=await fetch(PUSH,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({teste:true})});
+    const d=await r.json();if(el)el.textContent=r.ok?`Enviado para ${d.enviados} ${d.enviados===1?"aparelho":"aparelhos"}.`:"Não deu para enviar agora."}
+  catch(e){if(el)el.textContent="Sem conexão agora."}
+}
+function vNotif(){
+  const n=notif();
+  const est={verificando:"Verificando este aparelho…",ativando:"Ativando…",ativo:"Ativas neste aparelho.",inativo:"Desligadas neste aparelho.",
+    negado:"O navegador bloqueou as notificações deste site. Libere nas configurações do navegador e volte aqui.",
+    ios:"No iPhone, as notificações só funcionam com o Estúdio instalado: no Safari, toque em Compartilhar › Adicionar à Tela de Início e abra o Microciclo pelo ícone.",
+    "sem-suporte":"Este navegador não recebe notificações de sites. No celular, use o Chrome (Android) ou o app instalado (iPhone).",
+    erro:"Não consegui ativar. Confira a internet e tente de novo."}[pushEstado];
+  return `<div class="panel"><h2>Notificações</h2>
+   <p class="note">${est}</p>
+   <div class="row">${pushEstado==="ativo"?`<button class="btn" data-act="pushteste">Enviar teste</button><button class="btn ghost" data-act="pushoff">Desligar neste aparelho</button>`
+     :["inativo","erro"].includes(pushEstado)?`<button class="btn" data-act="pushon">Ativar neste aparelho</button>`:""}<span class="note" id="pushMsg"></span></div>
+   <div class="label">O que avisar (vale para todos os aparelhos)</div>
+   <label class="row note"><input type="checkbox" data-act="nopt" data-k="blocos" ${n.blocos?"checked":""}> No começo de cada bloco da semana</label>
+   <label class="row note"><input type="checkbox" data-act="nopt" data-k="lembrete" ${n.lembrete?"checked":""}> Lembrete para registrar o dia às <input type="time" data-act="nhora" value="${n.lembrete||"21:30"}" ${n.lembrete?"":"disabled"} aria-label="Horário do lembrete"></label>
+   <label class="row note"><input type="checkbox" data-act="nopt" data-k="semana" ${n.semana?"checked":""}> Resumo da semana no domingo, às 20h</label>
+   <label class="row note"><input type="checkbox" data-act="nopt" data-k="mes" ${n.mes?"checked":""}> Média do mês no dia 1, às 8h</label>
+  </div>`;
 }
 function vCopia(){return `<div class="panel"><h2>Cópia de segurança</h2><p class="note">O painel sincroniza sozinho entre os seus aparelhos. Se quiser uma cópia guardada fora do site, baixe aqui.</p><div class="copia"><button class="btn" data-act="baixar">Baixar cópia</button><label class="btn ghost" style="cursor:pointer">Restaurar cópia<input type="file" accept=".json,application/json" data-act="restaurar" hidden></label></div></div>`;}
 
@@ -471,7 +599,7 @@ view.addEventListener("click",e=>{
   switch(act){
     case"feito":{const f=S.feitos[HOJE]||(S.feitos[HOJE]=[]);const i=f.indexOf(id);i<0?f.push(id):f.splice(i,1);
       Object.keys(S.feitos).forEach(k=>{if(k<iso(new Date(hoje.getTime()-14*864e5)))delete S.feitos[k]});save();break}
-    case"dmin":{if(!S.diario)S.diario={};const r=S.diario[HOJE]||(S.diario[HOJE]={});const v=Math.max(0,(r[el.dataset.k]||0)+Number(el.dataset.m));if(v)r[el.dataset.k]=v;else delete r[el.dataset.k];Object.keys(S.diario).forEach(k=>{if(k<iso(new Date(hoje.getTime()-90*864e5)))delete S.diario[k]});save();break}
+    case"dmin":{if(!S.diario)S.diario={};const r=S.diario[regDia]||(S.diario[regDia]={});const v=Math.max(0,(r[el.dataset.k]||0)+Number(el.dataset.m));if(v)r[el.dataset.k]=v;else delete r[el.dataset.k];Object.keys(S.diario).forEach(k=>{if(k<iso(new Date(hoje.getTime()-1100*864e5)))delete S.diario[k]});save();break}
     case"tarefa":{const t=proj(p).tarefas.find(t=>t.id===id);t.feito=!t.feito;save();break}
     case"foco":{const t=proj(p).tarefas.find(t=>t.id===id);t.foco=!t.foco;save();break}
     case"deltarefa":{const pr=proj(p);pr.tarefas=pr.tarefas.filter(t=>t.id!==id);save();break}
@@ -488,6 +616,13 @@ view.addEventListener("click",e=>{
     case"limpaprazo":{const i=document.getElementById("etP");if(i)i.value="";return}
     case"delarea":{const k=el.dataset.k;S.blocos.forEach(b=>{if(b.area===k)b.area="pessoal"});S.projetos.forEach(x=>{if(x.area===k)x.area="pessoal"});delete S.areas[k];confirmar=null;save();break}
     case"baixar":baixarCopia();return;
+    case"voltahoje":regDia=HOJE;break;
+    case"irdia":regDia=el.dataset.d;tab="hoje";try{localStorage.setItem("mv_tab",tab)}catch(e){}render();setTimeout(()=>{const d=document.getElementById("diatipico");d&&d.scrollIntoView({behavior:"smooth"})},50);return;
+    case"hsem":histSem=Math.min(0,histSem+Number(el.dataset.m));break;
+    case"hmes":{const[a,m]=histMes.split("-").map(Number);const d=new Date(a,m-1+Number(el.dataset.m),1);const k=d.getFullYear()+"-"+pad(d.getMonth()+1);if(k<=HOJE.slice(0,7))histMes=k;break}
+    case"pushon":ativarPush();return;
+    case"pushoff":desativarPush();return;
+    case"pushteste":testarPush();return;
     case"dellivro":S.livros=S.livros.filter(x=>x.id!==id);confirmar=null;save();break;
     default:return;
   }
@@ -495,6 +630,9 @@ view.addEventListener("click",e=>{
 });
 view.addEventListener("change",e=>{
   const el=e.target;const {act,id,p}=el.dataset;
+  if(act==="regdia"){if(el.value&&el.value<=HOJE)regDia=el.value;render();return}
+  if(act==="nopt"){const n=notif();const k=el.dataset.k;n[k]=k==="lembrete"?(el.checked?(n.lembrete||"21:30"):""):el.checked;if(k==="lembrete"&&el.checked&&!n.lembrete)n.lembrete="21:30";S.notif=n;save();render();return}
+  if(act==="nhora"){const n=notif();if(el.value){n.lembrete=el.value;S.notif=n;save()}return}
   if(act==="restaurar"){if(el.files[0])restaurarCopia(el.files[0]);el.value="";return}
   if(act==="nome"){proj(p).nome=el.value.trim()||"Sem nome";save();return}
   if(act==="area"){proj(p).area=el.value;save();render();return}

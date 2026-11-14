@@ -1,5 +1,5 @@
 /* Estúdio: guarda o app para abrir sem internet. Os livros ficam no IndexedDB, não aqui. */
-const VERSAO = 'estudio-v2';
+const VERSAO = 'estudio-v3';
 const BASE = new URL('./', self.location).pathname; // /estudo/
 const ARQUIVOS = ['', 'estudio.css', 'estudio.js', 'apps.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/apple-touch-icon.png',
@@ -43,4 +43,24 @@ self.addEventListener('fetch', e => {
     const rede = fetch(req).then(r => { if (pode(r)) c.put(url.pathname, r.clone()); return r; }).catch(() => m);
     return m || rede;
   })));
+});
+
+// Notificações do Microciclo (enviadas por netlify/functions/estudo-avisos.mjs)
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (_) { d = { corpo: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.titulo || 'Microciclo', {
+    body: d.corpo || '', tag: d.tag || undefined, renotify: !!d.tag,
+    icon: BASE + 'icons/icon-192.png', badge: BASE + 'icons/icon-192.png',
+    data: { url: d.url || BASE + 'microciclo/' }
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const alvo = new URL((e.notification.data && e.notification.data.url) || BASE + 'microciclo/', self.location.origin).href;
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
+    const c = cs.find(c => c.url.includes('/estudo/microciclo/')) || cs.find(c => c.url.includes(BASE));
+    if (c) return (c.navigate ? c.navigate(alvo).catch(() => c) : Promise.resolve(c)).then(w => (w || c).focus());
+    return self.clients.openWindow(alvo);
+  }));
 });

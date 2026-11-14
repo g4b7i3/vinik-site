@@ -22,3 +22,9 @@ Copie os dois valores para `SAL` e `RESUMO` em `netlify/edge-functions/estudo-po
 - O app salva primeiro no aparelho e envia a cópia ao site logo depois; ao abrir em outro aparelho, puxa a versão mais nova. Vale a última alteração.
 - A função confere o mesmo cookie do porteiro. Se trocar a senha, troque o `RESUMO` nos dois arquivos.
 - A dependência `@netlify/blobs` está no `package.json`; a Netlify instala sozinha a cada publicação.
+
+## Notificações do Microciclo
+- Cada aparelho liga as notificações no painel Notificações (aba Hoje). No iPhone, só funciona com o Estúdio instalado na tela de início e aberto pelo ícone.
+- `netlify/functions/estudo-push.mjs` guarda os aparelhos (loja `estudio`, chave `push-assinaturas`) e manda o aviso de teste. As chaves VAPID são criadas sozinhas no primeiro uso (chave `push-vapid`).
+- `netlify/functions/estudo-avisos.mjs` roda a cada 5 minutos: avisa o começo de cada bloco da semana, lembra de registrar o dia no horário escolhido, manda a média da semana no domingo às 20h e a média do mês no dia 1 às 8h. Só lê o painel; não altera nada.
+- O que avisar fica no próprio painel (vale para todos os aparelhos). As metas usadas nas médias são as mesmas do Dia típico; se mudar uma, mude nos dois arquivos.
