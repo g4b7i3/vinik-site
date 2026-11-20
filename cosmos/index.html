@@ -64,7 +64,7 @@ body.pilot #hud{display:flex}
 <div id="veu"></div>
 <div id="info"><div>
   Uma viagem pelo Sistema Solar e pela Via Láctea. Toque no foguete para pilotar; no modo foguete, toque no nome de um planeta, estrela ou constelação para o piloto automático levar você até lá.<br><br>
-  Tamanhos e distâncias dos planetas estão fora de escala para caberem na tela. As posições das estrelas, das constelações e do Centro Galáctico seguem as coordenadas reais do céu. Ninguém nunca fotografou a Via Láctea de fora: a vista de cima é uma concepção artística feita por astrônomos a partir de medições.<br><br>
+  Tudo está em escala real: tamanhos dos planetas, distâncias até o Sol, a galáxia em anos-luz e o buraco negro Sagitário A* com seu tamanho verdadeiro. Por isso, de longe, os planetas são pontinhos; os nomes ajudam a achá-los. O tempo é acelerado: um ano da Terra dura 30 minutos. Exageros: o relevo da Terra (8 vezes), a densidade de rochas no Cinturão de Asteroides e nos anéis de Saturno, e o brilho do disco do buraco negro. As posições das estrelas, das constelações e do Centro Galáctico seguem as coordenadas reais do céu. Ninguém nunca fotografou a Via Láctea de fora: a vista de cima é uma concepção artística feita por astrônomos a partir de medições.<br><br>
   Terra: mosaico Blue Marble da NASA (dezembro de 2004) e relevo de shadedrelief.com, com montanhas exageradas 8 vezes para aparecerem.<br>
   Céu e estrelas: NASA Scientific Visualization Studio (Deep Star Maps, a partir dos catálogos Gaia, Hipparcos e Tycho) e catálogo HYG 4.0 (astronexus, CC BY-SA 4.0), com 83 mil estrelas reais nas posições, cores e brilhos medidos.<br>
   Planetas: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> (CC BY 4.0), a partir de imagens da NASA e do panorama da Via Láctea do ESO.<br>
@@ -83,6 +83,9 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+// Real scale spans 2 m to millions of light-years. Depth comes from the logarithmic depth buffer (gl_FragDepth),
+// so clip-space z is pinned to 0: nothing is ever clipped by the near/far planes, which float32 can't resolve at this range.
+THREE.ShaderChunk.logdepthbuf_vertex += '\n#ifdef USE_LOGDEPTHBUF\n gl_Position.z = 0.0;\n#endif\n';
 const D2R = Math.PI / 180;
 const isTouch = matchMedia('(pointer:coarse)').matches;
 const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -101,9 +104,16 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
 document.body.prepend(renderer.domElement);
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.004, 5e6);
+// real scale: 1 unit = 1000 km (Earth radius 6.371, 1 AU = 149 598, 1 light-year = 9.46e9)
+const LY = 9.4607e9, AU = 149598;
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 2e-6, 1e13);
 const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: 4 }));
-composer.addPass(new RenderPass(scene, camera));
+// Two scenes: the far universe in light-years (galaxy, sky, other galaxies) and the near one in units of 1000 km.
+// Each has its own camera at the same place, so no coordinate ever gets too large for the GPU.
+const farScene = new THREE.Scene();
+const farCam = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 1e-5, 1e9);
+composer.addPass(new RenderPass(farScene, farCam));
+{ const nearPass = new RenderPass(scene, camera); nearPass.clear = false; nearPass.clearDepth = true; composer.addPass(nearPass); }
 // the rocket is drawn in its own pass (layer 1) so the black-hole lensing never covers it
 const rocketCam = new THREE.PerspectiveCamera();
 const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.6, 0.55, 0.8);
@@ -122,10 +132,10 @@ const GCd = radec(266.405, -28.936).normalize(); GCd.addScaledVector(NGP, -GCd.d
 const GAL_X = GCd.clone().negate();
 const GAL_Y = V3().crossVectors(NGP, GAL_X);
 const R_SUN = 27000, R0 = 33000, PITCH = Math.tan(12 * D2R);
-const GC_WORLD = GAL_X.clone().multiplyScalar(-R_SUN);
+const GC_WORLD = GAL_X.clone().multiplyScalar(-R_SUN * LY);
 const galFrame = new THREE.Group(); galFrame.matrixAutoUpdate = false;
-galFrame.matrix.makeBasis(GAL_X, GAL_Y, NGP); galFrame.matrix.setPosition(GC_WORLD); scene.add(galFrame);
-const galToWorld = (x, y, z = 0) => GC_WORLD.clone().addScaledVector(GAL_X, x).addScaledVector(GAL_Y, y).addScaledVector(NGP, z);
+galFrame.matrix.makeBasis(GAL_X, GAL_Y, NGP); galFrame.matrix.setPosition(GAL_X.clone().multiplyScalar(-R_SUN)); farScene.add(galFrame);
+const galToWorld = (x, y, z = 0) => GC_WORLD.clone().addScaledVector(GAL_X, x * LY).addScaledVector(GAL_Y, y * LY).addScaledVector(NGP, z * LY);
 const armPhi = (k, r) => k * Math.PI / 2 + Math.log(r / R0) / PITCH;
 
 /* ---------- shared GLSL ---------- */
@@ -196,7 +206,7 @@ const skyMat = new THREE.ShaderMaterial({
   }`,
   side: THREE.BackSide, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
 });
-const sky = new THREE.Mesh(new THREE.SphereGeometry(2e6, 64, 32), skyMat); sky.renderOrder = -10; sky.frustumCulled = false; scene.add(sky);
+const sky = new THREE.Mesh(new THREE.SphereGeometry(5e6, 64, 32), skyMat); sky.renderOrder = -10; sky.frustumCulled = false; farScene.add(sky);
 
 /* ---------- fixed-pixel star material ---------- */
 function starMat() {
@@ -225,14 +235,14 @@ function ciColor(ci) { // B-V colour index to an approximate star colour
 const bgStars = (() => {
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0], 3));
   g.setAttribute('aColor', new THREE.Float32BufferAttribute([0, 0, 0], 3)); g.setAttribute('aSize', new THREE.Float32BufferAttribute([0], 1));
-  const p = new THREE.Points(g, starMat()); p.frustumCulled = false; p.renderOrder = -9; scene.add(p);
+  const p = new THREE.Points(g, starMat()); p.frustumCulled = false; p.renderOrder = -9; farScene.add(p);
   manager.itemStart('stars');
   fetch('tex/stars_hyg.txt').then(r => r.text()).then(b64 => { const bin = atob(b64.trim()); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); const buf = u8.buffer;
     const dv = new DataView(buf), n = buf.byteLength / 6, P = new Float32Array(n * 3), C = new Float32Array(n * 3), S = new Float32Array(n);
     for (let i = 0; i < n; i++) {
       const ra = dv.getUint16(i * 6, true) / 65535 * 360, dec = dv.getUint16(i * 6 + 2, true) / 65535 * 180 - 90;
       const mag = dv.getUint8(i * 6 + 4) / 20 - 2, ci = dv.getUint8(i * 6 + 5) / 100 - .5;
-      const v = radec(ra, dec, 1.5e6); P[i * 3] = v.x; P[i * 3 + 1] = v.y; P[i * 3 + 2] = v.z;
+      const v = radec(ra, dec, 3e6); P[i * 3] = v.x; P[i * 3 + 1] = v.y; P[i * 3 + 2] = v.z;
       const k = clamp(Math.pow(10, -.4 * (mag - 1.5)), .05, 3); const c = ciColor(ci).multiplyScalar(k);
       C[i * 3] = c.r; C[i * 3 + 1] = c.g; C[i * 3 + 2] = c.b; S[i] = clamp(4.6 - mag * .4, 1.1, 6.5);
     }
@@ -274,8 +284,8 @@ const STAR_SUB = {
   Aldebaran: 'gigante laranja · o olho do Touro', Vega: 'estrela', Arcturus: 'gigante laranja', Acrux: 'a estrela mais brilhante do Cruzeiro'
 };
 const STAR_TINT = { Betelgeuse: .05, Antares: .05, Aldebaran: .18, Arcturus: .22, Pollux: .3, Rigel: .95, Spica: .95, Vega: .85, Acrux: .9, Mimosa: .9, Regulus: .85, Achernar: .95, Sirius: .8, Alcyone: .9, Atlas: .9, Electra: .9, Maia: .9, Merope: .9, Taygeta: .9, Gacrux: .1, Capella: .4 };
-const CONST_R = 16000;
-const skyGroup = new THREE.Group(); scene.add(skyGroup); // constellations travel with the camera, like the real (infinitely far) sky
+const CONST_R = 1e6;
+const skyGroup = new THREE.Group(); farScene.add(skyGroup); // constellations travel with the camera, like the real (infinitely far) sky
 const constObjs = [];
 const starLabelDefs = [];
 {
@@ -302,7 +312,7 @@ const starLabelDefs = [];
   var constStars = new THREE.Points(g, starMat()); constStars.frustumCulled = false; skyGroup.add(constStars);
 }
 // faint nebulae for the Orion Nebula and the Pleiades
-function nebSprite(dir, size, color, op) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: op })); s.position.copy(dir).multiplyScalar(CONST_R * .98); s.scale.set(size, size, 1); skyGroup.add(s); return s; }
+function nebSprite(dir, size, color, op) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: op })); s.position.copy(dir).multiplyScalar(CONST_R * .98); s.scale.setScalar(size * CONST_R / 16000); skyGroup.add(s); return s; }
 const nebulae = [nebSprite(radec(83.82, -5.39), 260, 0xff8fb0, .55), nebSprite(radec(56.75, 24.12), 420, 0x8fb6ff, .35)];
 
 /* ---------- the galaxy ---------- */
@@ -369,26 +379,26 @@ function galaxyTex(aspect, rot, irregular) {
     g.putImageData(img, 0, 0);
   });
 }
-function farGalaxy(dir, dist, size, texr) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: texr, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false })); s.position.copy(dir).multiplyScalar(dist); s.scale.set(size, size, 1); scene.add(s); farSprites.push(s); return s; }
+function farGalaxy(dir, dist, size, texr) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: texr, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false })); s.position.copy(dir).multiplyScalar(dist); s.scale.set(size, size, 1); farScene.add(s); farSprites.push(s); return s; }
 const farSprites = [];
 const ANDRO = radec(10.68, 41.27), LMC = radec(80.89, -69.76), SMC = radec(13.19, -72.83);
-farGalaxy(ANDRO, 1.6e6, 1.4e5, galaxyTex(.3, .6, false));
-farGalaxy(LMC, 1.6e5, 16000, galaxyTex(.7, .3, true));
-farGalaxy(SMC, 2.0e5, 9000, galaxyTex(.6, 1.1, true));
+farGalaxy(ANDRO, 2.5e6, 2.2e5, galaxyTex(.3, .6, false));
+farGalaxy(LMC, 1.6e5, 14000, galaxyTex(.7, .3, true));
+farGalaxy(SMC, 2.0e5, 7000, galaxyTex(.6, 1.1, true));
 
 /* ---------- Sagittarius A*: a ray-traced black hole at the galactic centre ---------- */
 // Photons are integrated through Schwarzschild spacetime (units of the Schwarzschild radius rs);
 // the accretion disk is sampled where the bent rays cross it, with Doppler beaming and gravitational redshift.
-const BH_RS = 30;
+const BH_RS = 12000;
 const BH_N = NGP.clone().multiplyScalar(Math.cos(.35)).addScaledVector(GAL_Y, Math.sin(.35)).normalize();
 const BH_X = V3().crossVectors(BH_N, GAL_X).normalize(), BH_Z = V3().crossVectors(BH_X, BH_N);
 const bhPass = new ShaderPass({
-  uniforms: { tDiffuse: { value: null }, uOn: { value: 0 }, uTime: { value: 0 }, uCam: { value: V3() }, uBH: { value: GC_WORLD.clone() }, uRs: { value: BH_RS },
+  uniforms: { tDiffuse: { value: null }, uOn: { value: 0 }, uTime: { value: 0 }, uRel: { value: V3() }, uRs: { value: BH_RS },
     uInvProj: { value: new THREE.Matrix4() }, uInvView: { value: new THREE.Matrix4() }, uViewProj: { value: new THREE.Matrix4() },
     uBasis: { value: new THREE.Matrix3().set(BH_X.x, BH_X.y, BH_X.z, BH_N.x, BH_N.y, BH_N.z, BH_Z.x, BH_Z.y, BH_Z.z) } },
   vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
   fragmentShader: `
-  uniform sampler2D tDiffuse; uniform float uOn,uTime,uRs; uniform vec3 uCam,uBH; uniform mat4 uInvProj,uInvView,uViewProj; uniform mat3 uBasis; varying vec2 vUv;
+  uniform sampler2D tDiffuse; uniform float uOn,uTime,uRs; uniform vec3 uRel; uniform mat4 uInvProj,uInvView,uViewProj; uniform mat3 uBasis; varying vec2 vUv;
   float h2(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
   float n2(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.-2.*f); return mix(mix(h2(i),h2(i+vec2(1.,0.)),f.x),mix(h2(i+vec2(0.,1.)),h2(i+vec2(1.,1.)),f.x),f.y); }
   float fb(vec2 p){ float s=0.,a=.5; for(int i=0;i<5;i++){ s+=a*n2(p); p=p*2.03+vec2(1.7,9.2); a*=.5; } return s; }
@@ -410,7 +420,7 @@ const bhPass = new ShaderPass({
     vec4 base=texture2D(tDiffuse,vUv);
     if(uOn<.5){ gl_FragColor=base; return; }
     vec4 vv=uInvProj*vec4(vUv*2.-1.,-1.,1.); vv/=vv.w; vec3 dirW=normalize((uInvView*vec4(vv.xyz,0.)).xyz);
-    vec3 p=uBasis*((uCam-uBH)/uRs); vec3 d=uBasis*dirW;
+    vec3 p=uBasis*uRel; vec3 d=uBasis*dirW;
     float R0=60.; float r0=length(p);
     if(r0>R0){ float tb=-dot(p,d); float hh=R0*R0-(r0*r0-tb*tb); if(hh<0.||tb<0.){ gl_FragColor=base; return; } p+=d*(tb-sqrt(hh)); }
     vec3 L=cross(p,d); float H2=dot(L,L);
@@ -424,7 +434,7 @@ const bhPass = new ShaderPass({
       p=pn;
     }
     vec3 bg=vec3(0.);
-    if(!cap){ vec3 wd=normalize(transpose(uBasis)*v); vec4 cl=uViewProj*vec4(uCam+wd*1000.,1.);
+    if(!cap){ vec3 wd=normalize(transpose(uBasis)*v); vec4 cl=uViewProj*vec4(wd,0.);
       if(cl.w>0.){ vec2 uv=cl.xy/cl.w*.5+.5; if(all(greaterThanEqual(uv,vec2(0.)))&&all(lessThanEqual(uv,vec2(1.)))) bg=texture2D(tDiffuse,uv).rgb; else bg=stars(wd); } else bg=stars(wd); }
     // fade the lensed region into the untouched frame at the edge of the 60 rs sphere
     float b=sqrt(H2); float edge=1.-smoothstep(R0*.7,R0*.92,b);
@@ -438,13 +448,13 @@ const bhPass = new ShaderPass({
 const ambLight = new THREE.AmbientLight(0xffffff, .045); ambLight.layers.enable(1); scene.add(ambLight);
 const sunLight = new THREE.PointLight(0xfff4e6, 2.7, 0, 0); sunLight.layers.enable(1); scene.add(sunLight);
 
-const YEAR = 900;
+const YEAR = 1800; // one Earth year = 30 minutes
 const bodies = []; const bodyByName = {};
 function sphere(r, seg = 64) { return new THREE.SphereGeometry(r, seg, Math.round(seg * .66)); }
 function atmo(r, color, power, inten) {
   const m = new THREE.ShaderMaterial({
     uniforms: { uC: { value: new THREE.Color(color) }, uP: { value: power }, uI: { value: inten } },
-    vertexShader: LD_V + `varying vec3 vN,vW; void main(){ vN=normalize(mat3(modelMatrix)*normal); vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w;` + LD_VE + `}`,
+    vertexShader: LD_V + `varying vec3 vN,vW; void main(){ vN=normalize(mat3(modelMatrix)*normal); vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);` + LD_VE + `}`,
     fragmentShader: LD_F + `uniform vec3 uC; uniform float uP,uI; varying vec3 vN,vW;
     void main(){` + LD_FE + ` vec3 N=normalize(vN), V=normalize(cameraPosition-vW), L=normalize(-vW);
       float rim=pow(clamp(1.0-abs(dot(N,V)),0.,1.),uP); float lit=smoothstep(-.3,.45,dot(N,L));
@@ -458,17 +468,17 @@ const atmos = [];
 function physAtmo(r, o) {
   const Ra = 1 + o.th;
   const m = new THREE.ShaderMaterial({
-    uniforms: { uC: { value: V3() }, uR: { value: 1 }, uRa: { value: Ra }, uScale: { value: r }, uBR: { value: new THREE.Vector3(...o.br) }, uBM: { value: new THREE.Vector3(...o.bm) },
+    uniforms: { uRel: { value: V3() }, uL: { value: V3(1, 0, 0) }, uR: { value: 1 }, uRa: { value: Ra }, uScale: { value: r }, uBR: { value: new THREE.Vector3(...o.br) }, uBM: { value: new THREE.Vector3(...o.bm) },
       uHR: { value: o.th * o.hr }, uHM: { value: o.th * o.hm }, uSun: { value: o.sun }, uG: { value: o.g } },
-    vertexShader: LD_V + `varying vec3 vW; void main(){ vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w;` + LD_VE + `}`,
-    fragmentShader: LD_F + `uniform vec3 uC,uBR,uBM; uniform float uR,uRa,uScale,uHR,uHM,uSun,uG; varying vec3 vW;
+    vertexShader: LD_V + `varying vec3 vDir; void main(){ vec4 mv=modelViewMatrix*vec4(position,1.); vDir=transpose(mat3(viewMatrix))*mv.xyz; gl_Position=projectionMatrix*mv;` + LD_VE + `}`,
+    fragmentShader: LD_F + `uniform vec3 uRel,uL,uBR,uBM; uniform float uR,uRa,uScale,uHR,uHM,uSun,uG; varying vec3 vDir;
     vec2 rsi(vec3 o, vec3 d, float r){ float b=dot(o,d), c=dot(o,o)-r*r, h=b*b-c; if(h<0.) return vec2(1e9,-1e9); h=sqrt(h); return vec2(-b-h,-b+h); }
     void main(){` + LD_FE + `
-      vec3 ro=(cameraPosition-uC)/uScale; vec3 rd=normalize(vW-cameraPosition);
+      vec3 ro=-uRel; vec3 rd=normalize(vDir);
       vec2 a=rsi(ro,rd,uRa); if(a.x>a.y||a.y<0.) discard;
       vec2 p=rsi(ro,rd,uR);
       float t0=max(a.x,0.), t1=a.y; if(p.x<p.y&&p.x>0.) t1=min(t1,p.x);
-      vec3 L=normalize(-uC); float mu=dot(rd,L);
+      vec3 L=uL; float mu=dot(rd,L);
       float pr=0.0596831*(1.+mu*mu);
       float g2=uG*uG; float pm=0.1193662*((1.-g2)*(1.+mu*mu))/((2.+g2)*pow(1.+g2-2.*uG*mu,1.5));
       const int NS=10; const int NL=5;
@@ -491,8 +501,9 @@ function physAtmo(r, o) {
 const _ac = V3();
 function updateAtmos() {
   for (const a of atmos) {
-    a.mesh.getWorldPosition(a.m.uniforms.uC.value);
-    const inside = camera.position.distanceTo(a.m.uniforms.uC.value) < a.Rw * 1.002;
+    a.mesh.getWorldPosition(_ac); a.m.uniforms.uL.value.copy(_ac).negate().normalize();
+    const inside = camera.position.distanceTo(_ac) < a.Rw * 1.002;
+    a.m.uniforms.uRel.value.copy(_ac).sub(camera.position).divideScalar(a.m.uniforms.uScale.value);
     a.m.side = inside ? THREE.BackSide : THREE.FrontSide; a.m.depthTest = !inside;
   }
 }
@@ -517,17 +528,17 @@ const stdN = (map, nrm, k = 1) => new THREE.MeshStandardMaterial({ map: tex(map)
 // Sun
 const sunMat = new THREE.ShaderMaterial({
   uniforms: { uMap: { value: tex('2k_sun.jpg') }, uT: { value: 0 } },
-  vertexShader: LD_V + `varying vec2 vUv; varying vec3 vN,vW; void main(){ vUv=uv; vN=normalize(mat3(modelMatrix)*normal); vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w;` + LD_VE + `}`,
+  vertexShader: LD_V + `varying vec2 vUv; varying vec3 vN,vW; void main(){ vUv=uv; vec4 mv=modelViewMatrix*vec4(position,1.); vN=normalize(normalMatrix*normal); vW=-mv.xyz; gl_Position=projectionMatrix*mv;` + LD_VE + `}`,
   fragmentShader: LD_F + `uniform sampler2D uMap; uniform float uT; varying vec2 vUv; varying vec3 vN,vW;
   void main(){` + LD_FE + `
     vec2 o=vec2(sin(vUv.y*60.+uT*.7),cos(vUv.x*80.+uT*.5))*.0025;
     vec3 a=texture2D(uMap,vUv+o).rgb, b=texture2D(uMap,vUv*1.0+vec2(uT*.002,0.)-o).rgb;
     vec3 c=mix(a,b,.5+.5*sin(uT*.3));
-    float mu=clamp(dot(normalize(vN),normalize(cameraPosition-vW)),0.,1.);
+    float mu=clamp(dot(normalize(vN),normalize(vW)),0.,1.);
     c*=vec3(1.9,1.45,1.0)*(.45+.75*pow(mu,.45));
     gl_FragColor=vec4(c*1.6,1.); }`
 });
-const SUN_R = 22;
+const SUN_R = 696.34;
 const sunGlow1 = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffd8a8, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: .95 })); sunGlow1.scale.setScalar(SUN_R * 7);
 const sunGlow2 = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffb070, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: .12 })); sunGlow2.scale.setScalar(SUN_R * 11);
 const coronaTex = canvasTex(512, 512, (g, w) => {
@@ -539,13 +550,13 @@ const coronaTex = canvasTex(512, 512, (g, w) => {
 const corona = new THREE.Sprite(new THREE.SpriteMaterial({ map: coronaTex, color: 0xffe0b0, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: .55 })); corona.scale.setScalar(SUN_R * 5.5);
 addBody({ name: 'Sol', sub: 'estrela · o centro do Sistema Solar', r: SUN_R, a: 0, T: 0, rot: .01, mesh: new THREE.Mesh(sphere(SUN_R, 96), sunMat), extra: [sunGlow1, sunGlow2, corona], k: 7 });
 
-addBody({ name: 'Mercúrio', sub: 'planeta', r: 1.5, a: 50, T: .241, rot: .01, tilt: .03, mesh: new THREE.Mesh(sphere(1.5, 96), stdN('2k_mercury.jpg', '2k_mercury_n.jpg')), k: 5, hiMap: '4k_mercury.jpg', hiN: '4k_mercury_n.jpg' });
-const venus = new THREE.Mesh(sphere(3.6), std(tex('2k_venus_atmosphere.jpg'), 1));
-addBody({ name: 'Vênus', sub: 'planeta', r: 3.6, a: 72, T: .615, rot: -.006, tilt: 177, mesh: venus, extra: [physAtmo(3.6, { th: .045, hr: .3, hm: .45, br: [1.2, 2.4, 4.8], bm: [14, 12, 8], sun: 3.6, g: .7 })], k: 4.5 });
+addBody({ name: 'Mercúrio', sub: 'planeta', r: 2.44, a: 57909, T: .241, rot: .01, tilt: .03, mesh: new THREE.Mesh(sphere(2.44, 96), stdN('2k_mercury.jpg', '2k_mercury_n.jpg')), k: 5, hiMap: '4k_mercury.jpg', hiN: '4k_mercury_n.jpg' });
+const venus = new THREE.Mesh(sphere(6.052, 96), std(tex('2k_venus_atmosphere.jpg'), 1));
+addBody({ name: 'Vênus', sub: 'planeta', r: 6.052, a: 108209, T: .615, rot: -.006, tilt: 177, mesh: venus, extra: [physAtmo(6.052, { th: .045, hr: .3, hm: .45, br: [1.2, 2.4, 4.8], bm: [14, 12, 8], sun: 3.6, g: .7 })], k: 4.5 });
 
 // Earth: NASA Blue Marble (Dec 2004) split into 32 tiles of 2048 px (16K), loaded only where the camera is looking
-const EARTH_R = 3.8, ENX = 8, ENY = 4;
-const E_DISP = .0557, E_BIAS = -35 / 255 * .0557; // relief exaggerated 8x
+const EARTH_R = 6.371, ENX = 8, ENY = 4;
+const E_DISP = .0934, E_BIAS = -35 / 255 * .0934; // relief exaggerated 8x
 const eTex = { map: tex('2k_earth_bm.jpg'), emissiveMap: tex('2k_earth_nightmap.jpg'), normalMap: tex('2k_earth_relief_n.jpg', 1), roughnessMap: tex('2k_earth_rough.jpg', 1), displacementMap: tex('2k_earth_elev.jpg', 1) };
 for (const k in eTex) eTex[k].channel = 1;
 const cloudTex = tex('2k_earth_clouds.jpg', 1);
@@ -576,7 +587,7 @@ for (let j = 0; j < ENY; j++) for (let i = 0; i < ENX; i++) {
 }
 const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, alphaMap: cloudTex, bumpMap: cloudTex, bumpScale: 2.5, transparent: true, depthWrite: false, roughness: 1 });
 const clouds = new THREE.Mesh(sphere(EARTH_R * 1.012, 128), cloudMat);
-const earth = addBody({ name: 'Terra', sub: 'planeta · nosso lar', r: EARTH_R, a: 100, T: 1, rot: .012, tilt: 23.44, mesh: earthGroup, extra: [physAtmo(EARTH_R, { th: .025, hr: .25, hm: 1 / 12, br: [7.4, 17.2, 42.2], bm: [10, 10, 10], sun: 4.2, g: .76 })], k: 4.2 });
+const earth = addBody({ name: 'Terra', sub: 'planeta · nosso lar', r: EARTH_R, a: 149598, T: 1, rot: .012, tilt: 23.44, mesh: earthGroup, extra: [physAtmo(EARTH_R, { th: .025, hr: .25, hm: 1 / 12, br: [7.4, 17.2, 42.2], bm: [10, 10, 10], sun: 4.2, g: .76 })], k: 4.2 });
 earth.spin.add(clouds);
 // tiles and 4K base textures for the Earth
 const tileLoader = new THREE.TextureLoader();
@@ -628,9 +639,9 @@ function updateEarth(dt) {
   }
 }
 const sphDir = (th, ph) => new THREE.Vector3(-Math.cos(ph) * Math.sin(th), Math.cos(th), Math.sin(ph) * Math.sin(th));
-addBody({ name: 'Lua', sub: 'satélite natural da Terra', r: 1.03, a: 10, T: 27.3 / 365.25, rot: 0, tilt: 6.7, mesh: new THREE.Mesh(sphere(1.03, 128), stdN('2k_moon.jpg', '2k_moon_n.jpg')), parent: earth, k: 5, hiMap: '4k_moon.jpg', hiN: '4k_moon_n.jpg' });
-addBody({ name: 'Marte', sub: 'planeta · o planeta vermelho', r: 2.1, a: 135, T: 1.88, rot: .068, tilt: 25.2, mesh: new THREE.Mesh(sphere(2.1, 96), std(tex('2k_mars.jpg'))), extra: [physAtmo(2.1, { th: .02, hr: .3, hm: .3, br: [.25, .55, 1.2], bm: [8, 5.2, 3.2], sun: 4.5, g: .62 })], k: 4.5, hiMap: '4k_mars.jpg' });
-addBody({ name: 'Júpiter', sub: 'planeta · o maior do Sistema Solar', r: 13, a: 260, T: 11.86, rot: .17, tilt: 3.1, mesh: new THREE.Mesh(sphere(13, 128), std(tex('2k_jupiter.jpg'), 1)), extra: [atmo(13 * 1.015, 0xffe2c0, 3.5, .35)], k: 3.2, hiMap: '4k_jupiter.jpg' });
+addBody({ name: 'Lua', sub: 'satélite natural da Terra', r: 1.737, a: 384.4, T: 27.3 / 365.25, rot: 0, tilt: 6.7, mesh: new THREE.Mesh(sphere(1.737, 128), stdN('2k_moon.jpg', '2k_moon_n.jpg')), parent: earth, k: 5, hiMap: '4k_moon.jpg', hiN: '4k_moon_n.jpg' });
+addBody({ name: 'Marte', sub: 'planeta · o planeta vermelho', r: 3.39, a: 227939, T: 1.88, rot: .068, tilt: 25.2, mesh: new THREE.Mesh(sphere(3.39, 96), std(tex('2k_mars.jpg'))), extra: [physAtmo(3.39, { th: .02, hr: .3, hm: .3, br: [.25, .55, 1.2], bm: [8, 5.2, 3.2], sun: 4.5, g: .62 })], k: 4.5, hiMap: '4k_mars.jpg' });
+addBody({ name: 'Júpiter', sub: 'planeta · o maior do Sistema Solar', r: 69.911, a: 778479, T: 11.86, rot: .17, tilt: 3.1, mesh: new THREE.Mesh(sphere(69.911, 128), std(tex('2k_jupiter.jpg'), 1)), extra: [atmo(69.911 * 1.015, 0xffe2c0, 3.5, .35)], k: 3.2, hiMap: '4k_jupiter.jpg' });
 // Saturn and rings
 const ringTex = loader.load('tex/2k_saturn_ring_alpha.png'); ringTex.colorSpace = THREE.SRGBColorSpace;
 function ringMesh(inner, outer, mat) {
@@ -640,18 +651,18 @@ function ringMesh(inner, outer, mat) {
 }
 const satU = { uC: { value: V3() }, uN: { value: V3(0, 1, 0) }, uT: { value: ringTex } };
 const ringMat = new THREE.ShaderMaterial({
-  uniforms: { uT: satU.uT, uC: satU.uC, uN: satU.uN, uR: { value: 11 } },
-  vertexShader: LD_V + `varying vec2 vUv; varying vec3 vW; void main(){ vUv=uv; vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w;` + LD_VE + `}`,
-  fragmentShader: LD_F + `uniform sampler2D uT; uniform vec3 uC,uN; uniform float uR; varying vec2 vUv; varying vec3 vW;
+  uniforms: { uT: satU.uT, uC: satU.uC, uN: satU.uN, uR: { value: 58.232 }, uFadeNear: { value: 1 } },
+  vertexShader: LD_V + `varying vec2 vUv; varying vec3 vW; void main(){ vUv=uv; vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);` + LD_VE + `}`,
+  fragmentShader: LD_F + `uniform sampler2D uT; uniform vec3 uC,uN; uniform float uR,uFadeNear; varying vec2 vUv; varying vec3 vW;
   void main(){` + LD_FE + `
     vec4 t=texture2D(uT,vUv); vec3 L=normalize(-vW);
     vec3 oc=vW-uC; float b=dot(oc,L); float h=b*b-(dot(oc,oc)-uR*uR); float sh=(h>0.&&(-b-sqrt(h))>0.)?.06:1.;
     float lit=dot(uN,L), view=dot(uN,cameraPosition-vW);
     float side=lit*view>0.?1.:(.25+.9*(1.-t.a));
-    gl_FragColor=vec4(t.rgb*1.2*sh*side,t.a); }`,
+    gl_FragColor=vec4(t.rgb*1.2*sh*side,t.a*uFadeNear); }`,
   transparent: true, side: THREE.DoubleSide, depthWrite: false
 });
-const satRing = ringMesh(14, 26, ringMat);
+const satRing = ringMesh(74.5, 137, ringMat);
 const satMat = std(tex('2k_saturn.jpg'), 1);
 satMat.onBeforeCompile = sh => {
   sh.uniforms.uSC = satU.uC; sh.uniforms.uSN = satU.uN; sh.uniforms.uRingT = satU.uT;
@@ -659,27 +670,32 @@ satMat.onBeforeCompile = sh => {
   sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vSW; uniform vec3 uSC,uSN; uniform sampler2D uRingT;')
     .replace('#include <aomap_fragment>', `#include <aomap_fragment>
       { vec3 Ld=normalize(-vSW); float dn=dot(Ld,uSN); if(abs(dn)>1e-4){ float tt=dot(uSC-vSW,uSN)/dn; if(tt>0.){ float rr=length(vSW+Ld*tt-uSC);
-        if(rr>14.&&rr<26.){ float a=texture2D(uRingT,vec2((rr-14.)/12.,.5)).a; reflectedLight.directDiffuse*=1.-a*.88; reflectedLight.directSpecular*=1.-a*.88; } } } }`);
+        if(rr>74.5&&rr<137.){ float a=texture2D(uRingT,vec2((rr-74.5)/62.5,.5)).a; reflectedLight.directDiffuse*=1.-a*.88; reflectedLight.directSpecular*=1.-a*.88; } } } }`);
 };
-addBody({ name: 'Saturno', sub: 'planeta · o senhor dos anéis', r: 11, a: 370, T: 29.4, rot: .16, tilt: 26.7, mesh: new THREE.Mesh(sphere(11, 128), satMat), extra: [satRing], k: 3.8, elev: .32, hiMap: '4k_saturn.jpg', hi: [[satU.uT, 'value', '4k_saturn_ring_alpha.png']] });
-const uraRing = ringMesh(9, 10.5, new THREE.MeshBasicMaterial({ color: 0x9fb4c4, transparent: true, opacity: .12, side: THREE.DoubleSide, depthWrite: false }));
-addBody({ name: 'Urano', sub: 'planeta · gira deitado', r: 6.5, a: 470, T: 84, rot: -.1, tilt: 97.8, mesh: new THREE.Mesh(sphere(6.5), std(tex('2k_uranus.jpg'), 1)), extra: [uraRing, atmo(6.5 * 1.02, 0x9fe8ff, 3, .5)], k: 4 });
-addBody({ name: 'Netuno', sub: 'planeta · o mais distante do Sol', r: 6.3, a: 560, T: 164.8, rot: .11, tilt: 28.3, mesh: new THREE.Mesh(sphere(6.3), std(tex('2k_neptune.jpg'), 1)), extra: [atmo(6.3 * 1.02, 0x6f9bff, 3, .6)], k: 4 });
+addBody({ name: 'Saturno', sub: 'planeta · o senhor dos anéis', r: 58.232, a: 1433530, T: 29.4, rot: .16, tilt: 26.7, mesh: new THREE.Mesh(sphere(58.232, 128), satMat), extra: [satRing], k: 3.8, elev: .32, hiMap: '4k_saturn.jpg', hi: [[satU.uT, 'value', '4k_saturn_ring_alpha.png']] });
+const uraRing = ringMesh(41.8, 51.2, new THREE.MeshBasicMaterial({ color: 0x9fb4c4, transparent: true, opacity: .12, side: THREE.DoubleSide, depthWrite: false }));
+addBody({ name: 'Urano', sub: 'planeta · gira deitado', r: 25.362, a: 2870972, T: 84, rot: -.1, tilt: 97.8, mesh: new THREE.Mesh(sphere(25.362, 96), std(tex('2k_uranus.jpg'), 1)), extra: [uraRing, atmo(25.362 * 1.02, 0x9fe8ff, 3, .5)], k: 4 });
+addBody({ name: 'Netuno', sub: 'planeta · o mais distante do Sol', r: 24.622, a: 4498253, T: 164.8, rot: .11, tilt: 28.3, mesh: new THREE.Mesh(sphere(24.622, 96), std(tex('2k_neptune.jpg'), 1)), extra: [atmo(24.622 * 1.02, 0x6f9bff, 3, .6)], k: 4 });
 const plutoTex = sphereTex(256, 128, (x, y, z) => { const n = fbm(x * 3 + 2, y * 3, z * 3, 5); const heart = Math.exp(-((x - .55) ** 2 + (y + .05) ** 2 + (z - .6) ** 2) * 4); const v = .45 + n * .5 + heart * .5; return [clamp(205 * v, 0, 255), clamp(170 * v, 0, 255), clamp(140 * v, 0, 255), 255]; });
-addBody({ name: 'Plutão', sub: 'planeta anão', r: 1.0, a: 640, T: 248, rot: .02, tilt: 120, mesh: new THREE.Mesh(sphere(1.0, 48), std(plutoTex)), k: 6 });
+addBody({ name: 'Plutão', sub: 'planeta anão', r: 1.188, a: 5906380, T: 248, rot: .02, tilt: 120, mesh: new THREE.Mesh(sphere(1.188, 64), std(plutoTex)), k: 6 });
+// dwarf planet and big asteroid inside the belt
+addBody({ name: 'Ceres', sub: 'planeta anão · o maior objeto do Cinturão de Asteroides', r: .47, a: 413700, T: 4.6, rot: .03, tilt: 4, mesh: new THREE.Mesh(sphere(.47, 64), (() => { const m = stdN('2k_moon.jpg', '2k_moon_n.jpg'); m.color.set(0x8a8580); return m; })()), k: 6 });
+{ const vm = new THREE.Mesh(sphere(.263, 64), (() => { const m = stdN('2k_mercury.jpg', '2k_mercury_n.jpg'); m.color.set(0xb0a898); return m; })()); vm.scale.set(1, .8, 1.05);
+  addBody({ name: 'Vesta', sub: 'asteroide · 525 km de diâmetro', r: .263, a: 353400, T: 3.63, rot: .06, tilt: 29, mesh: vm, k: 6 }); }
 
 // asteroid belt and Kuiper belt
 function belt(n, r0, r1, th, color, size, op) {
   const p = []; for (let i = 0; i < n; i++) { const r = r0 + Math.random() * (r1 - r0), f = Math.random() * Math.PI * 2; p.push(Math.cos(f) * r, gauss() * th, -Math.sin(f) * r); }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(p, 3));
-  const pts = new THREE.Points(g, new THREE.PointsMaterial({ size, map: dotTex, color, transparent: true, opacity: op, depthWrite: false, sizeAttenuation: true }));
+  const pts = new THREE.Points(g, new THREE.PointsMaterial({ size, map: dotTex, color, transparent: true, opacity: op, depthWrite: false, sizeAttenuation: false }));
   eclFrame.add(pts); return pts;
 }
-const astBelt = belt(isTouch ? 3000 : 5000, 165, 215, 2.5, 0xa89a88, .55, .85);
-const kuiper = belt(isTouch ? 2500 : 4000, 600, 780, 18, 0x8f9fb8, 1.4, .5);
+const astBelt = belt(isTouch ? 6000 : 10000, 2.2 * AU, 3.3 * AU, .12 * AU, 0xa89a88, 1.6, .7);
+const kuiper = belt(isTouch ? 5000 : 8000, 30 * AU, 50 * AU, 3 * AU, 0x8f9fb8, 1.4, .45);
 
 /* ---------- rocket ---------- */
-const rocket = new THREE.Group(); scene.add(rocket); rocket.visible = false;
+const RS = 7e-4; // rocket scale: the model is 0.11 long, so 0.11 * RS units = 77 m
+const rocket = new THREE.Group(); scene.add(rocket); rocket.visible = false; rocket.scale.setScalar(RS);
 {
   // environment reflections from the real Milky Way panorama
   const pmrem = new THREE.PMREMGenerator(renderer); let envMap = null;
@@ -746,13 +762,13 @@ const rocket = new THREE.Group(); scene.add(rocket); rocket.visible = false;
   }
   const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffb070, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: .8 }));
   glow.scale.setScalar(.035); glow.position.z = .066; glow.layers.set(1); rocket.add(glow);
-  const fill = new THREE.PointLight(0xdfe8ff, .35, .4, 0); fill.position.set(.03, .06, .12); fill.layers.set(1); rocket.add(fill);
-  const engineLight = new THREE.PointLight(0xff9a50, .6, .12, 0); engineLight.position.z = .07; engineLight.layers.set(1); rocket.add(engineLight);
+  const fill = new THREE.PointLight(0xdfe8ff, .35, .4 * RS, 0); fill.position.set(.03, .06, .12); fill.layers.set(1); rocket.add(fill);
+  const engineLight = new THREE.PointLight(0xff9a50, .6, .12 * RS, 0); engineLight.position.z = .07; engineLight.layers.set(1); rocket.add(engineLight);
   rocket.userData = { plumes, plumeMat, bellMat, glow, engineLight, onSky };
 }
 // speed dust around the rocket
 const dust = (() => {
-  const n = 260, off = new Float32Array(n * 3); for (let i = 0; i < n * 3; i++) off[i] = (Math.random() - .5) * .6;
+  const n = 260, off = new Float32Array(n * 3); for (let i = 0; i < n * 3; i++) off[i] = (Math.random() - .5) * .6 * RS;
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(off, 3));
   const p = new THREE.Points(g, new THREE.PointsMaterial({ size: 1.6 * DPR, sizeAttenuation: false, map: dotTex, color: 0xcfd8ff, transparent: true, opacity: .45, depthWrite: false }));
   p.frustumCulled = false; p.visible = false; scene.add(p); return p;
@@ -770,8 +786,8 @@ function addLabel(kind, name, sub, o = {}) {
   return L;
 }
 for (const b of bodies) addLabel('body', b.name, b.sub, { body: b });
-addLabel('belt', 'Cinturão de Asteroides', 'entre Marte e Júpiter', { r: 190, show: 160 });
-addLabel('belt', 'Cinturão de Kuiper', 'gelo e planetas anões além de Netuno', { r: 690, show: 450 });
+addLabel('belt', 'Cinturão de Asteroides', 'entre Marte e Júpiter', { r: 2.75 * AU, show: 3 * AU });
+addLabel('belt', 'Cinturão de Kuiper', 'gelo e planetas anões além de Netuno', { r: 40 * AU, show: 40 * AU });
 for (const c of constObjs) addLabel('sky', c.name, c.sub, { dir: c.dir, th: 20 * D2R, cons: c });
 for (const s of starLabelDefs) addLabel('sky', s.name, s.sub, { dir: s.dir, th: 7 * D2R, star: true });
 addLabel('sky', 'Nebulosa de Órion', 'berçário de estrelas · 1.344 anos-luz', { dir: radec(83.82, -5.39), th: 6 * D2R });
@@ -791,9 +807,9 @@ imgLabel('Braço de Escudo-Centauro', 'braço espiral', .64, .594);
 imgLabel('Braço de Norma', 'braço espiral', .4, .57);
 imgLabel('Braço Externo', 'braço espiral', .69, .83);
 imgLabel('Barra central', 'estrelas antigas em forma de barra', .43, .54);
-addLabel('gal', 'Galáxia de Andrômeda', 'a 2,5 milhões de anos-luz', { pos: ANDRO.clone().multiplyScalar(1.6e6), far: true });
-addLabel('gal', 'Grande Nuvem de Magalhães', 'galáxia satélite', { pos: LMC.clone().multiplyScalar(1.6e5) });
-addLabel('gal', 'Pequena Nuvem de Magalhães', 'galáxia satélite', { pos: SMC.clone().multiplyScalar(2e5) });
+addLabel('gal', 'Galáxia de Andrômeda', 'a 2,5 milhões de anos-luz', { pos: ANDRO.clone().multiplyScalar(2.5e6 * LY), far: true });
+addLabel('gal', 'Grande Nuvem de Magalhães', 'galáxia satélite', { pos: LMC.clone().multiplyScalar(1.6e5 * LY) });
+addLabel('gal', 'Pequena Nuvem de Magalhães', 'galáxia satélite', { pos: SMC.clone().multiplyScalar(2e5 * LY) });
 
 let showLabels = true, nearPlanet = false;
 const _p = V3(), _f = V3(), _d = V3();
@@ -806,24 +822,23 @@ const _o = V3(), _v = V3();
 function updateLabels(dt, camDist) {
   camera.getWorldDirection(_f);
   const W = innerWidth, H = innerHeight;
-  const nearF = 1 - smooth(4000, 9000, camDist), galF = smooth(9000, 18000, camDist); const placed = [];
+  const nearF = 1 - smooth(4000 * LY, 9000 * LY, camDist), galF = smooth(9000 * LY, 18000 * LY, camDist); const placed = [];
   for (const L of labels) {
     let vis = 0;
     if (showLabels) {
       if (L.kind === 'body') {
         const b = L.body; _p.copy(b.wpos); const d = camera.position.distanceTo(_p);
-        vis = b.name === 'Sol' ? 1 - smooth(1800, 4000, d) : 1 - smooth(b.r * 70, b.r * 140, d);
-        if (mode === 'explore' && camDist < SYS_R * 1.3) vis = Math.max(vis, b.parent ? 1 - smooth(60, 160, d) : 1);
+        vis = b.name === 'Sol' ? 1 - smooth(SYS_R * 4, SYS_R * 10, d) : b.parent ? 1 - smooth(3000, 9000, d) : (b.r < 1 ? 1 - smooth(2e5, 6e5, d) : 1 - smooth(SYS_R * 1.3, SYS_R * 3, camDist));
         if (d < b.r * 1.2) vis = 0;
       } else if (L.kind === 'belt') {
         _d.copy(camera.position); const loc = _d.clone().applyMatrix4(new THREE.Matrix4().copy(eclFrame.matrix).invert());
         const a = Math.atan2(-loc.z, loc.x); eclToWorld(Math.cos(a) * L.r, 0, -Math.sin(a) * L.r, _p);
         const d = camera.position.distanceTo(_p); vis = nearPlanet ? 0 : 1 - smooth(L.show * .6, L.show, d);
-        if (Math.abs(loc.length() - L.r) < 25 && Math.abs(loc.y) < 10) vis = 0;
+        if (Math.abs(loc.length() - L.r) < .4 * AU && Math.abs(loc.y) < .2 * AU) vis = 0;
       } else if (L.kind === 'sky') {
         const ang = _f.angleTo(L.dir); vis = (1 - smooth(L.th * .55, L.th, ang)) * nearF;
         _p.copy(camera.position).addScaledVector(L.dir, 1000);
-      } else { _p.copy(L.pos); vis = galF; if (L.name !== 'Sagitário A*' && camera.position.distanceTo(GC_WORLD) < 8000) vis = 0; }
+      } else { _p.copy(L.pos); vis = galF; if (L.name !== 'Sagitário A*' && camera.position.distanceTo(GC_WORLD) < 8000 * LY) vis = 0; }
     }
     if (vis > 0.002 && occluded(_p, L.body)) vis = 0;
     if (vis > 0.002) { _d.copy(_p).project(camera); if (_d.z > 1 || Math.abs(_d.x) > 1.05 || Math.abs(_d.y) > 1.05) vis = 0; }
@@ -875,7 +890,7 @@ function updateHiRes(dt) {
     }
   }
 }
-function refreshWpos() { for (const b of bodies) b.holder.getWorldPosition(b.wpos); }
+function refreshWpos() { for (const b of bodies) { if (!b.dw) b.dw = V3(); const ox = b.wpos.x, oy = b.wpos.y, oz = b.wpos.z; b.holder.getWorldPosition(b.wpos); b.dw.set(b.wpos.x - ox, b.wpos.y - oy, b.wpos.z - oz); } }
 
 /* ---------- camera: contemplation tour ---------- */
 const _m4 = new THREE.Matrix4();
@@ -925,14 +940,14 @@ function wpEval(wp, ht, out) {
     out.up.copy(out.pos).sub(earth.wpos).normalize();
   } else if (wp.t === 'sky') {
     const mid = wp.from.clone().add(wp.to).normalize();
-    out.pos.copy(mid).multiplyScalar(820).addScaledVector(ECL_N, 40);
+    out.pos.copy(mid).multiplyScalar(9e6).addScaledVector(ECL_N, 4e5);
     const s = easeIO(clamp(ht / wp.hold, 0, 1)); const d = wp.from.clone().lerp(wp.to, s).normalize();
     out.look.copy(out.pos).addScaledVector(d, 1000); out.up.copy(ECL_N);
   } else {
     const a = ht * (wp.id === 'top' ? .006 : .004);
     const q = new THREE.Quaternion().setFromAxisAngle(NGP, a);
-    if (wp.id === 'top') { const dx = GAL_X.clone().applyQuaternion(q); out.pos.copy(GC_WORLD).addScaledVector(NGP, 105000).addScaledVector(dx, 22000); out.up.copy(dx).negate(); }
-    else { const dy = GAL_Y.clone().applyQuaternion(q); out.pos.copy(GC_WORLD).addScaledVector(NGP, 16000).addScaledVector(dy, -76000).addScaledVector(GAL_X, 8000); out.up.copy(NGP); }
+    if (wp.id === 'top') { const dx = GAL_X.clone().applyQuaternion(q); out.pos.copy(GC_WORLD).addScaledVector(NGP, 105000 * LY).addScaledVector(dx, 22000 * LY); out.up.copy(dx).negate(); }
+    else { const dy = GAL_Y.clone().applyQuaternion(q); out.pos.copy(GC_WORLD).addScaledVector(NGP, 16000 * LY).addScaledVector(dy, -76000 * LY).addScaledVector(GAL_X, 8000 * LY); out.up.copy(NGP); }
     out.look.copy(GC_WORLD);
   }
   return out;
@@ -969,7 +984,10 @@ function updateTour(dt) {
 
 /* ---------- camera: pilot ---------- */
 const ship = { pos: V3(), q: new THREE.Quaternion(), level: 10, yaw: 0, pitch: 0, roll: 0, camQ: new THREE.Quaternion() };
-const MAXL = 36; const speedOf = l => .05 * Math.pow(1.47, l);
+const MAXL = 36; const speedK = l => .004 * Math.pow(1.33, l);
+function nearestSurface(p) { let best = Infinity, bb = null; for (const b of bodies) { const d = p.distanceTo(b.wpos) - b.r; if (d < best) { best = d; bb = b; } } const dbh = p.distanceTo(GC_WORLD) - BH_RS * 3; if (dbh < best) { best = dbh; bb = null; } return [Math.max(best, 2e-4), bb]; }
+let shipNear = [1, null];
+const speedOf = l => speedK(l) * shipNear[0];
 let auto = null, autoCool = 0, keyCool = 0;
 const keys = {};
 function setAuto(L) { auto = L; flashHint('piloto automático: ' + L.name.toLowerCase()); }
@@ -988,42 +1006,92 @@ function updatePilot(dt) {
   if (auto) {
     let tgt, dist = Infinity, stopAt = 0;
     if (auto.kind === 'body') { tgt = auto.body.wpos; dist = ship.pos.distanceTo(tgt) - auto.body.r; stopAt = auto.body.r * 2.5; }
-    else if (auto.kind === 'gal') { tgt = auto.pos; dist = ship.pos.distanceTo(tgt); stopAt = auto.far ? 2e5 : 4000; }
+    else if (auto.kind === 'gal') { tgt = auto.pos; dist = ship.pos.distanceTo(tgt); stopAt = auto.far ? 2e5 * LY : (auto.name === 'Sagitário A*' ? BH_RS * 40 : 4000 * LY); }
     else if (auto.kind === 'belt') { tgt = _p.clone(); dist = Infinity; }
     else { tgt = ship.pos.clone().addScaledVector(auto.dir, 1e6); }
     const up = V3(0, 1, 0).applyQuaternion(ship.q);
     const want = lookQuat(ship.pos, tgt, up); const ang = ship.q.angleTo(want);
     ship.q.rotateTowards(want, dt * 1.1);
-    if (dist < Infinity && autoCool <= 0) {
-      const v = speedOf(ship.level);
-      if (dist < stopAt) { auto = null; ship.level = Math.min(ship.level, 8); }
-      else if (v * 2.2 > dist && ship.level > 0) { ship.level--; autoCool = .12; }
-      else if (ang < .15 && v * 9 < dist && ship.level < MAXL) { ship.level++; autoCool = .2; }
+    if (dist < Infinity) {
+      if (dist < stopAt) { auto = null; ship.level = 10; }
+      else ship.level = ang < .2 ? 17 : 8; // speed scales with distance, so it slows down by itself on arrival
     }
   }
   keyCool -= dt;
   if (keyCool <= 0 && (keys.w || keys['+'] || keys['='])) { bumpSpeed(1); auto = null; keyCool = .09; }
   if (keyCool <= 0 && (keys.s || keys['-'])) { bumpSpeed(-1); auto = null; keyCool = .09; }
+  shipNear = nearestSurface(ship.pos);
+  // ride along with the planet we are close to (they orbit fast)
+  { const nb = shipNear[1]; if (nb && nb.dw && ship.pos.distanceTo(nb.wpos) < nb.r * 400) ship.pos.add(nb.dw); if (nb && nb.parent && nb.parent.dw) {} }
   const v = speedOf(ship.level);
   const fwd = V3(0, 0, -1).applyQuaternion(ship.q);
   ship.pos.addScaledVector(fwd, v * dt);
   // don't fly into planets
-  for (const b of bodies) { const d = ship.pos.distanceTo(b.wpos), m = b === earth ? b.r * 1.012 + .004 : b.r * 1.08 + .05; if (d < m) ship.pos.sub(b.wpos).setLength(m).add(b.wpos); }
+  for (const b of bodies) { const d = ship.pos.distanceTo(b.wpos), m = b === earth ? b.r + .075 : b.r * 1.004 + .002; if (d < m) ship.pos.sub(b.wpos).setLength(m).add(b.wpos); }
+  rockFields(ship.pos);
   rocket.position.copy(ship.pos); rocket.quaternion.copy(ship.q);
   { const U = rocket.userData, lv = ship.level / MAXL; U.onSky();
     const len = .012 + lv * .07; for (const m of U.plumes) m.scale.set(1, 1, len * m.userData.len * (1 + (Math.random() - .5) * .08));
     U.plumeMat.uniforms.uT.value = simT; U.plumeMat.uniforms.uP.value = lv;
-    U.bellMat.emissiveIntensity = .05 + lv * .35; U.glow.material.opacity = .45 + lv * .5; U.engineLight.intensity = .3 + lv * .8; }
+    U.bellMat.emissiveIntensity = .02 + lv * .2; U.glow.material.opacity = .2 + lv * .35; U.engineLight.intensity = .3 + lv * .8; }
   // chase camera
   ship.camQ.slerp(ship.q, 1 - Math.exp(-dt * 4));
-  camera.position.copy(ship.pos).add(V3(0, .058, .23).applyQuaternion(ship.camQ));
+  camera.position.copy(ship.pos).add(V3(0, .058 * RS, .23 * RS).applyQuaternion(ship.camQ));
   camera.quaternion.copy(ship.camQ).multiply(new THREE.Quaternion().setFromAxisAngle(V3(1, 0, 0), -.17));
   // speed dust
-  const pa = dust.geometry.attributes.position, a = pa.array, mv = Math.min(v, .5) * dt; const lf = fwd.clone().multiplyScalar(mv);
-  for (let i = 0; i < a.length; i += 3) { a[i] -= lf.x; a[i + 1] -= lf.y; a[i + 2] -= lf.z; for (let j = 0; j < 3; j++) { if (a[i + j] > .3) a[i + j] -= .6; else if (a[i + j] < -.3) a[i + j] += .6; } }
-  pa.needsUpdate = true; dust.position.copy(ship.pos); dust.material.opacity = .45 * smooth(0, 6, ship.level) * (1 - smooth(26, 34, ship.level));
+  const pa = dust.geometry.attributes.position, a = pa.array, mv = Math.min(v, .5 * RS) * dt; const lf = fwd.clone().multiplyScalar(mv); const W = .3 * RS;
+  for (let i = 0; i < a.length; i += 3) { a[i] -= lf.x; a[i + 1] -= lf.y; a[i + 2] -= lf.z; for (let j = 0; j < 3; j++) { if (a[i + j] > W) a[i + j] -= 2 * W; else if (a[i + j] < -W) a[i + j] += 2 * W; } }
+  pa.needsUpdate = true; dust.position.copy(ship.pos); dust.material.opacity = .45 * smooth(2, 8, ship.level) * (1 - smooth(20, 28, ship.level));
   barFill.style.height = (100 * ship.level / MAXL) + '%';
   checkLanding();
+}
+
+/* ---------- 3D rocks around the rocket: asteroid belt and Saturn's rings ---------- */
+function rockGeo(seed, detail = 2) {
+  const g = new THREE.IcosahedronGeometry(1, detail); const p = g.attributes.position; const v = V3();
+  for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); const n = fbm(v.x * 1.7 + seed, v.y * 1.7, v.z * 1.7 - seed, 4); v.multiplyScalar(.62 + n * .75); p.setXYZ(i, v.x, v.y * (.7 + (seed % 3) * .1), v.z); }
+  g.computeVertexNormals(); return g;
+}
+function makeField(o) {
+  const geos = [0, 1, 2, 3].map(i => rockGeo(o.seed + i * 3.7, o.detail));
+  const mat = new THREE.MeshStandardMaterial({ color: o.color, roughness: o.rough, metalness: 0, flatShading: o.flat });
+  const per = Math.ceil(o.count / 4);
+  const meshes = geos.map(g => { const m = new THREE.InstancedMesh(g, mat, per); m.frustumCulled = false; m.visible = false; scene.add(m); return m; });
+  return { ...o, meshes, per, cell: null };
+}
+const beltField = makeField({ seed: 1.3, detail: 2, color: 0x7d7368, rough: .95, flat: false, count: isTouch ? 360 : 640, C: 2.5, smin: .0008, smax: .06 });
+const ringField = makeField({ seed: 7.1, detail: 1, color: 0xeef1f6, rough: .45, flat: true, count: isTouch ? 700 : 1200, C: .0015, smin: 8e-6, smax: 2.5e-4 });
+const _m4b = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _sv = V3(), _hp = V3();
+function hash3i(x, y, z, k) { const h = Math.sin(x * 127.1 + y * 311.7 + z * 74.7 + k * 19.19) * 43758.5453; return h - Math.floor(h); }
+function fillField(F, origin, toWorld, keep) {
+  // a 3x3x3 block of cells around the rocket; every cell always gets the same rocks, so they stay put while you fly
+  const cx = Math.floor(origin.x / F.C), cy = Math.floor(origin.y / F.C), cz = Math.floor(origin.z / F.C); const key = cx + ',' + cy + ',' + cz;
+  if (F.cell === key) return; F.cell = key;
+  const counts = F.meshes.map(() => 0); const perCell = Math.floor(F.count / 27);
+  for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) for (let k = 0; k < perCell; k++) {
+    const X = cx + dx, Y = cy + dy, Z = cz + dz;
+    _hp.set((X + hash3i(X, Y, Z, k)) * F.C, (Y + hash3i(Y, Z, X, k + 9)) * F.C, (Z + hash3i(Z, X, Y, k + 17)) * F.C);
+    if (keep && !keep(_hp)) continue;
+    const mi = Math.floor(hash3i(X, Y, Z, k + 31) * 4), m = F.meshes[mi]; if (counts[mi] >= F.per) continue;
+    const sz = F.smin * Math.pow(F.smax / F.smin, Math.pow(hash3i(X, Y, Z, k + 41), 2));
+    _e.set(hash3i(X, Y, Z, k + 51) * 6.3, hash3i(X, Y, Z, k + 61) * 6.3, 0); _q.setFromEuler(_e);
+    _m4b.compose(toWorld(_hp.clone()), _q, _sv.set(sz, sz * (.7 + hash3i(X, Y, Z, k + 71) * .5), sz)); m.setMatrixAt(counts[mi]++, _m4b);
+  }
+  F.meshes.forEach((m, i) => { m.count = counts[i]; m.instanceMatrix.needsUpdate = true; });
+}
+const _invE = new THREE.Matrix4();
+function rockFields(p) {
+  // asteroid belt: between 2.2 and 3.3 AU, close to the ecliptic
+  _invE.copy(eclFrame.matrix).invert(); const loc = p.clone().applyMatrix4(_invE); const rr = Math.hypot(loc.x, loc.z);
+  const inBelt = mode === 'pilot' && rr > 2.1 * AU && rr < 3.4 * AU && Math.abs(loc.y) < .3 * AU;
+  beltField.meshes.forEach(m => m.visible = inBelt);
+  if (inBelt) fillField(beltField, loc, v => v.applyMatrix4(eclFrame.matrix));
+  // Saturn's rings: chunks of ice right in the ring plane
+  const sat = bodyByName['Saturno']; sat.tilt.updateMatrixWorld(); const inv = sat.tilt.matrixWorld.clone().invert(); const sl = p.clone().applyMatrix4(inv);
+  const sr = Math.hypot(sl.x, sl.z); const inRing = mode === 'pilot' && sr > 74 && sr < 138 && Math.abs(sl.y) < .05;
+  ringField.meshes.forEach(m => m.visible = inRing);
+  if (inRing) { ringField.cell = null; ringField.anchor = ringField.anchor || null;
+    const M = sat.tilt.matrixWorld; fillField(ringField, sl, v => v.applyMatrix4(M), v => Math.abs(v.y) < .0025 && Math.hypot(v.x, v.z) > 74.5 && Math.hypot(v.x, v.z) < 137); }
 }
 
 /* ---------- landing on the real surface (only on vinikautor.com.br/cosmos) ---------- */
@@ -1049,7 +1117,7 @@ function checkLanding() {
 document.getElementById('pouso').onclick = () => { if (landTarget) land(landTarget); };
 
 /* ---------- explore with the finger (Solar System only) ---------- */
-const SYS_R = 1500;
+const SYS_R = 8e6; // a little past the Kuiper belt
 let controls = null; const exp = { body: null, last: V3(), anim: null };
 const minDist = b => b.r * (b === earth ? 1.06 : b.name === 'Sol' ? 1.6 : 1.3);
 function nearestBody() { let best = bodies[0], bd = Infinity; for (const b of bodies) { const d = camera.position.distanceTo(b.wpos) / (b.r * 12 + 40); if (d < bd) { bd = d; best = b; } } return best; }
@@ -1097,9 +1165,9 @@ function setMode(m) {
   rocket.visible = dust.visible = m === 'pilot'; if (m !== 'pilot') document.getElementById('pouso').style.display = 'none';
   if (m === 'pilot') {
     ship.q.copy(camera.quaternion); ship.camQ.copy(camera.quaternion);
-    ship.pos.copy(camera.position).add(V3(0, -.058, -.23).applyQuaternion(camera.quaternion));
+    ship.pos.copy(camera.position).add(V3(0, -.058 * RS, -.23 * RS).applyQuaternion(camera.quaternion));
     const near = Math.min(...bodies.map(b => ship.pos.distanceTo(b.wpos) - b.r));
-    ship.level = clamp(Math.round(Math.log(Math.max(near, .5) / 3 / .05) / Math.log(1.47)), 4, 30);
+    ship.level = 11; shipNear = nearestSurface(ship.pos);
     auto = null;
     flashHint(isTouch ? 'arraste o dedo para pilotar<br>+ e − mudam a velocidade<br>toque num nome para ir até ele' : 'arraste com o mouse ou use as setas para pilotar<br>W e S mudam a velocidade · Q e E giram<br>clique num nome para ir até ele', 7000);
   } else if (m === 'explore') { enterExplore(); } else { lookYaw = lookPitch = 0; startWP(); }
@@ -1178,29 +1246,31 @@ function frame() {
   updateAtmos();
   camera.updateMatrixWorld();
   const camDist = camera.position.length();
-  sky.position.copy(camera.position); bgStars.position.copy(camera.position); skyGroup.position.copy(camera.position);
-  skyMat.uniforms.uFade.value = 1 - smooth(4000, 22000, camDist);
+  farCam.position.copy(camera.position).divideScalar(LY); farCam.quaternion.copy(camera.quaternion); farCam.fov = camera.fov; farCam.aspect = camera.aspect; farCam.updateProjectionMatrix(); farCam.updateMatrixWorld();
+  sky.position.copy(farCam.position); bgStars.position.copy(farCam.position); skyGroup.position.copy(farCam.position);
+  skyMat.uniforms.uFade.value = 1 - smooth(4000 * LY, 22000 * LY, camDist);
   const h = Math.abs(V3().subVectors(camera.position, GC_WORLD).dot(NGP));
-  glowMat.uniforms.uFade.value = smooth(800, 9000, h) * smooth(6000, 24000, camDist);
+  glowMat.uniforms.uFade.value = smooth(800 * LY, 9000 * LY, h) * smooth(6000 * LY, 24000 * LY, camDist);
   const sc = pxScale(); if (galPts.mat) galPts.mat.uniforms.uScale.value = sc;
-  if (galPts.mat) galPts.mat.uniforms.uBright.value = .38 * smooth(4000, 20000, camDist);
-  const solarVis = camDist < 7000; nearPlanet = bodies.some(b => b.r < 20 && camera.position.distanceTo(b.wpos) < b.r * 6); orbitLines.forEach(l => l.visible = showLabels && solarVis && !nearPlanet); astBelt.visible = kuiper.visible = solarVis;
-  bgStars.material.uniforms.uOpacity.value = 1 - .75 * smooth(8000, 40000, camDist);
-  constStars.material.uniforms.uOpacity.value = 1 - smooth(4000, 9000, camDist);
+  if (galPts.mat) galPts.mat.uniforms.uBright.value = .38 * smooth(4000 * LY, 20000 * LY, camDist);
+  const solarVis = camDist < SYS_R * 6; nearPlanet = bodies.some(b => b.name !== 'Sol' && camera.position.distanceTo(b.wpos) < b.r * 30); orbitLines.forEach(l => l.visible = showLabels && solarVis && !nearPlanet); astBelt.visible = kuiper.visible = solarVis;
+  bgStars.material.uniforms.uOpacity.value = 1 - .75 * smooth(8000 * LY, 40000 * LY, camDist);
+  constStars.material.uniforms.uOpacity.value = 1 - smooth(4000 * LY, 9000 * LY, camDist);
   bgStars.material.uniforms.uTime.value = constStars.material.uniforms.uTime.value = simT;
-  nebulae.forEach(n => n.material.visible = camDist < 9000);
-  const fs = smooth(5000, 20000, camDist); farSprites.forEach(f => { f.material.opacity = fs; f.visible = fs > 0.01; });
+  nebulae.forEach(n => n.material.visible = camDist < 9000 * LY);
+  const fs = smooth(5000 * LY, 20000 * LY, camDist); farSprites.forEach(f => { f.material.opacity = fs; f.visible = fs > 0.01; });
   { const dBH = camera.position.distanceTo(GC_WORLD); const on = dBH < BH_RS * 220;
     bhPass.uniforms.uOn.value = on ? 1 : 0;
-    if (on) { const u = bhPass.uniforms; u.uTime.value = simT; u.uCam.value.copy(camera.position); u.uInvProj.value.copy(camera.projectionMatrixInverse); u.uInvView.value.copy(camera.matrixWorld);
+    if (on) { const u = bhPass.uniforms; u.uTime.value = simT; u.uRel.value.subVectors(camera.position, GC_WORLD).divideScalar(BH_RS); u.uInvProj.value.copy(camera.projectionMatrixInverse); u.uInvView.value.copy(camera.matrixWorld);
       u.uViewProj.value.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); } }
   rocketCam.copy(camera); rocketCam.layers.set(1); rocketPass.enabled = rocket.visible;
   gradePass.uniforms.uTime.value = simT;
   { const sp = V3(0, 0, 0).project(camera); const R = raysPass.uniforms; R.uSun.value.set(sp.x * .5 + .5, sp.y * .5 + .5); R.uAsp.value = camera.aspect;
     const onScr = sp.z < 1 && Math.abs(sp.x) < 1.6 && Math.abs(sp.y) < 1.6 ? 1 - smooth(1, 1.6, Math.max(Math.abs(sp.x), Math.abs(sp.y))) : 0;
-    R.uOn.value = onScr * (1 - smooth(1500, 4000, camDist)); raysPass.enabled = R.uOn.value > 0; }
+    R.uOn.value = onScr * (1 - smooth(SYS_R * 3, SYS_R * 8, camDist)); raysPass.enabled = R.uOn.value > 0; }
   corona.material.rotation += dt * .004;
-  { const sat = bodyByName['Saturno']; satU.uC.value.copy(sat.wpos); satU.uN.value.set(0, 1, 0).transformDirection(sat.tilt.matrixWorld); }
+  { const sat = bodyByName['Saturno']; satU.uC.value.copy(sat.wpos); satU.uN.value.set(0, 1, 0).transformDirection(sat.tilt.matrixWorld);
+    const hgt = Math.abs(V3().subVectors(camera.position, sat.wpos).dot(satU.uN.value)); ringMat.uniforms.uFadeNear.value = .08 + .92 * smooth(.003, .6, hgt); }
   updateLabels(dt, camDist);
   composer.render();
   // adapt resolution on slow devices
@@ -1213,7 +1283,7 @@ function frame() {
 manager.onLoad = () => {
   if (started) return; started = true;
   refreshWpos();
-  camera.position.copy(eclToWorld(-600, 260, 900)); camera.lookAt(0, 0, 0); camera.up.copy(ECL_N);
+  camera.position.copy(eclToWorld(-3.2e5, 1.5e5, 4.6e5)); camera.lookAt(0, 0, 0); camera.up.copy(ECL_N);
   tour.i = 0; startWP(); tour.dur = 16; $('bTour').classList.add('on');
   setTimeout(() => { if (mode === 'tour') flashHint(isTouch ? 'toque na tela para explorar com o dedo' : 'clique e arraste para explorar', 5000); }, 4000);
   loadEl.style.opacity = 0; setTimeout(() => loadEl.remove(), 2600);
@@ -1221,11 +1291,11 @@ manager.onLoad = () => {
     if (v) { const b = bodyByName[v]; const out = b.wpos.clone().normalize().negate(); // leave on the sunlit side, facing outward
       const side = V3().crossVectors(out, ECL_N).normalize();
       camera.position.copy(b.wpos).addScaledVector(out, b.r * 1.3); camera.up.copy(ECL_N); camera.lookAt(camera.position.clone().addScaledVector(side, 10)); camera.updateMatrixWorld();
-      refreshWpos(); setMode('pilot'); ship.level = 9; } }
+      refreshWpos(); setMode('pilot'); ship.level = 12; } }
   poke();
 };
 scene.updateMatrixWorld(); refreshWpos();
-camera.position.set(0, 0, 900); camera.lookAt(0, 0, 0);
+camera.position.set(0, 0, 5e5); camera.lookAt(0, 0, 0);
 frame();
 </script>
 </body>
