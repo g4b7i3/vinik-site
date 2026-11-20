@@ -16,7 +16,7 @@ canvas{display:block;touch-action:none;outline:none}
 .lb .s{font-size:9px;letter-spacing:.06em;font-weight:300;color:rgba(175,190,215,.78);margin-top:2px;text-shadow:0 0 6px #000}
 .lb.big .n{font-size:15px;letter-spacing:.3em}
 .lb.tgt .n{color:#ffd28a}
-body.pilot .lb{pointer-events:auto;cursor:pointer}
+body.pilot .lb,body.explore .lb{pointer-events:auto;cursor:pointer}
 #ui{position:fixed;top:calc(12px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));display:flex;gap:8px;transition:opacity 1.2s}
 .b{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(8,12,22,.42);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#dfe6f3;display:grid;place-items:center;cursor:pointer;padding:0;font:300 15px Inter,sans-serif}
 .b svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.4}
@@ -48,6 +48,7 @@ body.pilot #hud{display:flex}
 <body>
 <div id="labels"></div>
 <div id="ui">
+  <button class="b" id="bTour" aria-label="Passeio automático"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
   <button class="b" id="bMode" aria-label="Foguete"><svg viewBox="0 0 24 24"><path d="M12 2.5c3 2.4 4.3 6 4.3 9.7l-1.8 4.3h-5l-1.8-4.3C7.7 8.5 9 4.9 12 2.5z"/><circle cx="12" cy="9.5" r="1.6"/><path d="M8.3 13.5 5.5 16v3l3.2-1.7M15.7 13.5l2.8 2.5v3l-3.2-1.7M10.5 19.5c.4 1 .9 1.6 1.5 2 .6-.4 1.1-1 1.5-2"/></svg></button>
   <button class="b on" id="bLab" aria-label="Nomes">Aa</button>
   <button class="b" id="bFs" aria-label="Tela cheia"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
@@ -79,7 +80,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const D2R = Math.PI / 180;
 const isTouch = matchMedia('(pointer:coarse)').matches;
@@ -435,13 +436,7 @@ const bhPass = new ShaderPass({
 /* ---------- Solar System (sizes and distances compressed) ---------- */
 const ambLight = new THREE.AmbientLight(0xffffff, .045); ambLight.layers.enable(1); scene.add(ambLight);
 const sunLight = new THREE.PointLight(0xfff4e6, 2.7, 0, 0); sunLight.layers.enable(1); scene.add(sunLight);
-// lens flare on the Sun
-{ const ring = canvasTex(256, 256, (g, w) => { const r = g.createRadialGradient(w / 2, w / 2, w * .3, w / 2, w / 2, w / 2); r.addColorStop(0, 'rgba(255,255,255,0)'); r.addColorStop(.7, 'rgba(160,200,255,.35)'); r.addColorStop(.85, 'rgba(255,190,140,.25)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, w, w); });
-  const hex = canvasTex(128, 128, (g, w) => { g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3; g.lineTo(w / 2 + Math.cos(a) * w * .45, w / 2 + Math.sin(a) * w * .45); } g.fill(); });
-  const lf = new Lensflare(); lf.addElement(new LensflareElement(glowTex, 220, 0, new THREE.Color(1, .9, .75)));
-  lf.addElement(new LensflareElement(hex, 60, .4, new THREE.Color(.5, .7, 1))); lf.addElement(new LensflareElement(hex, 90, .6, new THREE.Color(1, .7, .4)));
-  lf.addElement(new LensflareElement(ring, 220, .85, new THREE.Color(.8, .85, 1))); lf.addElement(new LensflareElement(hex, 40, 1, new THREE.Color(.6, 1, .7)));
-  sunLight.add(lf); window.__lf = lf; }
+
 const YEAR = 900;
 const bodies = []; const bodyByName = {};
 function sphere(r, seg = 64) { return new THREE.SphereGeometry(r, seg, Math.round(seg * .66)); }
@@ -740,7 +735,7 @@ function addLabel(kind, name, sub, o = {}) {
   el.innerHTML = `<div class="n">${name}</div>` + (sub ? `<div class="s">${sub}</div>` : '');
   labelsEl.appendChild(el);
   const L = { kind, name, el, cur: 0, ...o }; labels.push(L);
-  el.addEventListener('pointerdown', e => { e.stopPropagation(); if (mode === 'pilot') setAuto(L); });
+  el.addEventListener('pointerdown', e => { e.stopPropagation(); if (mode === 'pilot') setAuto(L); else if (mode === 'explore' && L.kind === 'body') setFocus(L.body); });
   return L;
 }
 for (const b of bodies) addLabel('body', b.name, b.sub, { body: b });
@@ -787,6 +782,7 @@ function updateLabels(dt, camDist) {
       if (L.kind === 'body') {
         const b = L.body; _p.copy(b.wpos); const d = camera.position.distanceTo(_p);
         vis = b.name === 'Sol' ? 1 - smooth(1800, 4000, d) : 1 - smooth(b.r * 70, b.r * 140, d);
+        if (mode === 'explore' && camDist < SYS_R * 1.3) vis = Math.max(vis, b.parent ? 1 - smooth(60, 160, d) : 1);
         if (d < b.r * 1.2) vis = 0;
       } else if (L.kind === 'belt') {
         _d.copy(camera.position); const loc = _d.clone().applyMatrix4(new THREE.Matrix4().copy(eclFrame.matrix).invert());
@@ -1021,6 +1017,43 @@ function checkLanding() {
 }
 document.getElementById('pouso').onclick = () => { if (landTarget) land(landTarget); };
 
+/* ---------- explore with the finger (Solar System only) ---------- */
+const SYS_R = 1500;
+let controls = null; const exp = { body: null, last: V3(), anim: null };
+const minDist = b => b.r * (b === earth ? 1.06 : b.name === 'Sol' ? 1.6 : 1.3);
+function nearestBody() { let best = bodies[0], bd = Infinity; for (const b of bodies) { const d = camera.position.distanceTo(b.wpos) / (b.r * 12 + 40); if (d < bd) { bd = d; best = b; } } return best; }
+function setFocus(b, dist) {
+  const cur = controls.target.clone();
+  const from = camera.position.distanceTo(cur);
+  exp.anim = { t: 0, dur: 1.8, fromT: cur, fromD: from, toD: dist ?? b.r * (b.k || 4) * .95 };
+  exp.body = b; exp.last.copy(b.wpos); controls.minDistance = 0; controls.maxDistance = Infinity;
+  flashHint(b.name, 1800);
+}
+function enterExplore() {
+  if (!controls) { camera.up.copy(ECL_N); controls = new OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = .09; controls.enablePan = false; controls.rotateSpeed = .55; controls.zoomSpeed = 1.1; }
+  camera.up.copy(ECL_N); controls.enabled = true;
+  const far = camera.position.length() > SYS_R;
+  const b = far ? bodyByName['Terra'] : nearestBody();
+  const fwd = V3(); camera.getWorldDirection(fwd);
+  controls.target.copy(camera.position).addScaledVector(fwd, Math.max(camera.position.distanceTo(b.wpos), 1));
+  if (far) { camera.position.copy(b.wpos).add(eclToWorld(0, b.r * 3, b.r * 10)); controls.target.copy(b.wpos); }
+  controls.update(); setFocus(b, far ? b.r * 6 : Math.min(camera.position.distanceTo(b.wpos), SYS_R));
+  flashHint(isTouch ? 'arraste para girar · pinça para aproximar<br>toque no nome de um planeta para ir até ele' : 'arraste para girar · roda do mouse aproxima<br>clique no nome de um planeta para ir até ele', 6000);
+}
+function updateExplore(dt) {
+  const b = exp.body; if (!b) return;
+  if (exp.anim) {
+    const a = exp.anim; a.t += dt; const e = easeIO(Math.min(1, a.t / a.dur));
+    const dir = camera.position.clone().sub(controls.target).normalize();
+    controls.target.lerpVectors(a.fromT, b.wpos, e);
+    camera.position.copy(controls.target).addScaledVector(dir, a.fromD + (a.toD - a.fromD) * e);
+    if (a.t >= a.dur) { exp.anim = null; controls.minDistance = minDist(b); controls.maxDistance = SYS_R; }
+  } else { const d = b.wpos.clone().sub(exp.last); camera.position.add(d); controls.target.add(d); } // ride along with the planet
+  exp.last.copy(b.wpos);
+  controls.update();
+  if (camera.position.length() > SYS_R * 1.1) camera.position.setLength(SYS_R * 1.1); // the rocket is the way out
+}
+
 /* ---------- UI ---------- */
 let mode = 'tour';
 const $ = id => document.getElementById(id);
@@ -1028,7 +1061,8 @@ const barFill = $('bar').querySelector('i'), hintEl = $('hint');
 let hintTimer;
 function flashHint(t, ms = 3500) { hintEl.innerHTML = t; hintEl.style.opacity = 1; clearTimeout(hintTimer); hintTimer = setTimeout(() => hintEl.style.opacity = 0, ms); }
 function setMode(m) {
-  mode = m; document.body.classList.toggle('pilot', m === 'pilot'); $('bMode').classList.toggle('on', m === 'pilot');
+  mode = m; document.body.classList.toggle('pilot', m === 'pilot'); document.body.classList.toggle('explore', m === 'explore'); $('bMode').classList.toggle('on', m === 'pilot');
+  $('bTour').classList.toggle('on', m === 'tour'); if (controls) controls.enabled = m === 'explore';
   rocket.visible = dust.visible = m === 'pilot'; if (m !== 'pilot') document.getElementById('pouso').style.display = 'none';
   if (m === 'pilot') {
     ship.q.copy(camera.quaternion); ship.camQ.copy(camera.quaternion);
@@ -1037,9 +1071,10 @@ function setMode(m) {
     ship.level = clamp(Math.round(Math.log(Math.max(near, .5) / 3 / .05) / Math.log(1.47)), 4, 30);
     auto = null;
     flashHint(isTouch ? 'arraste o dedo para pilotar<br>+ e − mudam a velocidade<br>toque num nome para ir até ele' : 'arraste com o mouse ou use as setas para pilotar<br>W e S mudam a velocidade · Q e E giram<br>clique num nome para ir até ele', 7000);
-  } else { startWP(); }
+  } else if (m === 'explore') { enterExplore(); } else { lookYaw = lookPitch = 0; startWP(); }
 }
-$('bMode').onclick = () => setMode(mode === 'pilot' ? 'tour' : 'pilot');
+$('bMode').onclick = () => setMode(mode === 'pilot' ? (camera.position.length() < SYS_R ? 'explore' : 'tour') : 'pilot');
+$('bTour').onclick = () => { if (mode !== 'tour') setMode('tour'); };
 $('bLab').onclick = () => { showLabels = !showLabels; $('bLab').classList.toggle('on', showLabels); orbitLines.forEach(l => l.visible = showLabels); };
 $('bFs').onclick = () => { const d = document; try { if (d.fullscreenElement) d.exitFullscreen(); else d.documentElement.requestFullscreen().catch(() => { }); } catch (e) { } };
 $('bInfo').onclick = () => $('info').classList.add('show');
@@ -1056,7 +1091,7 @@ addEventListener('keyup', e => { keys[e.key.length === 1 ? e.key.toLowerCase() :
 // pointer: joystick in pilot mode, gentle look-around in tour mode
 const stick = { on: false, x0: 0, y0: 0, dx: 0, dy: 0, lx: 0, ly: 0 };
 const cv = renderer.domElement;
-cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); stick.on = mode === 'pilot'; dragging = true; stick.x0 = stick.lx = e.clientX; stick.y0 = stick.ly = e.clientY; stick.dx = stick.dy = 0; poke(); });
+cv.addEventListener('pointerdown', e => { if (mode === 'tour' && started) { setMode('explore'); poke(); return; } if (mode === 'explore') { poke(); return; } cv.setPointerCapture(e.pointerId); stick.on = mode === 'pilot'; dragging = true; stick.x0 = stick.lx = e.clientX; stick.y0 = stick.ly = e.clientY; stick.dx = stick.dy = 0; poke(); });
 cv.addEventListener('pointermove', e => {
   poke(); if (!dragging) return;
   if (mode === 'pilot') { stick.dx = e.clientX - stick.x0; stick.dy = e.clientY - stick.y0; }
@@ -1097,7 +1132,7 @@ function frame() {
   requestAnimationFrame(frame);
   const rawDt = clock.getDelta(); const dt = Math.min(rawDt, .05);
   simT += dt; updateBodies(dt); scene.updateMatrixWorld(); refreshWpos();
-  if (mode === 'pilot') updatePilot(dt); else if (started) updateTour(dt);
+  if (mode === 'pilot') updatePilot(dt); else if (mode === 'explore') updateExplore(dt); else if (started) updateTour(dt);
   if (started) { updateHiRes(dt); updateEarth(dt); }
   updateAtmos();
   camera.updateMatrixWorld();
@@ -1119,7 +1154,7 @@ function frame() {
     if (on) { const u = bhPass.uniforms; u.uTime.value = simT; u.uCam.value.copy(camera.position); u.uInvProj.value.copy(camera.projectionMatrixInverse); u.uInvView.value.copy(camera.matrixWorld);
       u.uViewProj.value.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); } }
   rocketCam.copy(camera); rocketCam.layers.set(1); rocketPass.enabled = rocket.visible;
-  gradePass.uniforms.uTime.value = simT; if (window.__lf) window.__lf.visible = camDist < 2500;
+  gradePass.uniforms.uTime.value = simT;
   updateLabels(dt, camDist);
   composer.render();
   // adapt resolution on slow devices
@@ -1133,7 +1168,8 @@ manager.onLoad = () => {
   if (started) return; started = true;
   refreshWpos();
   camera.position.copy(eclToWorld(-600, 260, 900)); camera.lookAt(0, 0, 0); camera.up.copy(ECL_N);
-  tour.i = 0; startWP(); tour.dur = 16;
+  tour.i = 0; startWP(); tour.dur = 16; $('bTour').classList.add('on');
+  setTimeout(() => { if (mode === 'tour') flashHint(isTouch ? 'toque na tela para explorar com o dedo' : 'clique e arraste para explorar', 5000); }, 4000);
   loadEl.style.opacity = 0; setTimeout(() => loadEl.remove(), 2600);
   { const v = ({ terra: 'Terra', lua: 'Lua', marte: 'Marte' })[new URLSearchParams(location.search).get('volta')];
     if (v) { const b = bodyByName[v]; const out = b.wpos.clone().normalize().negate(); // leave on the sunlit side, facing outward
