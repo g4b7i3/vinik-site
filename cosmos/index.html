@@ -225,7 +225,7 @@ const bgStars = (() => {
   g.setAttribute('aColor', new THREE.Float32BufferAttribute([0, 0, 0], 3)); g.setAttribute('aSize', new THREE.Float32BufferAttribute([0], 1));
   const p = new THREE.Points(g, starMat()); p.frustumCulled = false; p.renderOrder = -9; scene.add(p);
   manager.itemStart('stars');
-  fetch('tex/stars_hyg.bin').then(r => r.arrayBuffer()).then(buf => {
+  fetch('tex/stars_hyg.txt').then(r => r.text()).then(b64 => { const bin = atob(b64.trim()); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); const buf = u8.buffer;
     const dv = new DataView(buf), n = buf.byteLength / 6, P = new Float32Array(n * 3), C = new Float32Array(n * 3), S = new Float32Array(n);
     for (let i = 0; i < n; i++) {
       const ra = dv.getUint16(i * 6, true) / 65535 * 360, dec = dv.getUint16(i * 6 + 2, true) / 65535 * 180 - 90;
