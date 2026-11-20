@@ -273,6 +273,7 @@ const STAR_SUB = {
 };
 const STAR_TINT = { Betelgeuse: .05, Antares: .05, Aldebaran: .18, Arcturus: .22, Pollux: .3, Rigel: .95, Spica: .95, Vega: .85, Acrux: .9, Mimosa: .9, Regulus: .85, Achernar: .95, Sirius: .8, Alcyone: .9, Atlas: .9, Electra: .9, Maia: .9, Merope: .9, Taygeta: .9, Gacrux: .1, Capella: .4 };
 const CONST_R = 16000;
+const skyGroup = new THREE.Group(); scene.add(skyGroup); // constellations travel with the camera, like the real (infinitely far) sky
 const constObjs = [];
 const starLabelDefs = [];
 {
@@ -290,16 +291,16 @@ const starLabelDefs = [];
       const lp = []; for (const [a, b] of c.l) { const A = verts[a].clone().lerp(verts[b], .06), B = verts[b].clone().lerp(verts[a], .06); lp.push(A.x, A.y, A.z, B.x, B.y, B.z); }
       const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3));
       const m = new THREE.LineBasicMaterial({ color: 0x9fb8e8, transparent: true, opacity: .1, blending: THREE.AdditiveBlending, depthWrite: false });
-      const ls = new THREE.LineSegments(g, m); scene.add(ls);
+      const ls = new THREE.LineSegments(g, m); ls.frustumCulled = false; skyGroup.add(ls);
       constObjs.push({ name: c.n, sub: c.s, dir: cen.normalize(), line: ls });
     }
   }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('aColor', new THREE.Float32BufferAttribute(col, 3)); g.setAttribute('aSize', new THREE.Float32BufferAttribute(sz, 1));
-  var constStars = new THREE.Points(g, starMat()); constStars.frustumCulled = false; scene.add(constStars);
+  var constStars = new THREE.Points(g, starMat()); constStars.frustumCulled = false; skyGroup.add(constStars);
 }
 // faint nebulae for the Orion Nebula and the Pleiades
-function nebSprite(dir, size, color, op) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: op })); s.position.copy(dir).multiplyScalar(CONST_R * .98); s.scale.set(size, size, 1); scene.add(s); return s; }
+function nebSprite(dir, size, color, op) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: op })); s.position.copy(dir).multiplyScalar(CONST_R * .98); s.scale.set(size, size, 1); skyGroup.add(s); return s; }
 const nebulae = [nebSprite(radec(83.82, -5.39), 260, 0xff8fb0, .55), nebSprite(radec(56.75, 24.12), 420, 0x8fb6ff, .35)];
 
 /* ---------- the galaxy ---------- */
@@ -1101,7 +1102,7 @@ function frame() {
   updateAtmos();
   camera.updateMatrixWorld();
   const camDist = camera.position.length();
-  sky.position.copy(camera.position); bgStars.position.copy(camera.position);
+  sky.position.copy(camera.position); bgStars.position.copy(camera.position); skyGroup.position.copy(camera.position);
   skyMat.uniforms.uFade.value = 1 - smooth(4000, 22000, camDist);
   const h = Math.abs(V3().subVectors(camera.position, GC_WORLD).dot(NGP));
   glowMat.uniforms.uFade.value = smooth(800, 9000, h) * smooth(6000, 24000, camDist);
