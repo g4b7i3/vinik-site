@@ -94,12 +94,12 @@ let DPR = Math.min(devicePixelRatio, isTouch ? 1.5 : 1.75);
 const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(DPR);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = THREE.AgXToneMapping;
-renderer.toneMappingExposure = 1.25;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
 document.body.prepend(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.004, 5e6);
-const composer = new EffectComposer(renderer);
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: 4 }));
 composer.addPass(new RenderPass(scene, camera));
 // the rocket is drawn in its own pass (layer 1) so the black-hole lensing never covers it
 const rocketCam = new THREE.PerspectiveCamera();
@@ -1056,22 +1056,21 @@ function poke() { document.body.classList.remove('idle'); clearTimeout(idleT); i
 
 function onResize() {
   camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); bloom.setSize(innerWidth, innerHeight); gradePass.uniforms.uRes.value.set(innerWidth, innerHeight);
+  renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); bloom.setSize(innerWidth, innerHeight); gradePass.uniforms.uRes.value.set(innerWidth * renderer.getPixelRatio(), innerHeight * renderer.getPixelRatio());
 }
 addEventListener('resize', onResize);
 
-/* ---------- film look: grain, vignette, slight chromatic aberration ---------- */
+/* ---------- final touch: light sharpening and a soft vignette ---------- */
 const gradePass = new ShaderPass({
-  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(innerWidth, innerHeight) } },
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(innerWidth * DPR, innerHeight * DPR) } },
   vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-  fragmentShader: `uniform sampler2D tDiffuse; uniform float uTime; uniform vec2 uRes; varying vec2 vUv;
-  float h(vec2 p){ return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453); }
+  fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 uRes; varying vec2 vUv;
   void main(){
-    vec2 c=vUv-.5; float r2=dot(c,c);
-    vec2 off=c*r2*.012;
-    vec3 col=vec3(texture2D(tDiffuse,vUv+off).r, texture2D(tDiffuse,vUv).g, texture2D(tDiffuse,vUv-off).b);
-    col*=1.-smoothstep(.12,.75,r2)*.42;
-    float g=h(vUv*uRes+fract(uTime*17.)*100.)-.5; col+=g*.028*(1.-col*.5);
+    vec2 px=1./uRes;
+    vec3 c=texture2D(tDiffuse,vUv).rgb;
+    vec3 n=texture2D(tDiffuse,vUv+vec2(px.x,0.)).rgb+texture2D(tDiffuse,vUv-vec2(px.x,0.)).rgb+texture2D(tDiffuse,vUv+vec2(0.,px.y)).rgb+texture2D(tDiffuse,vUv-vec2(0.,px.y)).rgb;
+    vec3 col=clamp(c+(c*4.-n)*.18,0.,1.);
+    vec2 d=vUv-.5; col*=1.-smoothstep(.2,.8,dot(d,d))*.22;
     gl_FragColor=vec4(col,1.);
   }`
 });
