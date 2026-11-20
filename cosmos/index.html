@@ -65,7 +65,8 @@ body.pilot #hud{display:flex}
   Uma viagem pelo Sistema Solar e pela Via Láctea. Toque no foguete para pilotar; no modo foguete, toque no nome de um planeta, estrela ou constelação para o piloto automático levar você até lá.<br><br>
   Tamanhos e distâncias dos planetas estão fora de escala para caberem na tela. As posições das estrelas, das constelações e do Centro Galáctico seguem as coordenadas reais do céu. Ninguém nunca fotografou a Via Láctea de fora: a vista de cima é uma concepção artística feita por astrônomos a partir de medições.<br><br>
   Terra: mosaico Blue Marble da NASA (dezembro de 2004) e relevo de shadedrelief.com, com montanhas exageradas 8 vezes para aparecerem.<br>
-  Planetas e céu visto da Terra: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> (CC BY 4.0), a partir de imagens da NASA e do panorama da Via Láctea do ESO.<br>
+  Céu e estrelas: NASA Scientific Visualization Studio (Deep Star Maps, a partir dos catálogos Gaia, Hipparcos e Tycho) e catálogo HYG 4.0 (astronexus, CC BY-SA 4.0), com 83 mil estrelas reais nas posições, cores e brilhos medidos.<br>
+  Planetas: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> (CC BY 4.0), a partir de imagens da NASA e do panorama da Via Láctea do ESO.<br>
   Sagitário A*: o buraco negro é calculado em tempo real, desviando cada raio de luz pela gravidade (relatividade geral de Schwarzschild); o tamanho e o brilho do disco foram exagerados para aparecer.<br>
   Via Láctea vista de fora: NASA/JPL-Caltech/R. Hurt (SSC-Caltech), concepção artística baseada em dados do telescópio Spitzer.
 </div></div>
@@ -90,7 +91,7 @@ function radec(ra, dec, r = 1) { ra *= D2R; dec *= D2R; return new THREE.Vector3
 function gauss() { let u = 0; while (u === 0) u = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random()); }
 
 /* ---------- renderer ---------- */
-let DPR = Math.min(devicePixelRatio, isTouch ? 1.5 : 1.75);
+const DPR_MAX = Math.min(devicePixelRatio, 3); let DPR = DPR_MAX; // render at the screen's native resolution
 const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(DPR);
 renderer.setSize(innerWidth, innerHeight);
@@ -176,18 +177,19 @@ function tex(name, lin) { const t = loader.load('tex/' + name); if (!lin) t.colo
 const hiLoader = new THREE.TextureLoader();
 
 /* ---------- sky: Milky Way band seen from inside ---------- */
-const skyTex = tex('sky_milky_way_4k.jpg'); skyTex.generateMipmaps = false; skyTex.minFilter = THREE.LinearFilter;
+const skyTex = tex('sky_milky_way_4k.jpg'); // used only for reflections on the rocket
+function skyTile(f) { const t = tex(f); t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; return t; }
 const skyMat = new THREE.ShaderMaterial({
-  uniforms: { uSky: { value: skyTex }, uNGP: { value: NGP }, uGC: { value: GCd }, uL90: { value: GAL_Y.clone().negate() }, uFade: { value: 1 } },
+  uniforms: { uSkyA: { value: skyTile('sky8k_a.jpg') }, uSkyB: { value: skyTile('sky8k_b.jpg') }, uFade: { value: 1 } },
   vertexShader: LD_V + `varying vec3 vW; void main(){ vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w;` + LD_VE + `}`,
   fragmentShader: LD_F + `
-  uniform sampler2D uSky; uniform vec3 uNGP,uGC,uL90; uniform float uFade; varying vec3 vW;
+  uniform sampler2D uSkyA,uSkyB; uniform float uFade; varying vec3 vW;
   void main(){` + LD_FE + `
     vec3 d=normalize(vW-cameraPosition);
-    float b=asin(clamp(dot(d,uNGP),-1.,1.)); float l=atan(dot(d,uL90),dot(d,uGC));
-    vec2 uv=vec2(0.5-l/6.2831853, 0.5-b/3.1415927);
-    vec3 c=texture2D(uSky,uv).rgb;
-    c=pow(c,vec3(0.85))*3.2;
+    float ra=atan(-d.z,d.x); float dec=asin(clamp(d.y,-1.,1.));
+    float u=fract(0.5-ra/6.2831853); float v=0.5+dec/3.1415927;
+    vec3 c = u<0.5 ? texture2D(uSkyA,vec2(u*2.,v)).rgb : texture2D(uSkyB,vec2(u*2.-1.,v)).rgb;
+    c=max(c-vec3(0.012),0.); c=pow(c,vec3(0.85))*3.4;
     gl_FragColor=vec4(c*uFade,1.0);
   }`,
   side: THREE.BackSide, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
@@ -197,13 +199,13 @@ const sky = new THREE.Mesh(new THREE.SphereGeometry(2e6, 64, 32), skyMat); sky.r
 /* ---------- fixed-pixel star material ---------- */
 function starMat() {
   return new THREE.ShaderMaterial({
-    uniforms: { uOpacity: { value: 1 }, uTime: { value: 0 } },
-    vertexShader: LD_V + `attribute float aSize; attribute vec3 aColor; varying vec3 vC; varying float vTw; uniform float uTime;
+    uniforms: { uOpacity: { value: 1 }, uTime: { value: 0 }, uDpr: { value: DPR } },
+    vertexShader: LD_V + `attribute float aSize; attribute vec3 aColor; varying vec3 vC; varying float vTw; uniform float uTime,uDpr;
     void main(){ vC=aColor; vec4 mv=modelViewMatrix*vec4(position,1.);
       float ph=fract(sin(dot(position.xy,vec2(12.9898,78.233)))*43758.5453)*6.2831;
-      vTw=0.82+0.18*sin(uTime*(1.2+ph*0.3)+ph); gl_PointSize=aSize; gl_Position=projectionMatrix*mv;` + LD_VE + `}`,
+      vTw=0.94+0.06*sin(uTime*(1.2+ph*0.3)+ph); gl_PointSize=aSize*uDpr; gl_Position=projectionMatrix*mv;` + LD_VE + `}`,
     fragmentShader: LD_F + `uniform float uOpacity; varying vec3 vC; varying float vTw;
-    void main(){` + LD_FE + ` float d=length(gl_PointCoord-.5)*2.; float a=1.0-smoothstep(0.0,1.0,d); a=a*a*a; if(a<0.004) discard;
+    void main(){` + LD_FE + ` float d=length(gl_PointCoord-.5)*2.; float a=exp(-d*d*5.5); if(a<0.01) discard;
       gl_FragColor=vec4(vC*a*uOpacity*vTw,1.); }`,
     blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
   });
@@ -213,19 +215,29 @@ function starColor(t) { // t: 0 red .. 1 blue
 }
 
 /* background stars (follow camera, effectively at infinity) */
+function ciColor(ci) { // B-V colour index to an approximate star colour
+  const t = clamp((ci + .4) / 2.4, 0, 1); const c = new THREE.Color();
+  if (t < .25) c.setRGB(.66 + t * 1.2, .78 + t * .8, 1); else if (t < .45) c.setRGB(1, .98, .95 - (t - .25)); else c.setRGB(1, .9 - (t - .45) * .55, .75 - (t - .45) * .9);
+  return c;
+}
 const bgStars = (() => {
-  const N = isTouch ? 6000 : 9000, pos = [], col = [], sz = [];
-  const H = V3().crossVectors(NGP, GCd);
-  while (pos.length / 3 < N) {
-    const v = V3().randomDirection(); const b = v.dot(NGP);
-    if (Math.random() > 0.35 + 0.65 * Math.exp(-Math.pow(b / 0.22, 2))) continue;
-    v.multiplyScalar(1.5e6); pos.push(v.x, v.y, v.z);
-    const m = Math.pow(Math.random(), 3.2); const c = starColor(Math.random() * .9 + .05).multiplyScalar(.35 + m * 1.1);
-    col.push(c.r, c.g, c.b); sz.push((1.0 + m * 2.6) * DPR);
-  }
-  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  g.setAttribute('aColor', new THREE.Float32BufferAttribute(col, 3)); g.setAttribute('aSize', new THREE.Float32BufferAttribute(sz, 1));
-  const p = new THREE.Points(g, starMat()); p.frustumCulled = false; p.renderOrder = -9; scene.add(p); return p;
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0], 3));
+  g.setAttribute('aColor', new THREE.Float32BufferAttribute([0, 0, 0], 3)); g.setAttribute('aSize', new THREE.Float32BufferAttribute([0], 1));
+  const p = new THREE.Points(g, starMat()); p.frustumCulled = false; p.renderOrder = -9; scene.add(p);
+  manager.itemStart('stars');
+  fetch('tex/stars_hyg.bin').then(r => r.arrayBuffer()).then(buf => {
+    const dv = new DataView(buf), n = buf.byteLength / 6, P = new Float32Array(n * 3), C = new Float32Array(n * 3), S = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const ra = dv.getUint16(i * 6, true) / 65535 * 360, dec = dv.getUint16(i * 6 + 2, true) / 65535 * 180 - 90;
+      const mag = dv.getUint8(i * 6 + 4) / 20 - 2, ci = dv.getUint8(i * 6 + 5) / 100 - .5;
+      const v = radec(ra, dec, 1.5e6); P[i * 3] = v.x; P[i * 3 + 1] = v.y; P[i * 3 + 2] = v.z;
+      const k = clamp(Math.pow(10, -.4 * (mag - 1.5)), .05, 3); const c = ciColor(ci).multiplyScalar(k);
+      C[i * 3] = c.r; C[i * 3 + 1] = c.g; C[i * 3 + 2] = c.b; S[i] = clamp(4.6 - mag * .4, 1.1, 6.5);
+    }
+    g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('aColor', new THREE.BufferAttribute(C, 3)); g.setAttribute('aSize', new THREE.BufferAttribute(S, 1));
+    manager.itemEnd('stars');
+  }).catch(() => manager.itemEnd('stars'));
+  return p;
 })();
 
 /* ---------- constellations & named stars (real RA/Dec, J2000) ---------- */
@@ -271,7 +283,7 @@ const starLabelDefs = [];
       const v = radec(ra, dec, CONST_R); pos.push(v.x, v.y, v.z); verts.push(v); cen.add(v);
       const t = STAR_TINT[name] ?? (.55 + Math.random() * .2);
       const b = clamp(1.4 - mag * .28, .25, 1.8); const cc = starColor(t).multiplyScalar(b); col.push(cc.r, cc.g, cc.b);
-      sz.push(clamp(8.5 - mag * 1.5, 2.2, 11) * DPR);
+      sz.push(clamp(6.2 - mag * 1.1, 1.6, 8));
       if (mag < 1.65 || name === 'Polaris') starLabelDefs.push({ name, sub: STAR_SUB[name] || 'estrela', dir: v.clone().normalize() });
     }
     if (c.l.length) {
@@ -322,7 +334,7 @@ function buildGalaxyPoints(img) {
   const S = 420, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d'); g.drawImage(img, 0, 0, S, S);
   const d = g.getImageData(0, 0, S, S).data, w = new Float32Array(S * S); let tot = 0;
   for (let i = 0; i < S * S; i++) { const L = (d[i * 4] * .3 + d[i * 4 + 1] * .55 + d[i * 4 + 2] * .15) / 255; const v = Math.pow(Math.max(L - .08, 0), 1.7); tot += v; w[i] = tot; }
-  const N = isTouch ? 80000 : 150000, P = [], C = [], Z = [];
+  const N = isTouch ? 150000 : 300000, P = [], C = [], Z = [];
   for (let n = 0; n < N; n++) {
     const t = Math.random() * tot; let lo = 0, hi = S * S - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (w[m] < t) lo = m + 1; else hi = m; }
     const ix = ((lo % S) + Math.random()) / S, iy = (Math.floor(lo / S) + Math.random()) / S;
@@ -330,7 +342,7 @@ function buildGalaxyPoints(img) {
     if ((x - R_SUN) ** 2 + y * y < 1500 * 1500) continue;
     const z = gauss() * (140 + 1300 * Math.exp(-r / 2600));
     const k = 4 * lo, col = new THREE.Color(d[k] / 255, d[k + 1] / 255, d[k + 2] / 255).multiplyScalar(.75 + Math.random() * .5);
-    P.push(x, y, z); C.push(col.r, col.g, col.b); Z.push(r < 5000 ? 160 : 120);
+    P.push(x, y, z); C.push(col.r, col.g, col.b); Z.push(r < 5000 ? 120 : 85);
   }
   const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
   geo.setAttribute('aColor', new THREE.Float32BufferAttribute(C, 3)); geo.setAttribute('aSize', new THREE.Float32BufferAttribute(Z, 1));
@@ -428,7 +440,7 @@ const sunLight = new THREE.PointLight(0xfff4e6, 2.7, 0, 0); sunLight.layers.enab
   const lf = new Lensflare(); lf.addElement(new LensflareElement(glowTex, 220, 0, new THREE.Color(1, .9, .75)));
   lf.addElement(new LensflareElement(hex, 60, .4, new THREE.Color(.5, .7, 1))); lf.addElement(new LensflareElement(hex, 90, .6, new THREE.Color(1, .7, .4)));
   lf.addElement(new LensflareElement(ring, 220, .85, new THREE.Color(.8, .85, 1))); lf.addElement(new LensflareElement(hex, 40, 1, new THREE.Color(.6, 1, .7)));
-  sunLight.add(lf); }
+  sunLight.add(lf); window.__lf = lf; }
 const YEAR = 900;
 const bodies = []; const bodyByName = {};
 function sphere(r, seg = 64) { return new THREE.SphereGeometry(r, seg, Math.round(seg * .66)); }
@@ -1082,7 +1094,7 @@ const clock = new THREE.Clock();
 let started = false, perfN = 0, perfT = 0;
 function frame() {
   requestAnimationFrame(frame);
-  const dt = Math.min(clock.getDelta(), .05);
+  const rawDt = clock.getDelta(); const dt = Math.min(rawDt, .05);
   simT += dt; updateBodies(dt); scene.updateMatrixWorld(); refreshWpos();
   if (mode === 'pilot') updatePilot(dt); else if (started) updateTour(dt);
   if (started) { updateHiRes(dt); updateEarth(dt); }
@@ -1096,7 +1108,7 @@ function frame() {
   const sc = pxScale(); if (galPts.mat) galPts.mat.uniforms.uScale.value = sc;
   if (galPts.mat) galPts.mat.uniforms.uBright.value = .38 * smooth(4000, 20000, camDist);
   const solarVis = camDist < 7000; nearPlanet = bodies.some(b => b.r < 20 && camera.position.distanceTo(b.wpos) < b.r * 6); orbitLines.forEach(l => l.visible = showLabels && solarVis && !nearPlanet); astBelt.visible = kuiper.visible = solarVis;
-  bgStars.material.uniforms.uOpacity.value = .45 - .3 * smooth(8000, 40000, camDist);
+  bgStars.material.uniforms.uOpacity.value = 1 - .75 * smooth(8000, 40000, camDist);
   constStars.material.uniforms.uOpacity.value = 1 - smooth(4000, 9000, camDist);
   bgStars.material.uniforms.uTime.value = constStars.material.uniforms.uTime.value = simT;
   nebulae.forEach(n => n.material.visible = camDist < 9000);
@@ -1106,11 +1118,15 @@ function frame() {
     if (on) { const u = bhPass.uniforms; u.uTime.value = simT; u.uCam.value.copy(camera.position); u.uInvProj.value.copy(camera.projectionMatrixInverse); u.uInvView.value.copy(camera.matrixWorld);
       u.uViewProj.value.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); } }
   rocketCam.copy(camera); rocketCam.layers.set(1); rocketPass.enabled = rocket.visible;
-  gradePass.uniforms.uTime.value = simT;
+  gradePass.uniforms.uTime.value = simT; if (window.__lf) window.__lf.visible = camDist < 2500;
   updateLabels(dt, camDist);
   composer.render();
   // adapt resolution on slow devices
-  if (started && perfN < 120) { perfN++; perfT += dt; if (perfN === 120 && perfT / 120 > 1 / 34 && DPR > 1) { DPR = 1; renderer.setPixelRatio(1); composer.setPixelRatio(1); onResize(); } }
+  // keep the native resolution while the phone keeps up; step down a little only if it doesn't
+  if (started) { perfN++; perfT += rawDt; if (perfN >= 60) { const avg = perfT / perfN; perfN = 0; perfT = 0; let nd = DPR;
+    if (avg > 1 / 36 && DPR > 1.5) nd = Math.max(1.5, DPR - .25); else if (avg < 1 / 55 && DPR < DPR_MAX) nd = Math.min(DPR_MAX, DPR + .25);
+    if (nd !== DPR) { DPR = nd; renderer.setPixelRatio(DPR); composer.setPixelRatio(DPR); onResize(); } } }
+  bgStars.material.uniforms.uDpr.value = constStars.material.uniforms.uDpr.value = DPR;
 }
 manager.onLoad = () => {
   if (started) return; started = true;
