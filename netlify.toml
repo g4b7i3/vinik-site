@@ -26,3 +26,7 @@
   for = "/content/*"
   [headers.values]
     Cache-Control = "no-cache"
+[[headers]]
+  for = "/cosmos/tex/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"

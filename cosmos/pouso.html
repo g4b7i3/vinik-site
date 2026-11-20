@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Cosmos · pouso</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script>window.CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.147.0/Build/Cesium/';</script>
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.147.0/Build/Cesium/Cesium.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/cesium@1.147.0/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+<script src="config.js"></script>
+<style>
+html,body,#globo{margin:0;width:100%;height:100%;background:#000;overflow:hidden;font-family:Inter,system-ui,sans-serif;color:#e8ecf4;-webkit-tap-highlight-color:transparent}
+.cesium-viewer-bottom{bottom:calc(4px + env(safe-area-inset-bottom))}
+.cesium-viewer-toolbar{top:calc(10px + env(safe-area-inset-top));right:10px}
+.cesium-geocoder-input{font:300 13px Inter,sans-serif;background:rgba(8,12,22,.6)!important;border-color:rgba(255,255,255,.18)!important;border-radius:20px!important}
+.b{height:40px;min-width:40px;padding:0 14px;border-radius:20px;border:1px solid rgba(255,255,255,.16);background:rgba(8,12,22,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#dfe6f3;font:300 13px Inter,sans-serif;letter-spacing:.04em;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.b.on{border-color:rgba(255,210,140,.6);color:#ffd28a}
+#topo{position:fixed;left:calc(10px + env(safe-area-inset-left));top:calc(10px + env(safe-area-inset-top));display:flex;gap:8px;z-index:2}
+#alt{position:fixed;left:calc(14px + env(safe-area-inset-left));top:calc(62px + env(safe-area-inset-top));font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(220,228,245,.8);text-shadow:0 0 8px #000;pointer-events:none;z-index:2;white-space:nowrap}
+#lugares{position:fixed;left:0;right:0;bottom:calc(30px + env(safe-area-inset-bottom));display:flex;gap:8px;overflow-x:auto;padding:0 12px;z-index:2;scrollbar-width:none}
+#lugares::-webkit-scrollbar{display:none}
+#lugares .b{flex:none;font-size:12px}
+#vel{position:fixed;right:calc(12px + env(safe-area-inset-right));bottom:calc(90px + env(safe-area-inset-bottom));display:none;flex-direction:column;gap:10px;z-index:2}
+#vel .b{width:52px;height:52px;padding:0;font-size:22px;border-radius:50%}
+body.foguete #vel{display:flex}
+#dica{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);font-size:11px;letter-spacing:.06em;line-height:1.7;text-align:center;color:rgba(215,225,242,.9);text-shadow:0 0 8px #000;opacity:0;transition:opacity 1s;pointer-events:none;z-index:2;width:80vw}
+#aviso{position:fixed;inset:0;display:none;place-items:center;background:#000;z-index:5;padding:24px}
+#aviso div{max-width:380px;font-size:13px;line-height:1.75;font-weight:300;color:#cdd6e6}
+#aviso b{font-weight:400;color:#fff}
+#aviso a{color:#9cc1ff}
+#veu{position:fixed;inset:0;background:#000;z-index:4;pointer-events:none;transition:opacity 1.6s}
+</style>
+</head>
+<body>
+<div id="globo"></div>
+<div id="topo">
+  <button class="b" id="espaco">← espaço</button>
+  <button class="b" id="modo">foguete</button>
+  <button class="b" id="luz" title="Luz do Sol real ou sempre de dia">☀ dia</button>
+</div>
+<div id="alt"></div>
+<div id="lugares"></div>
+<div id="vel"><button class="b" id="mais">+</button><button class="b" id="menos">−</button></div>
+<div id="dica"></div>
+<div id="veu"></div>
+<div id="aviso"><div>
+  <b>Falta só um passo para pousar.</b><br><br>
+  As imagens de satélite e o relevo da Terra, da Lua e de Marte vêm do Cesium ion, que é gratuito para uso pessoal, mas pede uma conta.<br><br>
+  1. Crie a conta em <a href="https://ion.cesium.com" target="_blank" rel="noopener">ion.cesium.com</a> (dá para entrar com o Google).<br>
+  2. Em <b>Asset Depot</b>, adicione <b>Cesium Moon</b> e <b>Cesium Mars</b> à sua biblioteca.<br>
+  3. Em <b>Access Tokens</b>, crie um token e, em <b>Allowed URLs</b>, coloque https://vinikautor.com.br.<br>
+  4. Cole o token no arquivo <b>cosmos/config.js</b> do site.<br><br>
+  <a href="./">← voltar ao espaço</a>
+</div></div>
+<script>
+(async () => {
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+const CORPO = ({ lua: 'lua', marte: 'marte' })[q.get('c')] || 'terra';
+const NOMES = { terra: 'Terra', lua: 'Lua', marte: 'Marte' };
+const isTouch = matchMedia('(pointer:coarse)').matches;
+let saindo = false;
+$('espaco').onclick = () => { if (saindo) return; saindo = true; $('veu').style.opacity = 1; setTimeout(() => location.href = './?volta=' + CORPO, 900); };
+if (!window.COSMOS_CESIUM_TOKEN) { $('aviso').style.display = 'grid'; return; }
+Cesium.Ion.defaultAccessToken = window.COSMOS_CESIUM_TOKEN;
+
+// famous places: [name, subtitle, lat, lon, viewing distance in metres]
+const LUGARES = {
+  terra: [
+    ['São Luís', 'Maranhão', -2.53, -44.30, 9000], ['Lençóis Maranhenses', 'dunas e lagoas', -2.52, -43.12, 30000],
+    ['Rio de Janeiro', 'Cristo e Baía de Guanabara', -22.95, -43.21, 14000], ['Monte Everest', '8.849 m', 27.988, 86.925, 18000],
+    ['Pirâmides de Gizé', 'Egito', 29.976, 31.131, 2500], ['Grand Canyon', 'Estados Unidos', 36.10, -112.11, 25000],
+    ['Paris', 'Torre Eiffel', 48.858, 2.294, 3500], ['Nova York', 'Manhattan', 40.75, -73.98, 6000],
+    ['Tóquio', 'Japão', 35.68, 139.76, 9000], ['Amazônia', 'encontro das águas', -3.14, -59.90, 30000]],
+  lua: [
+    ['Apollo 11', 'Mar da Tranquilidade, 1969', 0.674, 23.473, 25000], ['Cratera Tycho', '86 km de diâmetro', -43.31, -11.36, 160000],
+    ['Cratera Copérnico', '93 km de diâmetro', 9.62, -20.08, 160000], ['Polo Sul', 'onde a Artemis vai pousar', -89.6, 0, 60000],
+    ['Mar da Serenidade', 'planície de lava', 28.0, 17.5, 600000]],
+  marte: [
+    ['Cratera Gale', 'onde está o robô Curiosity', -4.59, 137.44, 40000], ['Cratera Jezero', 'onde está o robô Perseverance', 18.44, 77.45, 50000],
+    ['Monte Olimpo', 'o maior vulcão do Sistema Solar', 18.65, -133.8, 900000], ['Valles Marineris', 'cânion de 4 mil km', -13.9, -59.2, 900000],
+    ['Polo Norte', 'calota de gelo', 85, 0, 1200000]]
+};
+
+if (CORPO === 'lua') Cesium.Ellipsoid.default = Cesium.Ellipsoid.MOON;
+if (CORPO === 'marte') Cesium.Ellipsoid.default = Cesium.Ellipsoid.MARS;
+const terra = CORPO === 'terra';
+const viewer = new Cesium.Viewer('globo', {
+  globe: terra ? undefined : false,
+  terrain: terra ? Cesium.Terrain.fromWorldTerrain() : undefined,
+  baseLayer: terra ? undefined : false,
+  animation: false, timeline: false, baseLayerPicker: false, sceneModePicker: false, homeButton: false,
+  navigationHelpButton: false, fullscreenButton: false, infoBox: false, selectionIndicator: false,
+  geocoder: terra ? Cesium.IonGeocodeProviderType.DEFAULT : false,
+  skyAtmosphere: terra ? undefined : CORPO === 'marte' ? new Cesium.SkyAtmosphere(Cesium.Ellipsoid.MARS) : false
+});
+const scene = viewer.scene, cam = viewer.camera;
+scene.screenSpaceCameraController.enableCollisionDetection = true;
+scene.screenSpaceCameraController.minimumZoomDistance = 2;
+viewer.useBrowserRecommendedResolution = false; viewer.resolutionScale = Math.min(devicePixelRatio, isTouch ? 1.5 : 2) / devicePixelRatio;
+scene.postProcessStages.fxaa.enabled = true;
+if (terra) {
+  const inp = document.querySelector('.cesium-geocoder-input'); if (inp) inp.placeholder = 'Buscar qualquer lugar…';
+  scene.globe.enableLighting = false; scene.globe.depthTestAgainstTerrain = true;
+  if (window.COSMOS_GOOGLE_KEY) {
+    try { const g = await Cesium.createGooglePhotorealistic3DTileset({ key: window.COSMOS_GOOGLE_KEY }); scene.primitives.add(g); scene.globe.show = false; }
+    catch (e) { console.log(e); }
+  }
+} else {
+  if (scene.moon) scene.moon.show = false;
+  if (CORPO === 'marte' && scene.skyAtmosphere) { // dusty butterscotch sky
+    scene.skyAtmosphere.atmosphereRayleighCoefficient = new Cesium.Cartesian3(19e-6, 11e-6, 5e-6);
+    scene.skyAtmosphere.atmosphereMieCoefficient = new Cesium.Cartesian3(40e-6, 26e-6, 14e-6);
+  }
+  try { const t = await Cesium.Cesium3DTileset.fromIonAssetId(CORPO === 'lua' ? 2684829 : 3644333); scene.primitives.add(t); }
+  catch (e) { $('aviso').querySelector('div').innerHTML = '<b>Não consegui abrir o mapa da ' + NOMES[CORPO] + '.</b><br><br>Confira se Cesium Moon e Cesium Mars foram adicionados à sua biblioteca em ion.cesium.com (Asset Depot → Add to my assets).<br><br><a href="./">← voltar ao espaço</a>'; $('aviso').style.display = 'grid'; return; }
+}
+
+// arrival: start high above the point the rocket came from and descend
+const R = Cesium.Ellipsoid.default.maximumRadius;
+let lat = parseFloat(q.get('lat')), lon = parseFloat(q.get('lon'));
+if (!isFinite(lat) || !isFinite(lon)) { const p = LUGARES[CORPO][0]; lat = p[2]; lon = p[3]; }
+cam.setView({ destination: Cesium.Cartesian3.fromDegrees(lon, lat, R * 2.2) });
+$('veu').style.opacity = 0;
+cam.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lon, lat - (terra ? .25 : .4), terra ? 22000 : 60000), orientation: { heading: 0, pitch: Cesium.Math.toRadians(-38), roll: 0 }, duration: 7, easingFunction: Cesium.EasingFunction.QUADRATIC_IN_OUT });
+
+function dica(t, ms = 6000) { $('dica').innerHTML = t; $('dica').style.opacity = 1; clearTimeout(dica.t); dica.t = setTimeout(() => $('dica').style.opacity = 0, ms); }
+dica(isTouch ? 'um dedo arrasta · dois dedos aproximam e inclinam<br>ou toque em foguete para voar' : 'arraste para mover · roda do mouse aproxima · Ctrl + arrastar inclina<br>ou toque em foguete para voar', 8000);
+
+// famous places
+for (const [n, s, la, lo, d] of LUGARES[CORPO]) {
+  const b = document.createElement('button'); b.className = 'b'; b.textContent = n; b.title = s;
+  b.onclick = () => { setRocket(false); dica(n + '<br>' + s, 4000);
+    cam.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(lo, la, 0), 1), { offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-40), d), duration: 5 }); };
+  $('lugares').appendChild(b);
+}
+
+// sunlight: real (time of day) or always day
+$('luz').style.display = terra ? '' : 'none';
+$('luz').onclick = () => { const g = scene.globe; g.enableLighting = !g.enableLighting; $('luz').textContent = g.enableLighting ? '☀ hora real' : '☀ dia'; $('luz').classList.toggle('on', g.enableLighting); };
+
+// ground height under the camera, for the altitude readout and the rocket's floor
+let ground = 0, gTimer = 0;
+function updateGround() {
+  const c = cam.positionCartographic;
+  if (terra && scene.globe.show) { const h = scene.globe.getHeight(c); if (h !== undefined) ground = h; }
+  else { try { const h = scene.sampleHeight(new Cesium.Cartographic(c.longitude, c.latitude), undefined, 1); if (h !== undefined) ground = h; } catch (e) { } }
+}
+
+// rocket: fly forward, drag to steer, + and − change speed
+let rocket = false, lvl = 6; const st = { on: false, x0: 0, y0: 0, dx: 0, dy: 0 };
+const ctl = scene.screenSpaceCameraController;
+function setRocket(on) {
+  rocket = on; document.body.classList.toggle('foguete', on); $('modo').classList.toggle('on', on); ctl.enableInputs = !on;
+  if (on) { lvl = 6; dica(isTouch ? 'arraste o dedo para virar e subir ou descer<br>+ e − mudam a velocidade' : 'arraste para virar · W e S mudam a velocidade'); }
+}
+$('modo').onclick = () => setRocket(!rocket);
+const cv = viewer.canvas;
+cv.addEventListener('pointerdown', e => { if (!rocket) return; st.on = true; st.x0 = e.clientX; st.y0 = e.clientY; st.dx = st.dy = 0; });
+cv.addEventListener('pointermove', e => { if (st.on) { st.dx = e.clientX - st.x0; st.dy = e.clientY - st.y0; } });
+for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) cv.addEventListener(ev, () => { st.on = false; st.dx = st.dy = 0; });
+let rep;
+for (const [id, d] of [['mais', 1], ['menos', -1]]) {
+  const b = $(id); b.addEventListener('pointerdown', e => { e.preventDefault(); lvl = Math.max(0, Math.min(14, lvl + d)); clearInterval(rep); rep = setInterval(() => lvl = Math.max(0, Math.min(14, lvl + d)), 160); });
+  for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) b.addEventListener(ev, () => clearInterval(rep));
+}
+const keys = {}; addEventListener('keydown', e => keys[e.key.toLowerCase()] = true); addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+let last = performance.now(), kcool = 0;
+scene.preRender.addEventListener(() => {
+  const now = performance.now(), dt = Math.min((now - last) / 1000, .05); last = now;
+  gTimer -= dt; if (gTimer <= 0) { gTimer = .25; updateGround(); }
+  const alt = cam.positionCartographic.height - ground;
+  $('alt').textContent = NOMES[CORPO] + ' · altitude ' + (alt > 2000 ? (alt / 1000).toLocaleString('pt-BR', { maximumFractionDigits: alt > 100000 ? 0 : 1 }) + ' km' : Math.max(0, Math.round(alt)) + ' m');
+  if (!rocket) return;
+  kcool -= dt; if (kcool <= 0) { if (keys.w) { lvl = Math.min(14, lvl + 1); kcool = .15; } if (keys.s) { lvl = Math.max(0, lvl - 1); kcool = .15; } }
+  let tx = st.on ? st.dx / 110 : 0, ty = st.on ? st.dy / 110 : 0;
+  if (keys.arrowleft || keys.a) tx = -1; if (keys.arrowright || keys.d) tx = 1; if (keys.arrowup) ty = -1; if (keys.arrowdown) ty = 1;
+  tx = Math.max(-1, Math.min(1, tx)); ty = Math.max(-1, Math.min(1, ty));
+  const heading = cam.heading + tx * dt * 1.1, pitch = Math.max(-1.5, Math.min(.7, cam.pitch - ty * dt * .9));
+  cam.setView({ orientation: { heading, pitch, roll: 0 } });
+  const v = Math.max(alt, 40) * .25 * Math.pow(1.6, lvl - 6);
+  cam.moveForward(v * dt);
+  const c = cam.positionCartographic; // never go below the ground
+  if (c.height < ground + 3) cam.setView({ destination: Cesium.Cartesian3.fromRadians(c.longitude, c.latitude, ground + 3), orientation: { heading, pitch: Math.max(pitch, 0), roll: 0 } });
+  if (c.height > R * 1.5) $('espaco').click(); // climbed out: back to space
+});
+})();
+</script>
+</body>
+</html>
