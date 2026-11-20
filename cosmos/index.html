@@ -68,6 +68,7 @@ body.pilot #hud{display:flex}
   Terra: mosaico Blue Marble da NASA (dezembro de 2004) e relevo de shadedrelief.com, com montanhas exageradas 8 vezes para aparecerem.<br>
   Céu e estrelas: NASA Scientific Visualization Studio (Deep Star Maps, a partir dos catálogos Gaia, Hipparcos e Tycho) e catálogo HYG 4.0 (astronexus, CC BY-SA 4.0), com 83 mil estrelas reais nas posições, cores e brilhos medidos.<br>
   Planetas: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> (CC BY 4.0), a partir de imagens da NASA e do panorama da Via Láctea do ESO.<br>
+  Relevo da Lua e de Mercúrio calculado a partir das próprias fotos; sombras dos anéis de Saturno e raios de luz do Sol calculados em tempo real.<br>
   Sagitário A*: o buraco negro é calculado em tempo real, desviando cada raio de luz pela gravidade (relatividade geral de Schwarzschild); o tamanho e o brilho do disco foram exagerados para aparecer.<br>
   Via Láctea vista de fora: NASA/JPL-Caltech/R. Hurt (SSC-Caltech), concepção artística baseada em dados do telescópio Spitzer.
 </div></div>
@@ -511,6 +512,7 @@ function addBody(o) {
 }
 const orbitLines = [];
 const std = (map, rough = .95) => new THREE.MeshStandardMaterial({ map, roughness: rough, metalness: 0 });
+const stdN = (map, nrm, k = 1) => new THREE.MeshStandardMaterial({ map: tex(map), normalMap: tex(nrm, 1), normalScale: new THREE.Vector2(k, k), roughness: .97, metalness: 0 });
 
 // Sun
 const sunMat = new THREE.ShaderMaterial({
@@ -528,9 +530,16 @@ const sunMat = new THREE.ShaderMaterial({
 const SUN_R = 22;
 const sunGlow1 = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffd8a8, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: .95 })); sunGlow1.scale.setScalar(SUN_R * 7);
 const sunGlow2 = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffb070, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: .12 })); sunGlow2.scale.setScalar(SUN_R * 11);
-addBody({ name: 'Sol', sub: 'estrela · o centro do Sistema Solar', r: SUN_R, a: 0, T: 0, rot: .01, mesh: new THREE.Mesh(sphere(SUN_R, 96), sunMat), extra: [sunGlow1, sunGlow2], k: 7 });
+const coronaTex = canvasTex(512, 512, (g, w) => {
+  const c = w / 2; g.translate(c, c);
+  for (let i = 0; i < 260; i++) { const a = Math.random() * Math.PI * 2, len = c * (.35 + Math.pow(Math.random(), 2) * .65), wd = .4 + Math.random() * 1.6;
+    const gr = g.createLinearGradient(0, 0, Math.cos(a) * len, Math.sin(a) * len); gr.addColorStop(.18, 'rgba(255,230,190,.22)'); gr.addColorStop(1, 'rgba(255,200,140,0)');
+    g.strokeStyle = gr; g.lineWidth = wd; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a) * len, Math.sin(a) * len); g.stroke(); }
+});
+const corona = new THREE.Sprite(new THREE.SpriteMaterial({ map: coronaTex, color: 0xffe0b0, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: .55 })); corona.scale.setScalar(SUN_R * 5.5);
+addBody({ name: 'Sol', sub: 'estrela · o centro do Sistema Solar', r: SUN_R, a: 0, T: 0, rot: .01, mesh: new THREE.Mesh(sphere(SUN_R, 96), sunMat), extra: [sunGlow1, sunGlow2, corona], k: 7 });
 
-addBody({ name: 'Mercúrio', sub: 'planeta', r: 1.5, a: 50, T: .241, rot: .01, tilt: .03, mesh: new THREE.Mesh(sphere(1.5), std(tex('2k_mercury.jpg'))), k: 5, hiMap: '4k_mercury.jpg' });
+addBody({ name: 'Mercúrio', sub: 'planeta', r: 1.5, a: 50, T: .241, rot: .01, tilt: .03, mesh: new THREE.Mesh(sphere(1.5, 96), stdN('2k_mercury.jpg', '2k_mercury_n.jpg')), k: 5, hiMap: '4k_mercury.jpg', hiN: '4k_mercury_n.jpg' });
 const venus = new THREE.Mesh(sphere(3.6), std(tex('2k_venus_atmosphere.jpg'), 1));
 addBody({ name: 'Vênus', sub: 'planeta', r: 3.6, a: 72, T: .615, rot: -.006, tilt: 177, mesh: venus, extra: [physAtmo(3.6, { th: .045, hr: .3, hm: .45, br: [1.2, 2.4, 4.8], bm: [14, 12, 8], sun: 3.6, g: .7 })], k: 4.5 });
 
@@ -619,7 +628,7 @@ function updateEarth(dt) {
   }
 }
 const sphDir = (th, ph) => new THREE.Vector3(-Math.cos(ph) * Math.sin(th), Math.cos(th), Math.sin(ph) * Math.sin(th));
-addBody({ name: 'Lua', sub: 'satélite natural da Terra', r: 1.03, a: 10, T: 27.3 / 365.25, rot: 0, tilt: 6.7, mesh: new THREE.Mesh(sphere(1.03, 96), std(tex('2k_moon.jpg'))), parent: earth, k: 5, hiMap: '4k_moon.jpg' });
+addBody({ name: 'Lua', sub: 'satélite natural da Terra', r: 1.03, a: 10, T: 27.3 / 365.25, rot: 0, tilt: 6.7, mesh: new THREE.Mesh(sphere(1.03, 128), stdN('2k_moon.jpg', '2k_moon_n.jpg')), parent: earth, k: 5, hiMap: '4k_moon.jpg', hiN: '4k_moon_n.jpg' });
 addBody({ name: 'Marte', sub: 'planeta · o planeta vermelho', r: 2.1, a: 135, T: 1.88, rot: .068, tilt: 25.2, mesh: new THREE.Mesh(sphere(2.1, 96), std(tex('2k_mars.jpg'))), extra: [physAtmo(2.1, { th: .02, hr: .3, hm: .3, br: [.25, .55, 1.2], bm: [8, 5.2, 3.2], sun: 4.5, g: .62 })], k: 4.5, hiMap: '4k_mars.jpg' });
 addBody({ name: 'Júpiter', sub: 'planeta · o maior do Sistema Solar', r: 13, a: 260, T: 11.86, rot: .17, tilt: 3.1, mesh: new THREE.Mesh(sphere(13, 128), std(tex('2k_jupiter.jpg'), 1)), extra: [atmo(13 * 1.015, 0xffe2c0, 3.5, .35)], k: 3.2, hiMap: '4k_jupiter.jpg' });
 // Saturn and rings
@@ -629,8 +638,30 @@ function ringMesh(inner, outer, mat) {
   for (let i = 0; i < p.count; i++) { const r = Math.hypot(p.getX(i), p.getY(i)); uv.setXY(i, (r - inner) / (outer - inner), .5); }
   const m = new THREE.Mesh(g, mat); m.rotation.x = -Math.PI / 2; return m;
 }
-const satRing = ringMesh(14, 26, new THREE.MeshBasicMaterial({ map: ringTex, color: 0xd8d2c4, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-addBody({ name: 'Saturno', sub: 'planeta · o senhor dos anéis', r: 11, a: 370, T: 29.4, rot: .16, tilt: 26.7, mesh: new THREE.Mesh(sphere(11, 128), std(tex('2k_saturn.jpg'), 1)), extra: [satRing], k: 3.8, elev: .32, hiMap: '4k_saturn.jpg', hi: [[satRing.material, 'map', '4k_saturn_ring_alpha.png']] });
+const satU = { uC: { value: V3() }, uN: { value: V3(0, 1, 0) }, uT: { value: ringTex } };
+const ringMat = new THREE.ShaderMaterial({
+  uniforms: { uT: satU.uT, uC: satU.uC, uN: satU.uN, uR: { value: 11 } },
+  vertexShader: LD_V + `varying vec2 vUv; varying vec3 vW; void main(){ vUv=uv; vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w;` + LD_VE + `}`,
+  fragmentShader: LD_F + `uniform sampler2D uT; uniform vec3 uC,uN; uniform float uR; varying vec2 vUv; varying vec3 vW;
+  void main(){` + LD_FE + `
+    vec4 t=texture2D(uT,vUv); vec3 L=normalize(-vW);
+    vec3 oc=vW-uC; float b=dot(oc,L); float h=b*b-(dot(oc,oc)-uR*uR); float sh=(h>0.&&(-b-sqrt(h))>0.)?.06:1.;
+    float lit=dot(uN,L), view=dot(uN,cameraPosition-vW);
+    float side=lit*view>0.?1.:(.25+.9*(1.-t.a));
+    gl_FragColor=vec4(t.rgb*1.2*sh*side,t.a); }`,
+  transparent: true, side: THREE.DoubleSide, depthWrite: false
+});
+const satRing = ringMesh(14, 26, ringMat);
+const satMat = std(tex('2k_saturn.jpg'), 1);
+satMat.onBeforeCompile = sh => {
+  sh.uniforms.uSC = satU.uC; sh.uniforms.uSN = satU.uN; sh.uniforms.uRingT = satU.uT;
+  sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSW;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvSW=(modelMatrix*vec4(transformed,1.)).xyz;');
+  sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vSW; uniform vec3 uSC,uSN; uniform sampler2D uRingT;')
+    .replace('#include <aomap_fragment>', `#include <aomap_fragment>
+      { vec3 Ld=normalize(-vSW); float dn=dot(Ld,uSN); if(abs(dn)>1e-4){ float tt=dot(uSC-vSW,uSN)/dn; if(tt>0.){ float rr=length(vSW+Ld*tt-uSC);
+        if(rr>14.&&rr<26.){ float a=texture2D(uRingT,vec2((rr-14.)/12.,.5)).a; reflectedLight.directDiffuse*=1.-a*.88; reflectedLight.directSpecular*=1.-a*.88; } } } }`);
+};
+addBody({ name: 'Saturno', sub: 'planeta · o senhor dos anéis', r: 11, a: 370, T: 29.4, rot: .16, tilt: 26.7, mesh: new THREE.Mesh(sphere(11, 128), satMat), extra: [satRing], k: 3.8, elev: .32, hiMap: '4k_saturn.jpg', hi: [[satU.uT, 'value', '4k_saturn_ring_alpha.png']] });
 const uraRing = ringMesh(9, 10.5, new THREE.MeshBasicMaterial({ color: 0x9fb4c4, transparent: true, opacity: .12, side: THREE.DoubleSide, depthWrite: false }));
 addBody({ name: 'Urano', sub: 'planeta · gira deitado', r: 6.5, a: 470, T: 84, rot: -.1, tilt: 97.8, mesh: new THREE.Mesh(sphere(6.5), std(tex('2k_uranus.jpg'), 1)), extra: [uraRing, atmo(6.5 * 1.02, 0x9fe8ff, 3, .5)], k: 4 });
 addBody({ name: 'Netuno', sub: 'planeta · o mais distante do Sol', r: 6.3, a: 560, T: 164.8, rot: .11, tilt: 28.3, mesh: new THREE.Mesh(sphere(6.3), std(tex('2k_neptune.jpg'), 1)), extra: [atmo(6.3 * 1.02, 0x6f9bff, 3, .6)], k: 4 });
@@ -829,7 +860,7 @@ let hiTimer = 0;
 function updateHiRes(dt) {
   hiTimer -= dt; if (hiTimer > 0) return; hiTimer = .5;
   for (const b of bodies) {
-    const list = (b.hi || []).slice(); if (b.hiMap) list.push([b.mesh.material, 'map', b.hiMap]);
+    const list = (b.hi || []).slice(); if (b.hiMap) list.push([b.mesh.material, 'map', b.hiMap]); if (b.hiN) list.push([b.mesh.material, 'normalMap', b.hiN, 1]);
     if (!list.length) continue;
     const d = camera.position.distanceTo(b.wpos);
     if (!b.hiState && d < b.r * 30) {
@@ -1122,8 +1153,18 @@ const gradePass = new ShaderPass({
     gl_FragColor=vec4(col,1.);
   }`
 });
+const raysPass = new ShaderPass({
+  uniforms: { tDiffuse: { value: null }, uSun: { value: new THREE.Vector2(.5, .5) }, uOn: { value: 0 }, uAsp: { value: 1 } },
+  vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+  fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 uSun; uniform float uOn,uAsp; varying vec2 vUv;
+  void main(){ vec4 c=texture2D(tDiffuse,vUv); if(uOn<=0.){ gl_FragColor=c; return; }
+    vec2 d=vUv-uSun; vec2 st=d/48.*.85; float j=fract(sin(dot(vUv,vec2(12.9898,78.233)))*43758.5453); vec2 uv=vUv-st*j; float dec=1.; vec3 acc=vec3(0.);
+    for(int i=0;i<48;i++){ uv-=st; vec3 s=texture2D(tDiffuse,uv).rgb; float l=max(dot(s,vec3(.3,.6,.1))-1.5,0.); acc+=s*min(l,3.)*dec; dec*=.962; }
+    float fall=1.-smoothstep(0.,1.1,length(d*vec2(uAsp,1.)));
+    gl_FragColor=vec4(c.rgb+acc*.028*uOn*fall*vec3(1.,.9,.75),1.); }`
+});
 const rocketPass = new RenderPass(scene, rocketCam); rocketPass.clear = false; rocketPass.clearDepth = true;
-composer.addPass(bhPass); composer.addPass(rocketPass); composer.addPass(bloom); composer.addPass(new OutputPass()); composer.addPass(gradePass);
+composer.addPass(bhPass); composer.addPass(rocketPass); composer.addPass(raysPass); composer.addPass(bloom); composer.addPass(new OutputPass()); composer.addPass(gradePass);
 
 /* ---------- main loop ---------- */
 const clock = new THREE.Clock();
@@ -1155,6 +1196,11 @@ function frame() {
       u.uViewProj.value.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); } }
   rocketCam.copy(camera); rocketCam.layers.set(1); rocketPass.enabled = rocket.visible;
   gradePass.uniforms.uTime.value = simT;
+  { const sp = V3(0, 0, 0).project(camera); const R = raysPass.uniforms; R.uSun.value.set(sp.x * .5 + .5, sp.y * .5 + .5); R.uAsp.value = camera.aspect;
+    const onScr = sp.z < 1 && Math.abs(sp.x) < 1.6 && Math.abs(sp.y) < 1.6 ? 1 - smooth(1, 1.6, Math.max(Math.abs(sp.x), Math.abs(sp.y))) : 0;
+    R.uOn.value = onScr * (1 - smooth(1500, 4000, camDist)); raysPass.enabled = R.uOn.value > 0; }
+  corona.material.rotation += dt * .004;
+  { const sat = bodyByName['Saturno']; satU.uC.value.copy(sat.wpos); satU.uN.value.set(0, 1, 0).transformDirection(sat.tilt.matrixWorld); }
   updateLabels(dt, camDist);
   composer.render();
   // adapt resolution on slow devices
