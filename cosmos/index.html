@@ -96,7 +96,7 @@ function radec(ra, dec, r = 1) { ra *= D2R; dec *= D2R; return new THREE.Vector3
 function gauss() { let u = 0; while (u === 0) u = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random()); }
 
 /* ---------- renderer ---------- */
-const DPR_MAX = Math.min(devicePixelRatio, 2.5); let DPR = Math.min(DPR_MAX, 2); // sharp on every screen; 3x phones render at 2x, which looks the same and costs half
+const DPR_MAX = Math.min(devicePixelRatio, 2.5); let DPR = Math.min(DPR_MAX, isTouch ? 1.75 : 2); // sharp on every screen; 3x phones render at 2x, which looks the same and costs half
 const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(DPR);
 renderer.setSize(innerWidth, innerHeight);
@@ -107,7 +107,7 @@ const scene = new THREE.Scene();
 // real scale: 1 unit = 1000 km (Earth radius 6.371, 1 AU = 149 598, 1 light-year = 9.46e9)
 const LY = 9.4607e9, AU = 149598;
 const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 2e-6, 1e13);
-const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: DPR >= 2 ? 2 : 4 }));
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: isTouch ? 0 : (DPR >= 2 ? 2 : 4) }));
 // Two scenes: the far universe in light-years (galaxy, sky, other galaxies) and the near one in units of 1000 km.
 // Each has its own camera at the same place, so no coordinate ever gets too large for the GPU.
 const farScene = new THREE.Scene();
@@ -117,6 +117,7 @@ composer.addPass(new RenderPass(farScene, farCam));
 // the rocket is drawn in its own pass (layer 1) so the black-hole lensing never covers it
 const rocketCam = new THREE.PerspectiveCamera();
 const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.6, 0.55, 0.8);
+{ const set = bloom.setSize.bind(bloom); bloom.setSize = (w, h) => set(Math.max(1, Math.round(w / 2)), Math.max(1, Math.round(h / 2))); }
 function pxScale() { return renderer.domElement.height / (2 * Math.tan(camera.fov * D2R / 2)); }
 
 /* ---------- frames: equatorial world, ecliptic, galactic ---------- */
@@ -347,7 +348,7 @@ function buildGalaxyPoints(img) {
   const S = 420, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d'); g.drawImage(img, 0, 0, S, S);
   const d = g.getImageData(0, 0, S, S).data, w = new Float32Array(S * S); let tot = 0;
   for (let i = 0; i < S * S; i++) { const L = (d[i * 4] * .3 + d[i * 4 + 1] * .55 + d[i * 4 + 2] * .15) / 255; const v = Math.pow(Math.max(L - .08, 0), 1.7); tot += v; w[i] = tot; }
-  const N = isTouch ? 150000 : 300000, P = [], C = [], Z = [];
+  const N = isTouch ? 100000 : 300000, P = [], C = [], Z = [];
   for (let n = 0; n < N; n++) {
     const t = Math.random() * tot; let lo = 0, hi = S * S - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (w[m] < t) lo = m + 1; else hi = m; }
     const ix = ((lo % S) + Math.random()) / S, iy = (Math.floor(lo / S) + Math.random()) / S;
@@ -481,7 +482,7 @@ function physAtmo(r, o) {
       vec3 L=uL; float mu=dot(rd,L);
       float pr=0.0596831*(1.+mu*mu);
       float g2=uG*uG; float pm=0.1193662*((1.-g2)*(1.+mu*mu))/((2.+g2)*pow(1.+g2-2.*uG*mu,1.5));
-      const int NS=10; const int NL=5;
+      const int NS=8; const int NL=4;
       float ds=(t1-t0)/float(NS); vec3 sR=vec3(0.), sM=vec3(0.); float oR=0., oM=0.;
       for(int i=0;i<NS;i++){
         vec3 q=ro+rd*(t0+ds*(float(i)+.5)); float h=max(length(q)-uR,0.);
@@ -625,7 +626,7 @@ function updateEarth(dt) {
   { const altNow = camera.position.distanceTo(earth.wpos) / EARTH_R - 1; cloudMat.opacity = .55 + .45 * smooth(.15, 1.2, altNow); }
   eTimer -= dt; if (eTimer > 0) return; eTimer = .3;
   const camL = earth.spin.worldToLocal(camera.position.clone()); const alt = camL.length() / EARTH_R - 1;
-  const wantHi = alt < 25; if (wantHi !== eHi) { eHi = wantHi; swapEarthGlobal(wantHi); }
+  const wantHi = !isTouch && alt < 25; if (wantHi !== eHi) { eHi = wantHi; swapEarthGlobal(wantHi); }
   let want = [];
   if (alt < 2.2) {
     const cd = camL.normalize(), hor = Math.acos(Math.min(1, 1 / (1 + alt)));
@@ -850,9 +851,9 @@ function updateLabels(dt, camDist) {
     L.cur += (vis - L.cur) * Math.min(1, dt * 2.5);
     if (L.cur < 0.01) { if (L.shown) { L.el.style.display = 'none'; L.shown = false; } continue; }
     if (!L.shown) { L.el.style.display = 'block'; L.shown = true; }
-    L.el.style.opacity = L.cur.toFixed(3);
-    L.el.style.transform = `translate(${(L.x || 0).toFixed(1)}px,${((L.y || 0) - 9).toFixed(1)}px)`;
-    L.el.classList.toggle('tgt', auto === L);
+    const op = (Math.round(L.cur * 50) / 50).toString(); if (op !== L.op) { L.el.style.opacity = op; L.op = op; }
+    const tr = `translate(${Math.round(L.x || 0)}px,${Math.round((L.y || 0) - 9)}px)`; if (tr !== L.tr) { L.el.style.transform = tr; L.tr = tr; }
+    const tg = auto === L; if (tg !== L.tg) { L.el.classList.toggle('tgt', tg); L.tg = tg; }
   }
   // constellation lines brighten as you look at them
   for (const c of constObjs) { const ang = _f.angleTo(c.dir); c.line.material.opacity = (.05 + .32 * (1 - smooth(10 * D2R, 30 * D2R, ang))) * nearF * (showLabels ? 1 : .4); }
@@ -1261,7 +1262,7 @@ function frame() {
   nebulae.forEach(n => n.material.visible = camDist < 9000 * LY);
   const fs = smooth(5000 * LY, 20000 * LY, camDist); farSprites.forEach(f => { f.material.opacity = fs; f.visible = fs > 0.01; });
   { const dBH = camera.position.distanceTo(GC_WORLD); const on = dBH < BH_RS * 220;
-    bhPass.uniforms.uOn.value = on ? 1 : 0;
+    bhPass.uniforms.uOn.value = on ? 1 : 0; bhPass.enabled = on;
     if (on) { const u = bhPass.uniforms; u.uTime.value = simT; u.uRel.value.subVectors(camera.position, GC_WORLD).divideScalar(BH_RS); u.uInvProj.value.copy(camera.projectionMatrixInverse); u.uInvView.value.copy(camera.matrixWorld);
       u.uViewProj.value.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); } }
   rocketCam.copy(camera); rocketCam.layers.set(1); rocketPass.enabled = rocket.visible;
