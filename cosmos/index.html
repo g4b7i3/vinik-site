@@ -115,7 +115,7 @@ const rocketCam = new THREE.PerspectiveCamera();
 const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.6, 0.55, 0.8);
 // some phone GPUs sample half-float targets without smoothing, which turns the coarse bloom levels into grey squares around bright stars: use 8-bit targets there
 if (isTouch) for (const rt of [bloom.renderTargetBright, ...bloom.renderTargetsHorizontal, ...bloom.renderTargetsVertical]) { rt.texture.type = THREE.UnsignedByteType; rt.texture.minFilter = rt.texture.magFilter = THREE.LinearFilter; }
-bloom.compositeMaterial.uniforms.bloomFactors.value = [1.0, 0.8, 0.6, 0.3, 0.1];
+bloom.compositeMaterial.uniforms.bloomFactors.value = [1.0, 0.75, 0.45, 0.12, 0.0];
 function pxScale() { return renderer.domElement.height / (2 * Math.tan(camera.fov * D2R / 2)); }
 
 /* ---------- frames: equatorial world, ecliptic, galactic ---------- */
