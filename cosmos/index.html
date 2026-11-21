@@ -899,7 +899,10 @@ function addLabel(kind, name, sub, o = {}) {
   el.innerHTML = `<div class="n">${name}</div>` + (sub ? `<div class="s">${sub}</div>` : '');
   labelsEl.appendChild(el);
   const L = { kind, name, el, cur: 0, ...o }; labels.push(L);
-  el.addEventListener('pointerdown', e => { e.stopPropagation(); if (mode === 'pilot') setAuto(L); else if (mode === 'explore' && L.kind === 'body') setFocus(L.body); });
+  el.addEventListener('pointerdown', e => { e.stopPropagation(); if (mode === 'pilot') setAuto(L); else if (mode === 'explore') {
+    if (L.kind === 'body') setFocus(L.body);
+    else if (L.kind === 'xg') setFocus({ name: L.name, wpos: L.pos, r: L.dso.W * .5 * LY, k: 2.6 }, L.dso.W * 1.3 * LY);
+    else if (L.kind === 'gal' && L.pos) setFocus({ name: L.name, wpos: L.pos, r: L.name === 'Sagitário A*' ? BH_RS * 8 : 3e4 * LY, k: 3 }); } });
   return L;
 }
 for (const b of bodies) addLabel('body', b.name, b.sub, { body: b });
@@ -1270,15 +1273,17 @@ function checkLanding() {
 }
 document.getElementById('pouso').onclick = () => { if (landTarget) land(landTarget); };
 
-/* ---------- explore with the finger (Solar System only) ---------- */
+/* ---------- explore with the finger: from a planet out to the other galaxies ---------- */
 const SYS_R = 8e6; // a little past the Kuiper belt
+const EXP_MAX = 1.2e8 * LY; // zooming out all the way shows the galaxies around us
 let controls = null; const exp = { body: null, last: V3(), anim: null };
 const minDist = b => b.r * (b === earth ? 1.06 : b.name === 'Sol' ? 1.6 : 1.3);
 function nearestBody() { let best = bodies[0], bd = Infinity; for (const b of bodies) { const d = camera.position.distanceTo(b.wpos) / (b.r * 12 + 40); if (d < bd) { bd = d; best = b; } } return best; }
 function setFocus(b, dist) {
   const cur = controls.target.clone();
   const from = camera.position.distanceTo(cur);
-  exp.anim = { t: 0, dur: 1.8, fromT: cur, fromD: from, toD: dist ?? b.r * (b.k || 4) * .95 };
+  const toD = dist ?? b.r * (b.k || 4) * .95; const jump = cur.distanceTo(b.wpos) / Math.max(from, toD, 1);
+  exp.anim = { t: 0, dur: 1.8 + Math.min(3.5, Math.log10(1 + jump) * .9), fromT: cur, fromD: Math.max(from, 1e-6), toD };
   exp.body = b; exp.last.copy(b.wpos); controls.minDistance = 0; controls.maxDistance = Infinity;
   flashHint(b.name, 1800);
 }
@@ -1291,7 +1296,7 @@ function enterExplore() {
   controls.target.copy(camera.position).addScaledVector(fwd, Math.max(camera.position.distanceTo(b.wpos), 1));
   if (far) { camera.position.copy(b.wpos).add(eclToWorld(0, b.r * 3, b.r * 10)); controls.target.copy(b.wpos); }
   controls.update(); setFocus(b, far ? b.r * 6 : Math.min(camera.position.distanceTo(b.wpos), SYS_R));
-  flashHint(isTouch ? 'arraste para girar · pinça para aproximar<br>toque no nome de um planeta para ir até ele' : 'arraste para girar · roda do mouse aproxima<br>clique no nome de um planeta para ir até ele', 6000);
+  flashHint(isTouch ? 'arraste para girar · pinça para aproximar ou afastar<br>afaste bastante para ver as outras galáxias<br>toque num nome para ir até ele' : 'arraste para girar · roda do mouse aproxima ou afasta<br>afaste bastante para ver as outras galáxias<br>clique num nome para ir até ele', 6000);
 }
 function updateExplore(dt) {
   const b = exp.body; if (!b) return;
@@ -1299,12 +1304,13 @@ function updateExplore(dt) {
     const a = exp.anim; a.t += dt; const e = easeIO(Math.min(1, a.t / a.dur));
     const dir = camera.position.clone().sub(controls.target).normalize();
     controls.target.lerpVectors(a.fromT, b.wpos, e);
-    camera.position.copy(controls.target).addScaledVector(dir, a.fromD + (a.toD - a.fromD) * e);
-    if (a.t >= a.dur) { exp.anim = null; controls.minDistance = minDist(b); controls.maxDistance = SYS_R; }
+    camera.position.copy(controls.target).addScaledVector(dir, Math.exp(Math.log(a.fromD) * (1 - e) + Math.log(a.toD) * e));
+    if (a.t >= a.dur) { exp.anim = null; controls.minDistance = minDist(b); controls.maxDistance = EXP_MAX; }
   } else { const d = b.wpos.clone().sub(exp.last); camera.position.add(d); controls.target.add(d); } // ride along with the planet
   exp.last.copy(b.wpos);
+  // the farther out, the faster each pinch zooms, so a few gestures go from a planet to the galaxies
+  const zd = camera.position.distanceTo(controls.target); controls.zoomSpeed = 1.1 + 2.6 * clamp(Math.log10(Math.max(zd, 1) / SYS_R) / 8, 0, 1);
   controls.update();
-  if (camera.position.length() > SYS_R * 1.1) camera.position.setLength(SYS_R * 1.1); // the rocket is the way out
 }
 
 /* ---------- UI ---------- */
@@ -1413,7 +1419,7 @@ function frame() {
   glowPlane.visible = glowMat.uniforms.uFade.value > .002; sky.visible = skyMat.uniforms.uFade.value > .002;
   const solarVis = camDist < SYS_R * 6; nearPlanet = bodies.some(b => b.name !== 'Sol' && camera.position.distanceTo(b.wpos) < b.r * 30); orbitLines.forEach(l => l.visible = showLabels && solarVis && !nearPlanet); astBelt.visible = kuiper.visible = solarVis && !(mode === 'pilot' && view === 'capacete');
   bgStars.material.uniforms.uOpacity.value = (1 - .75 * smooth(8000 * LY, 40000 * LY, camDist)) * (1 - smooth(1e5 * LY, 4e5 * LY, camDist));
-  updateDSO(); deepField.mat.uniforms.uScale.value = sc; deepField.mat.uniforms.uBright.value = .35 * smooth(1.5e5 * LY, 1e6 * LY, camDist); deepField.pts.visible = deepField.mat.uniforms.uBright.value > .002;
+  updateDSO(); deepField.mat.uniforms.uScale.value = sc; deepField.mat.uniforms.uBright.value = .25 * smooth(1.5e5 * LY, 1e6 * LY, camDist); deepField.pts.visible = deepField.mat.uniforms.uBright.value > .002;
   constStars.material.uniforms.uOpacity.value = 1 - smooth(4000 * LY, 9000 * LY, camDist);
   bgStars.material.uniforms.uTime.value = constStars.material.uniforms.uTime.value = simT;
   nebulae.forEach(n => n.material.visible = camDist < 9000 * LY);
