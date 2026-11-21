@@ -26,6 +26,18 @@ body.pilot .lb,body.explore .lb{pointer-events:auto;cursor:pointer}
 #hud{position:fixed;right:calc(14px + env(safe-area-inset-right));bottom:calc(22px + env(safe-area-inset-bottom));display:none;flex-direction:column;align-items:center;gap:10px}
 body.pilot #hud{display:flex}
 #hud .b{width:52px;height:52px;font-size:22px}
+#bFp{display:none}body.pilot #bFp{display:grid}
+#helmet{position:fixed;inset:0;pointer-events:none;display:none}
+body.pilot.fp #helmet{display:block}
+#helmet svg.visor{position:absolute;inset:0;width:100%;height:100%}
+#helmet .tint{position:absolute;inset:0;background:radial-gradient(ellipse 70% 62% at 50% 47%,rgba(255,214,160,.035),rgba(255,190,120,.07))}
+#helmet .glare{position:absolute;left:8%;top:6%;width:46%;height:30%;border-radius:50%;background:radial-gradient(ellipse at 40% 40%,rgba(220,235,255,.07),rgba(220,235,255,0) 70%);transform:rotate(-14deg)}
+#helmet .glare2{position:absolute;right:12%;bottom:12%;width:22%;height:9%;border-radius:50%;background:radial-gradient(ellipse,rgba(220,235,255,.04),rgba(220,235,255,0) 70%);transform:rotate(-20deg)}
+#helmet .fog{position:absolute;left:18%;right:18%;bottom:4%;height:34%;border-radius:50%;background:radial-gradient(ellipse at 50% 90%,rgba(225,232,240,.22),rgba(225,232,240,0) 70%);opacity:0;animation:breath 4.6s ease-in-out infinite}
+@keyframes breath{0%,38%{opacity:0}52%{opacity:.85}100%{opacity:0}}
+#helmet .ret{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border:1px solid rgba(255,210,150,.28);border-radius:50%}
+#helmet .ret::after{content:'';position:absolute;left:8px;top:8px;width:2px;height:2px;background:rgba(255,210,150,.5);border-radius:50%}
+#helmet .data{position:absolute;left:50%;bottom:16%;transform:translateX(-50%);font:300 11px/1.7 'Inter',sans-serif;letter-spacing:.14em;color:rgba(255,214,160,.62);text-align:center;text-transform:uppercase;text-shadow:0 0 6px rgba(255,170,90,.25);white-space:nowrap}
 #bar{width:4px;height:120px;border-radius:2px;background:rgba(255,255,255,.12);position:relative;overflow:hidden}
 #bar i{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(#ffb36b,#7fb2ff);height:0}
 #hint{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%);font-size:11px;letter-spacing:.08em;color:rgba(210,220,240,.85);text-align:center;line-height:1.7;opacity:0;transition:opacity 1s;pointer-events:none;max-width:70vw;text-shadow:0 0 8px #000}
@@ -47,9 +59,21 @@ body.pilot #hud{display:flex}
 </head>
 <body>
 <div id="labels"></div>
+<div id="helmet"><div class="tint"></div><div class="fog"></div><div class="glare"></div><div class="glare2"></div>
+  <svg class="visor" viewBox="0 0 1000 1000" preserveAspectRatio="none"><defs>
+    <radialGradient id="vg" cx="50%" cy="47%" r="62%"><stop offset="68%" stop-color="#000" stop-opacity="0"/><stop offset="84%" stop-color="#000" stop-opacity=".55"/><stop offset="100%" stop-color="#000" stop-opacity=".9"/></radialGradient>
+    <mask id="vm"><rect width="1000" height="1000" fill="#fff"/><ellipse cx="500" cy="470" rx="470" ry="455" fill="#000"/></mask></defs>
+    <rect width="1000" height="1000" fill="url(#vg)"/>
+    <rect width="1000" height="1000" fill="#030406" mask="url(#vm)"/>
+    <ellipse cx="500" cy="470" rx="470" ry="455" fill="none" stroke="rgba(210,225,245,.10)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+    <ellipse cx="500" cy="470" rx="462" ry="447" fill="none" stroke="rgba(0,0,0,.6)" stroke-width="10" vector-effect="non-scaling-stroke"/>
+  </svg>
+  <div class="ret"></div><div class="data" id="fpData"></div>
+</div>
 <div id="ui">
   <button class="b" id="bTour" aria-label="Passeio automático"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
   <button class="b" id="bMode" aria-label="Foguete"><svg viewBox="0 0 24 24"><path d="M12 2.5c3 2.4 4.3 6 4.3 9.7l-1.8 4.3h-5l-1.8-4.3C7.7 8.5 9 4.9 12 2.5z"/><circle cx="12" cy="9.5" r="1.6"/><path d="M8.3 13.5 5.5 16v3l3.2-1.7M15.7 13.5l2.8 2.5v3l-3.2-1.7M10.5 19.5c.4 1 .9 1.6 1.5 2 .6-.4 1.1-1 1.5-2"/></svg></button>
+  <button class="b" id="bFp" aria-label="Visão do capacete"><svg viewBox="0 0 24 24"><path d="M12 3a8 8 0 0 0-8 8v4.5c0 2 1.6 3.5 3.5 3.5h9c1.9 0 3.5-1.5 3.5-3.5V11a8 8 0 0 0-8-8z"/><path d="M6.5 11.5c0-2.2 2.5-3.8 5.5-3.8s5.5 1.6 5.5 3.8v1.2c0 1-.8 1.8-1.8 1.8H8.3c-1 0-1.8-.8-1.8-1.8z"/></svg></button>
   <button class="b on" id="bLab" aria-label="Nomes">Aa</button>
   <button class="b" id="bFs" aria-label="Tela cheia"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
   <button class="b" id="bInfo" aria-label="Sobre">i</button>
@@ -78,6 +102,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 // Real scale spans 2 m to millions of light-years. Depth comes from the logarithmic depth buffer (gl_FragDepth),
 // so clip-space z is pinned to 0: nothing is ever clipped by the near/far planes, which float32 can't resolve at this range.
@@ -763,7 +788,59 @@ const rocket = new THREE.Group(); scene.add(rocket); rocket.visible = false; roc
   glow.scale.setScalar(.022); glow.position.z = .066; glow.layers.set(1); rocket.add(glow);
   const fill = new THREE.PointLight(0xdfe8ff, .35, .4 * RS, 0); fill.position.set(.03, .06, .12); fill.layers.set(1); rocket.add(fill);
   const engineLight = new THREE.PointLight(0xff9a50, .6, .12 * RS, 0); engineLight.position.z = .07; engineLight.layers.set(1); rocket.add(engineLight);
-  rocket.userData = { plumes, plumeMat, bellMat, glow, engineLight, onSky };
+  rocket.userData = { plumes, plumeMat, bellMat, glow, engineLight, onSky, mats };
+}
+/* ---------- astronaut (modelled in metres, facing -Z, backpack towards the camera) ---------- */
+const AS = 1e-6; // metres to scene units; the astronaut is drawn in its own metre-scale scene so depth stays precise
+const astroScene = new THREE.Scene(), astroCam = new THREE.PerspectiveCamera(55, 1, .05, 1e5);
+const astro = new THREE.Group(); astroScene.add(astro); astro.visible = false;
+const astroSun = new THREE.DirectionalLight(0xfff4e6, 2.7); astroScene.add(astroSun, astroSun.target, new THREE.AmbientLight(0xffffff, .06));
+{
+  const fabricTex = canvasTex(512, 512, (g, w) => { g.fillStyle = '#ebe9e4'; g.fillRect(0, 0, w, w);
+    for (let i = 0; i < 2600; i++) { const v = Math.random() < .5 ? 0 : 255; g.fillStyle = `rgba(${v},${v},${v},${Math.random() * .05})`; g.fillRect(Math.random() * w, Math.random() * w, 1 + Math.random() * 3, 1 + Math.random() * 14); }
+    g.strokeStyle = 'rgba(90,90,90,.18)'; g.lineWidth = 2; for (let y = 40; y < w; y += 85) { g.beginPath(); g.moveTo(0, y); for (let x = 0; x <= w; x += 32) g.lineTo(x, y + Math.sin(x * .05 + y) * 4); g.stroke(); } });
+  fabricTex.wrapS = fabricTex.wrapT = THREE.RepeatWrapping;
+  const suit = new THREE.MeshStandardMaterial({ map: fabricTex, roughness: .85, metalness: 0, envMapIntensity: 1 });
+  const shell = new THREE.MeshPhysicalMaterial({ color: 0xf2f2f0, roughness: .35, metalness: 0, clearcoat: .4, clearcoatRoughness: .4, envMapIntensity: .8 });
+  const visor = new THREE.MeshPhysicalMaterial({ color: 0xd9a84e, roughness: .08, metalness: 1, envMapIntensity: 1.6, side: THREE.DoubleSide });
+  const grey = new THREE.MeshStandardMaterial({ color: 0x8b9098, roughness: .45, metalness: .75, envMapIntensity: .9 });
+  const red = new THREE.MeshStandardMaterial({ color: 0xa8332a, roughness: .7 });
+  rocket.userData.mats.push(suit, shell, visor, grey);
+  const body = new THREE.Group(); body.position.y = -1.1; astro.add(body);
+  const M = (geo, mat, x = 0, y = 0, z = 0, parent = body) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; };
+  const cap = (r, l) => new THREE.CapsuleGeometry(r, l, 8, 20);
+  M(cap(.25, .36), suit, 0, 1.18, 0).scale.set(1.08, 1, .8);
+  M(cap(.2, .12), suit, 0, .9, 0).scale.set(1.1, 1, .85);
+  M(new RoundedBoxGeometry(.56, .66, .24, 4, .05), shell, 0, 1.24, .3);
+  M(new RoundedBoxGeometry(.5, .12, .2, 3, .03), grey, 0, .86, .3);
+  for (const x of [-.2, .2]) M(new THREE.CylinderGeometry(.022, .022, .5, 12), grey, x, 1.24, .43);
+  M(new RoundedBoxGeometry(.3, .16, .13, 3, .025), grey, 0, 1.13, -.27);
+  M(new RoundedBoxGeometry(.12, .035, .02, 2, .008), red, -.06, 1.17, -.34);
+  M(new THREE.TorusGeometry(.17, .03, 12, 40), grey, 0, 1.47, 0).rotation.x = Math.PI / 2;
+  const head = new THREE.Group(); head.position.set(0, 1.64, -.02); body.add(head);
+  M(new THREE.SphereGeometry(.2, 48, 32), shell, 0, 0, 0, head);
+  M(new THREE.SphereGeometry(.205, 48, 32, Math.PI * 1.5 - 1.05, 2.1, .62, 1.05), visor, 0, -.01, 0, head);
+  for (const x of [-.14, .14]) { const l = M(new THREE.CylinderGeometry(.03, .03, .06, 16), grey, x, .1, -.12, head); l.rotation.x = Math.PI / 2; }
+  const limb = (px, py, pz, r1, l1, r2, l2, endGeo, endMat, a1, a2) => {
+    const j1 = new THREE.Group(); j1.position.set(px, py, pz); j1.rotation.set(...a1); body.add(j1);
+    M(cap(r1, l1), suit, 0, -(l1 / 2 + r1 * .6), 0, j1);
+    const j2 = new THREE.Group(); j2.position.y = -(l1 + r1 * 1.1); j2.rotation.set(...a2); j1.add(j2);
+    M(new THREE.TorusGeometry(r2 * 1.02, .016, 8, 24), grey, 0, -.01, 0, j2).rotation.x = Math.PI / 2;
+    M(cap(r2, l2), suit, 0, -(l2 / 2 + r2 * .6), 0, j2);
+    const e = M(endGeo, endMat, 0, -(l2 + r2 * 1.5), 0, j2); return { j1, j2, e, a1, a2 };
+  };
+  const glove = new THREE.SphereGeometry(.075, 20, 14), boot = new RoundedBoxGeometry(.15, .12, .28, 3, .04);
+  const limbs = [
+    limb(-.33, 1.36, 0, .09, .24, .08, .22, glove, shell, [.35, 0, .32], [-.7, 0, 0]),
+    limb(.33, 1.36, 0, .09, .24, .08, .22, glove, shell, [.25, 0, -.38], [-.85, 0, 0]),
+    limb(-.13, .84, 0, .115, .34, .1, .34, boot, shell, [-.12, 0, .08], [.42, 0, 0]),
+    limb(.13, .84, 0, .115, .34, .1, .34, boot, shell, [.18, 0, -.06], [.3, 0, 0]),
+  ];
+  limbs[2].e.position.z = -.05; limbs[3].e.position.z = -.05;
+  const jetMat = new THREE.MeshBasicMaterial({ color: 0xcfe2ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+  const jets = [-.2, .2].map(x => { const g = new THREE.ConeGeometry(.05, .5, 16, 1, true); g.translate(0, -.25, 0); const c = M(g, jetMat, x, .8, .34); c.rotation.x = Math.PI; return c; });
+  const fill = new THREE.PointLight(0xdfe8ff, 1.6, 0, 0); fill.position.set(1.4, 1.6, 3); astro.add(fill);
+  astro.userData = { limbs, head, jets, jetMat, body };
 }
 // speed dust around the rocket
 const dust = (() => {
@@ -990,6 +1067,10 @@ const speedOf = l => speedK(l) * shipNear[0];
 let auto = null, autoCool = 0, keyCool = 0;
 const keys = {};
 function setAuto(L) { auto = L; flashHint('piloto automático: ' + L.name.toLowerCase()); }
+let view = 'nave', fpT = 0; const _fpQ = new THREE.Quaternion(), _fpE = new THREE.Euler(); const fpData = document.getElementById('fpData');
+const nf = (x, d = 0) => x.toLocaleString('pt-BR', { maximumFractionDigits: d, minimumFractionDigits: d });
+function fmtSpeed(v) { const kms = v * 1000; if (kms >= 299792) { const c = kms / 299792.458; return 'velocidade ' + nf(c, c < 10 ? 1 : 0) + '× a da luz'; } return 'velocidade ' + nf(kms, kms < 10 ? 2 : 0) + ' km/s'; }
+function fmtDist(d) { const km = d * 1000; if (d > LY * .05) return nf(d / LY, d / LY < 10 ? 2 : 0) + ' anos-luz'; if (km >= 1e6) return nf(km / 1e6, 1) + ' milhões de km'; if (km >= 1e4) return nf(km / 1e3, 0) + ' mil km'; return nf(km, km < 10 ? 2 : 0) + ' km'; }
 function updatePilot(dt) {
   // steering input
   let ty = (keys.ArrowLeft || keys.a ? 1 : 0) - (keys.ArrowRight || keys.d ? 1 : 0);
@@ -1033,10 +1114,30 @@ function updatePilot(dt) {
     const len = .012 + lv * .07; for (const m of U.plumes) m.scale.set(1, 1, len * m.userData.len * (1 + (Math.random() - .5) * .08));
     U.plumeMat.uniforms.uT.value = simT; U.plumeMat.uniforms.uP.value = lv;
     U.bellMat.emissiveIntensity = .02 + lv * .2; U.glow.material.opacity = .2 + lv * .35; U.engineLight.intensity = .3 + lv * .8; }
+  const fp = view === 'capacete'; rocket.visible = view === 'nave'; astro.visible = view === 'astronauta';
+  astro.quaternion.copy(ship.q);
+  if (astro.visible) { const A = astro.userData, t = simT;
+    A.limbs.forEach((L, i) => { L.j1.rotation.x = L.a1[0] + Math.sin(t * .6 + i * 1.7) * .06; L.j1.rotation.z = L.a1[2] + Math.sin(t * .45 + i) * .04; L.j2.rotation.x = L.a2[0] + Math.sin(t * .5 + i * 2.3) * .07; });
+    A.head.rotation.y = Math.sin(t * .23) * .12; A.head.rotation.x = Math.sin(t * .31) * .05;
+    A.body.rotation.z = Math.sin(t * .2) * .05; A.body.rotation.x = Math.sin(t * .17) * .04;
+    const lv = ship.level / MAXL; A.jetMat.opacity = .05 + lv * .4; A.jets.forEach(j => j.scale.set(1, .4 + lv * 2.2 * (1 + (Math.random() - .5) * .15), 1)); }
+  if (fp) { // inside the helmet: the head lags a little behind the ship and moves with the breathing
+    ship.camQ.slerp(ship.q, 1 - Math.exp(-dt * 7));
+    const br = Math.sin(simT * 2 * Math.PI / 4.6), sw = Math.sin(simT * .53) * .5 + Math.sin(simT * .29);
+    camera.position.copy(ship.pos);
+    camera.quaternion.copy(ship.camQ).multiply(_fpQ.setFromEuler(_fpE.set(br * .0035, sw * .0025, sw * .0015)));
+    fpT -= dt; if (fpT <= 0) { fpT = .25; fpData.innerHTML = fmtSpeed(v) + '<br>' + (shipNear[1] ? shipNear[1].name + ' · ' + fmtDist(shipNear[0]) : 'Sagitário A* · ' + fmtDist(shipNear[0])); }
+  } else if (view === 'astronauta') {
+    ship.camQ.slerp(ship.q, 1 - Math.exp(-dt * 3));
+    camera.position.copy(ship.pos).add(V3(0, .75 * AS, 3.6 * AS).applyQuaternion(ship.camQ));
+    camera.quaternion.copy(ship.camQ).multiply(new THREE.Quaternion().setFromAxisAngle(V3(1, 0, 0), -.16));
+  } else {
   // chase camera
   ship.camQ.slerp(ship.q, 1 - Math.exp(-dt * 4));
   camera.position.copy(ship.pos).add(V3(0, .058 * RS, .23 * RS).applyQuaternion(ship.camQ));
   camera.quaternion.copy(ship.camQ).multiply(new THREE.Quaternion().setFromAxisAngle(V3(1, 0, 0), -.17));
+  }
+  { const f = fp ? 72 : 55; if (Math.abs(camera.fov - f) > .01) { camera.fov += (f - camera.fov) * Math.min(1, dt * 4); camera.updateProjectionMatrix(); } }
   // speed dust
   const pa = dust.geometry.attributes.position, a = pa.array, mv = Math.min(v, .5 * RS) * dt; const lf = fwd.clone().multiplyScalar(mv); const W = .3 * RS;
   for (let i = 0; i < a.length; i += 3) { a[i] -= lf.x; a[i + 1] -= lf.y; a[i + 2] -= lf.z; for (let j = 0; j < 3; j++) { if (a[i + j] > W) a[i + j] -= 2 * W; else if (a[i + j] < -W) a[i + j] += 2 * W; } }
@@ -1161,17 +1262,19 @@ function flashHint(t, ms = 3500) { hintEl.innerHTML = t; hintEl.style.opacity = 
 function setMode(m) {
   mode = m; document.body.classList.toggle('pilot', m === 'pilot'); document.body.classList.toggle('explore', m === 'explore'); $('bMode').classList.toggle('on', m === 'pilot');
   $('bTour').classList.toggle('on', m === 'tour'); if (controls) controls.enabled = m === 'explore';
-  rocket.visible = dust.visible = m === 'pilot'; if (m !== 'pilot') document.getElementById('pouso').style.display = 'none';
+  rocket.visible = m === 'pilot' && view === 'nave'; dust.visible = m === 'pilot'; astro.visible = m === 'pilot' && view === 'astronauta'; if (m !== 'pilot') document.getElementById('pouso').style.display = 'none';
   if (m === 'pilot') {
     ship.q.copy(camera.quaternion); ship.camQ.copy(camera.quaternion);
     ship.pos.copy(camera.position).add(V3(0, -.058 * RS, -.23 * RS).applyQuaternion(camera.quaternion));
     const near = Math.min(...bodies.map(b => ship.pos.distanceTo(b.wpos) - b.r));
     ship.level = 11; shipNear = nearestSurface(ship.pos);
     auto = null;
-    flashHint(isTouch ? 'arraste o dedo para pilotar<br>+ e − mudam a velocidade<br>toque num nome para ir até ele' : 'arraste com o mouse ou use as setas para pilotar<br>W e S mudam a velocidade · Q e E giram<br>clique num nome para ir até ele', 7000);
-  } else if (m === 'explore') { enterExplore(); } else { lookYaw = lookPitch = 0; startWP(); }
+    flashHint(isTouch ? 'arraste o dedo para pilotar<br>+ e − mudam a velocidade<br>toque num nome para ir até ele<br>o capacete troca a visão: foguete, capacete ou astronauta' : 'arraste com o mouse ou use as setas para pilotar<br>W e S mudam a velocidade · Q e E giram<br>clique num nome para ir até ele<br>o capacete troca a visão: foguete, capacete ou astronauta', 7000);
+  } else if (m === 'explore') { camera.fov = 55; camera.updateProjectionMatrix(); enterExplore(); } else { camera.fov = 55; camera.updateProjectionMatrix(); lookYaw = lookPitch = 0; startWP(); }
 }
 $('bMode').onclick = () => setMode(mode === 'pilot' ? (camera.position.length() < SYS_R ? 'explore' : 'tour') : 'pilot');
+const VIEWS = ['nave', 'capacete', 'astronauta'], VIEW_TXT = { nave: 'visão: foguete', capacete: 'visão: dentro do capacete', astronauta: 'visão: astronauta sozinho no espaço' };
+$('bFp').onclick = () => { view = VIEWS[(VIEWS.indexOf(view) + 1) % 3]; $('bFp').classList.toggle('on', view !== 'nave'); document.body.classList.toggle('fp', view === 'capacete'); ship.camQ.copy(ship.q); flashHint(VIEW_TXT[view], 2500); };
 $('bTour').onclick = () => { if (mode !== 'tour') setMode('tour'); };
 $('bLab').onclick = () => { showLabels = !showLabels; $('bLab').classList.toggle('on', showLabels); orbitLines.forEach(l => l.visible = showLabels); };
 $('bFs').onclick = () => { const d = document; try { if (d.fullscreenElement) d.exitFullscreen(); else d.documentElement.requestFullscreen().catch(() => { }); } catch (e) { } };
@@ -1231,7 +1334,8 @@ const raysPass = new ShaderPass({
     gl_FragColor=vec4(c.rgb+acc*.028*uOn*fall*vec3(1.,.9,.75),1.); }`
 });
 const rocketPass = new RenderPass(scene, rocketCam); rocketPass.clear = false; rocketPass.clearDepth = true;
-composer.addPass(bhPass); composer.addPass(raysPass); composer.addPass(rocketPass); composer.addPass(bloom); composer.addPass(new OutputPass()); composer.addPass(gradePass);
+const astroPass = new RenderPass(astroScene, astroCam); astroPass.clear = false; astroPass.clearDepth = true; astroPass.enabled = false;
+composer.addPass(bhPass); composer.addPass(raysPass); composer.addPass(rocketPass); composer.addPass(astroPass); composer.addPass(bloom); composer.addPass(new OutputPass()); composer.addPass(gradePass);
 
 /* ---------- main loop ---------- */
 const clock = new THREE.Clock();
@@ -1263,7 +1367,10 @@ function frame() {
     bhPass.uniforms.uOn.value = on ? 1 : 0; bhPass.enabled = on;
     if (on) { const u = bhPass.uniforms; u.uTime.value = simT; u.uRel.value.subVectors(camera.position, GC_WORLD).divideScalar(BH_RS); u.uInvProj.value.copy(camera.projectionMatrixInverse); u.uInvView.value.copy(camera.matrixWorld);
       u.uViewProj.value.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); } }
-  rocketCam.copy(camera); rocketCam.layers.set(1); rocketPass.enabled = rocket.visible;
+  rocketCam.copy(camera); rocketCam.layers.set(1); rocketPass.enabled = rocket.visible; astroPass.enabled = astro.visible;
+  if (astro.visible) { astroCam.fov = camera.fov; astroCam.aspect = camera.aspect; astroCam.updateProjectionMatrix();
+    astroCam.position.subVectors(camera.position, ship.pos).divideScalar(AS); astroCam.quaternion.copy(camera.quaternion);
+    astroSun.position.copy(ship.pos).negate().normalize().multiplyScalar(10); }
   gradePass.uniforms.uTime.value = simT;
   { const sp = V3(0, 0, 0).project(camera); const R = raysPass.uniforms; R.uSun.value.set(sp.x * .5 + .5, sp.y * .5 + .5); R.uAsp.value = camera.aspect;
     const onScr = sp.z < 1 && Math.abs(sp.x) < 1.6 && Math.abs(sp.y) < 1.6 ? 1 - smooth(1, 1.6, Math.max(Math.abs(sp.x), Math.abs(sp.y))) : 0;
