@@ -115,7 +115,7 @@ const viewer = new Cesium.Viewer('globo', {
 const scene = viewer.scene, cam = viewer.camera;
 scene.screenSpaceCameraController.enableCollisionDetection = true;
 scene.screenSpaceCameraController.minimumZoomDistance = 2;
-viewer.useBrowserRecommendedResolution = false; viewer.resolutionScale = Math.min(devicePixelRatio, isTouch ? 1.5 : 2) / devicePixelRatio;
+viewer.useBrowserRecommendedResolution = false; viewer.resolutionScale = Math.min(devicePixelRatio, isTouch ? 2.25 : 2) / devicePixelRatio;
 scene.postProcessStages.fxaa.enabled = true;
 if (terra) {
   const inp = document.querySelector('.cesium-geocoder-input'); if (inp) inp.placeholder = 'Buscar qualquer lugar…';
@@ -132,7 +132,7 @@ if (terra) {
   document.querySelectorAll('[data-img]').forEach(b => b.onclick = () => setImg(b.dataset.img));
   let google = null, osm = null, mar = false;
   async function toggleGoogle(on) {
-    if (on && !google) { try { google = await Cesium.Cesium3DTileset.fromIonAssetId(ID.google); scene.primitives.add(google); } catch (e) { dica('as cidades 3D do Google não abriram agora'); on = false; } }
+    if (on && !google) { try { google = await Cesium.Cesium3DTileset.fromIonAssetId(ID.google, { maximumScreenSpaceError: 6, skipLevelOfDetail: false }); scene.primitives.add(google); } catch (e) { dica('as cidades 3D do Google não abriram agora'); on = false; } }
     if (google) google.show = on; scene.globe.show = !on; $('cG').classList.toggle('on', on);
     if (on && osm) { osm.show = false; $('cO').classList.remove('on'); }
   }
