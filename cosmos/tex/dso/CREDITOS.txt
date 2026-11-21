@@ -1,0 +1,39 @@
+Fotos de galáxias e nebulosas do Cosmos
+Fonte: acervo de imagens de objetos do céu profundo do Stellarium (github.com/Stellarium/stellarium, pasta nebulae/default).
+
+Galáxia de Andrômeda (M31): LEE ang HG731GZ
+Galáxia do Triângulo (M33): HG731GZ
+Galáxia de Bode (M81): crédito não informado no acervo — https://www.flickr.com/photos/kees-scherer/39830303935/
+Galáxia do Charuto (M82): Plover Hill Observatory — http://www.madpc.co.uk/~peterv/
+Cata-Vento do Sul (M83): TRAPPIST/E. Jehin/ESO — https://www.eso.org/public/images/eso1023d/
+Galáxia do Olho Negro (M64): Adam Block/Mount Lemmon SkyCenter/University of Arizona — http://www.caelumobservatory.com/gallery/m64.shtml
+Galáxia M94 (M94): Starhopper — https://commons.wikimedia.org/wiki/File:M094.jpg
+Galáxia do Cata-Vento (M101): crédito não informado no acervo — http://www.madpc.co.uk/~peterv/
+Galáxia do Rodamoinho (M51): crédito não informado no acervo — http://www.madpc.co.uk/~peterv/
+Galáxia M106 (M106): crédito não informado no acervo — http://www.madpc.co.uk/~peterv/
+Galáxia do Girassol (M63): crédito não informado no acervo — http://www.madpc.co.uk/~peterv/
+Galáxia do Sombreiro (M104): Adam Block/Mount Lemmon SkyCenter/University of Arizona & Ngc1535, post-processing: Sun Shuwei — https://commons.wikimedia.org/wiki/File:M104_Sombrero_Galaxy_from_the_Mount_Lemmon_SkyCenter_Schulman_Telescope_courtesy_Adam_Block.jpg
+Galáxia Fantasma (M74): Bart Delsaert — https://delsaert.com/
+Galáxia M65 (M65): Adam Block/Mount Lemmon SkyCenter/University of Arizona — http://www.caelumobservatory.com/gallery/m65.shtml
+Galáxia M66 (M66): Adam Block/Mount Lemmon SkyCenter/University of Arizona — http://www.caelumobservatory.com/gallery/m66.shtml
+Galáxia M105 (M105): crédito não informado no acervo — http://www.madpc.co.uk/~peterv/
+Galáxia da Prancha de Surfe (M108): Hewholooks — https://en.wikipedia.org/wiki/File:M108HunterWilson.jpg
+Galáxia M77 (M77): Wang Lingyi
+Galáxia M88 (M88): Hewholooks — https://commons.wikimedia.org/wiki/File:M88HunterWilson.jpg
+Galáxia do Fuso (M102): Starhopper — https://commons.wikimedia.org/wiki/File:Messierposter-V6-Starhopper-plain.jpg
+Galáxia M89 (M89): ESO/Digitized Sky Survey 2 — https://www.eso.org/public/images/eso0919c/
+Galáxia M100 (M100): Adam Block/Mount Lemmon SkyCenter/University of Arizona — http://www.caelumobservatory.com/gallery/m100.shtml
+Galáxia M85 (M85): Starhopper — https://commons.wikimedia.org/wiki/File:Messierposter-V6-Starhopper-plain.jpg
+Galáxia M109 (M109): KPNO/NOIRLab/NSF/AURA/George Hatfield and Flynn Haase, post-processing: Sun Shuwei — https://noirlab.edu/public/images/noao-m109hatfield
+Nebulosa de Órion (M42): HG731GZ
+Nebulosa M78 (M78): crédito não informado no acervo — https://manuel-astro.ch/project/messier-78/
+Nebulosa Cabeça de Cavalo (IC434): Manuel Peitsch, post-processing: Sun Shuwei — https://manuel-astro.ch/project/south-of-orions-belt/
+Nebulosa do Haltere (M27): Stephane Dumont
+Nebulosa da Coruja (M97): Stephane Dumont
+Tromba do Elefante (IC1396): Giuseppe Donatiello — https://commons.wikimedia.org/wiki/File:IC_1396_rev_20140921_s_(18237481073).jpg
+Nebulosa do Anel (M57): Stephane Dumont
+Nebulosa da Lagoa (M8): Dylan O'Donnell — http://deography.com/m8-lagoon-nebula-ngc6559/
+Nebulosa Trífida (M20): Hewholooks — https://commons.wikimedia.org/wiki/File:TrifidHunterWilson.jpg
+Nebulosa Ômega (M17): Dylan O'Donnell — http://deography.com/the-tree-of-life-m17-omega-nebula/
+Nebulosa da Águia (M16): Sun Gang
+Nebulosa do Caranguejo (M1): Stephane Dumont
