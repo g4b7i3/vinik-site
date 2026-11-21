@@ -27,17 +27,20 @@ body.pilot .lb,body.explore .lb{pointer-events:auto;cursor:pointer}
 body.pilot #hud{display:flex}
 #hud .b{width:52px;height:52px;font-size:22px}
 #bFp{display:none}body.pilot #bFp{display:grid}
-#helmet{position:fixed;inset:0;pointer-events:none;display:none}
+#helmet{position:fixed;inset:0;pointer-events:none;display:none;overflow:hidden}
 body.pilot.fp #helmet{display:block}
-#helmet svg.visor{position:absolute;inset:0;width:100%;height:100%}
-#helmet .tint{position:absolute;inset:0;background:radial-gradient(ellipse 70% 62% at 50% 47%,rgba(255,214,160,.035),rgba(255,190,120,.07))}
-#helmet .glare{position:absolute;left:8%;top:6%;width:46%;height:30%;border-radius:50%;background:radial-gradient(ellipse at 40% 40%,rgba(220,235,255,.07),rgba(220,235,255,0) 70%);transform:rotate(-14deg)}
-#helmet .glare2{position:absolute;right:12%;bottom:12%;width:22%;height:9%;border-radius:50%;background:radial-gradient(ellipse,rgba(220,235,255,.04),rgba(220,235,255,0) 70%);transform:rotate(-20deg)}
-#helmet .fog{position:absolute;left:18%;right:18%;bottom:4%;height:34%;border-radius:50%;background:radial-gradient(ellipse at 50% 90%,rgba(225,232,240,.22),rgba(225,232,240,0) 70%);opacity:0;animation:breath 4.6s ease-in-out infinite}
+#helmet .glass{position:absolute;left:50%;top:50%;width:max(82vmax,104vmin);height:max(82vmax,104vmin);transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;
+  box-shadow:0 0 0 200vmax #010203,inset 0 0 6vmin 4vmin #010203,inset 0 0 16vmin 4vmin rgba(1,2,3,.75),inset 0 0 34vmin 2vmin rgba(1,2,3,.3)}
+#helmet .rim{position:absolute;left:50%;top:50%;width:max(84vmax,106vmin);height:max(84vmax,106vmin);transform:translate(-50%,-50%);border-radius:50%;border:2.2vmin solid rgba(150,160,175,.07);filter:blur(1.6vmin)}
+#helmet .sunv{position:absolute;inset:0;background:linear-gradient(180deg,rgba(70,44,8,.62),rgba(58,36,6,.55));opacity:var(--sun,0);transition:opacity 1.6s}
+#helmet .tint{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,214,160,.02),rgba(255,190,120,.07))}
+#helmet .glare{position:absolute;left:9%;top:7%;width:48%;height:26%;border-radius:50%;background:radial-gradient(ellipse at 40% 40%,rgba(220,235,255,.075),rgba(220,235,255,0) 70%);transform:rotate(-24deg)}
+#helmet .glare2{position:absolute;right:13%;bottom:15%;width:24%;height:8%;border-radius:50%;background:radial-gradient(ellipse,rgba(220,235,255,.045),rgba(220,235,255,0) 70%);transform:rotate(-32deg)}
+#helmet .fog{position:absolute;left:14%;right:14%;bottom:0;height:38%;border-radius:50%;background:radial-gradient(ellipse at 50% 95%,rgba(225,232,240,.2),rgba(225,232,240,0) 70%);opacity:0;animation:breath 4.6s ease-in-out infinite}
 @keyframes breath{0%,38%{opacity:0}52%{opacity:.85}100%{opacity:0}}
 #helmet .ret{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border:1px solid rgba(255,210,150,.28);border-radius:50%}
 #helmet .ret::after{content:'';position:absolute;left:8px;top:8px;width:2px;height:2px;background:rgba(255,210,150,.5);border-radius:50%}
-#helmet .data{position:absolute;left:50%;bottom:16%;transform:translateX(-50%);font:300 11px/1.7 'Inter',sans-serif;letter-spacing:.14em;color:rgba(255,214,160,.62);text-align:center;text-transform:uppercase;text-shadow:0 0 6px rgba(255,170,90,.25);white-space:nowrap}
+#helmet .data{display:none;position:absolute;left:50%;bottom:17%;transform:translateX(-50%);font:300 11px/1.7 'Inter',sans-serif;letter-spacing:.14em;color:rgba(255,214,160,.62);text-align:center;text-transform:uppercase;text-shadow:0 0 6px rgba(255,170,90,.25);white-space:nowrap}
 #bar{width:4px;height:120px;border-radius:2px;background:rgba(255,255,255,.12);position:relative;overflow:hidden}
 #bar i{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(#ffb36b,#7fb2ff);height:0}
 #hint{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%);font-size:11px;letter-spacing:.08em;color:rgba(210,220,240,.85);text-align:center;line-height:1.7;opacity:0;transition:opacity 1s;pointer-events:none;max-width:70vw;text-shadow:0 0 8px #000}
@@ -59,16 +62,7 @@ body.pilot.fp #helmet{display:block}
 </head>
 <body>
 <div id="labels"></div>
-<div id="helmet"><div class="tint"></div><div class="fog"></div><div class="glare"></div><div class="glare2"></div>
-  <svg class="visor" viewBox="0 0 1000 1000" preserveAspectRatio="none"><defs>
-    <radialGradient id="vg" cx="50%" cy="47%" r="62%"><stop offset="68%" stop-color="#000" stop-opacity="0"/><stop offset="84%" stop-color="#000" stop-opacity=".55"/><stop offset="100%" stop-color="#000" stop-opacity=".9"/></radialGradient>
-    <mask id="vm"><rect width="1000" height="1000" fill="#fff"/><ellipse cx="500" cy="470" rx="470" ry="455" fill="#000"/></mask></defs>
-    <rect width="1000" height="1000" fill="url(#vg)"/>
-    <rect width="1000" height="1000" fill="#030406" mask="url(#vm)"/>
-    <ellipse cx="500" cy="470" rx="470" ry="455" fill="none" stroke="rgba(210,225,245,.10)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
-    <ellipse cx="500" cy="470" rx="462" ry="447" fill="none" stroke="rgba(0,0,0,.6)" stroke-width="10" vector-effect="non-scaling-stroke"/>
-  </svg>
-  <div class="ret"></div><div class="data" id="fpData"></div>
+<div id="helmet"><div class="glass"><div class="tint"></div><div class="fog"></div><div class="glare"></div><div class="glare2"></div></div><div class="rim"></div><div class="data" id="fpData"></div></div>
 </div>
 <div id="ui">
   <button class="b" id="bTour" aria-label="Passeio automático"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
@@ -931,7 +925,7 @@ function updateLabels(dt, camDist) {
     const tg = auto === L; if (tg !== L.tg) { L.el.classList.toggle('tgt', tg); L.tg = tg; }
   }
   // constellation lines brighten as you look at them
-  for (const c of constObjs) { const ang = _f.angleTo(c.dir); c.line.material.opacity = (.05 + .32 * (1 - smooth(10 * D2R, 30 * D2R, ang))) * nearF * (showLabels ? 1 : .4); }
+  for (const c of constObjs) { const ang = _f.angleTo(c.dir); c.line.material.opacity = (mode === 'pilot' && view === 'capacete' ? 0 : 1) * (.05 + .32 * (1 - smooth(10 * D2R, 30 * D2R, ang))) * nearF * (showLabels ? 1 : .4); }
 }
 
 /* ---------- simulation update ---------- */
@@ -1063,13 +1057,14 @@ const ship = { pos: V3(), q: new THREE.Quaternion(), level: 10, yaw: 0, pitch: 0
 const MAXL = 36; const speedK = l => .004 * Math.pow(1.33, l);
 function nearestSurface(p) { let best = Infinity, bb = null; for (const b of bodies) { const d = p.distanceTo(b.wpos) - b.r; if (d < best) { best = d; bb = b; } } const dbh = p.distanceTo(GC_WORLD) - BH_RS * 3; if (dbh < best) { best = dbh; bb = null; } return [Math.max(best, 2e-4), bb]; }
 let shipNear = [1, null];
-const speedOf = l => speedK(l) * shipNear[0];
+const SHIP_MAX = 4e5 * LY; // beyond the Magellanic Clouds; past this there is nothing more to see in this model
+const speedOf = l => speedK(l) * Math.min(shipNear[0], 2e4 * LY);
 let auto = null, autoCool = 0, keyCool = 0;
 const keys = {};
 function setAuto(L) { auto = L; flashHint('piloto automático: ' + L.name.toLowerCase()); }
-let view = 'nave', fpT = 0; const _fpQ = new THREE.Quaternion(), _fpE = new THREE.Euler(); const fpData = document.getElementById('fpData');
+let view = 'nave', fpT = 0, fpSun = 0, visorK = 0; const helmetEl = document.getElementById('helmet'); const _fpQ = new THREE.Quaternion(), _fpE = new THREE.Euler(); const fpData = document.getElementById('fpData');
 const nf = (x, d = 0) => x.toLocaleString('pt-BR', { maximumFractionDigits: d, minimumFractionDigits: d });
-function fmtSpeed(v) { const kms = v * 1000; if (kms >= 299792) { const c = kms / 299792.458; return 'velocidade ' + nf(c, c < 10 ? 1 : 0) + '× a da luz'; } return 'velocidade ' + nf(kms, kms < 10 ? 2 : 0) + ' km/s'; }
+function fmtSpeed(v) { const kms = v * 1000; if (v / LY >= .1) { const l = v / LY; return 'velocidade ' + nf(l, l < 10 ? 1 : 0) + ' anos-luz por segundo'; } if (kms >= 299792) { const c = kms / 299792.458; return 'velocidade ' + nf(c, c < 10 ? 1 : 0) + '× a da luz'; } return 'velocidade ' + nf(kms, kms < 10 ? 2 : 0) + ' km/s'; }
 function fmtDist(d) { const km = d * 1000; if (d > LY * .05) return nf(d / LY, d / LY < 10 ? 2 : 0) + ' anos-luz'; if (km >= 1e6) return nf(km / 1e6, 1) + ' milhões de km'; if (km >= 1e4) return nf(km / 1e3, 0) + ' mil km'; return nf(km, km < 10 ? 2 : 0) + ' km'; }
 function updatePilot(dt) {
   // steering input
@@ -1106,6 +1101,7 @@ function updatePilot(dt) {
   const v = speedOf(ship.level);
   const fwd = V3(0, 0, -1).applyQuaternion(ship.q);
   ship.pos.addScaledVector(fwd, v * dt);
+  if (ship.pos.length() > SHIP_MAX) { ship.pos.setLength(SHIP_MAX); if (!ship.edge) flashHint('fim do mapa: daqui você vê a Via Láctea inteira<br>vire para voltar', 4000); ship.edge = true; } else ship.edge = false;
   // don't fly into planets
   for (const b of bodies) { const d = ship.pos.distanceTo(b.wpos), m = b === earth ? b.r + .075 : b.r * 1.004 + .002; if (d < m) ship.pos.sub(b.wpos).setLength(m).add(b.wpos); }
   rockFields(ship.pos);
@@ -1126,7 +1122,7 @@ function updatePilot(dt) {
     const br = Math.sin(simT * 2 * Math.PI / 4.6), sw = Math.sin(simT * .53) * .5 + Math.sin(simT * .29);
     camera.position.copy(ship.pos);
     camera.quaternion.copy(ship.camQ).multiply(_fpQ.setFromEuler(_fpE.set(br * .0035, sw * .0025, sw * .0015)));
-    fpT -= dt; if (fpT <= 0) { fpT = .25; fpData.innerHTML = fmtSpeed(v) + '<br>' + (shipNear[1] ? shipNear[1].name + ' · ' + fmtDist(shipNear[0]) : 'Sagitário A* · ' + fmtDist(shipNear[0])); }
+    fpT -= dt; if (fpT <= 0) { fpT = .25; { const f = V3(0, 0, -1).applyQuaternion(camera.quaternion), sd = ship.pos.clone().negate(); const sv = sd.length() < 60 * AU && f.angleTo(sd) < .7 ? 1 : 0; fpSun = sv; } fpData.innerHTML = fmtSpeed(v) + '<br>' + (shipNear[0] > LY ? 'distância do Sol · ' + fmtDist(ship.pos.length()) : shipNear[1] ? shipNear[1].name + ' · ' + fmtDist(shipNear[0]) : 'Sagitário A* · ' + fmtDist(shipNear[0])); }
   } else if (view === 'astronauta') {
     ship.camQ.slerp(ship.q, 1 - Math.exp(-dt * 3));
     camera.position.copy(ship.pos).add(V3(0, .75 * AS, 3.6 * AS).applyQuaternion(ship.camQ));
@@ -1269,12 +1265,12 @@ function setMode(m) {
     const near = Math.min(...bodies.map(b => ship.pos.distanceTo(b.wpos) - b.r));
     ship.level = 11; shipNear = nearestSurface(ship.pos);
     auto = null;
-    flashHint(isTouch ? 'arraste o dedo para pilotar<br>+ e − mudam a velocidade<br>toque num nome para ir até ele<br>o capacete troca a visão: foguete, capacete ou astronauta' : 'arraste com o mouse ou use as setas para pilotar<br>W e S mudam a velocidade · Q e E giram<br>clique num nome para ir até ele<br>o capacete troca a visão: foguete, capacete ou astronauta', 7000);
+    flashHint(isTouch ? 'arraste o dedo para pilotar<br>+ e − mudam a velocidade<br>toque num nome para ir até ele<br>o capacete põe você dentro do traje de astronauta' : 'arraste com o mouse ou use as setas para pilotar<br>W e S mudam a velocidade · Q e E giram<br>clique num nome para ir até ele<br>o capacete põe você dentro do traje de astronauta', 7000);
   } else if (m === 'explore') { camera.fov = 55; camera.updateProjectionMatrix(); enterExplore(); } else { camera.fov = 55; camera.updateProjectionMatrix(); lookYaw = lookPitch = 0; startWP(); }
 }
 $('bMode').onclick = () => setMode(mode === 'pilot' ? (camera.position.length() < SYS_R ? 'explore' : 'tour') : 'pilot');
-const VIEWS = ['nave', 'capacete', 'astronauta'], VIEW_TXT = { nave: 'visão: foguete', capacete: 'visão: dentro do capacete', astronauta: 'visão: astronauta sozinho no espaço' };
-$('bFp').onclick = () => { view = VIEWS[(VIEWS.indexOf(view) + 1) % 3]; $('bFp').classList.toggle('on', view !== 'nave'); document.body.classList.toggle('fp', view === 'capacete'); ship.camQ.copy(ship.q); flashHint(VIEW_TXT[view], 2500); };
+const VIEWS = ['nave', 'capacete'], VIEW_TXT = { nave: 'visão: foguete', capacete: 'visão do astronauta<br>Aa mostra os nomes de novo' };
+$('bFp').onclick = () => { view = VIEWS[(VIEWS.indexOf(view) + 1) % 2]; if (view === 'capacete' && showLabels) $('bLab').click(); $('bFp').classList.toggle('on', view !== 'nave'); document.body.classList.toggle('fp', view === 'capacete'); ship.camQ.copy(ship.q); flashHint(VIEW_TXT[view], 2500); };
 $('bTour').onclick = () => { if (mode !== 'tour') setMode('tour'); };
 $('bLab').onclick = () => { showLabels = !showLabels; $('bLab').classList.toggle('on', showLabels); orbitLines.forEach(l => l.visible = showLabels); };
 $('bFs').onclick = () => { const d = document; try { if (d.fullscreenElement) d.exitFullscreen(); else d.documentElement.requestFullscreen().catch(() => { }); } catch (e) { } };
@@ -1311,16 +1307,16 @@ addEventListener('resize', onResize);
 
 /* ---------- final touch: light sharpening and a soft vignette ---------- */
 const gradePass = new ShaderPass({
-  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(innerWidth * DPR, innerHeight * DPR) } },
+  uniforms: { tDiffuse: { value: null }, uTint: { value: new THREE.Vector3(1, 1, 1) }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(innerWidth * DPR, innerHeight * DPR) } },
   vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-  fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 uRes; varying vec2 vUv;
+  fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 uRes; uniform vec3 uTint; varying vec2 vUv;
   void main(){
     vec2 px=1./uRes;
     vec3 c=texture2D(tDiffuse,vUv).rgb;
     vec3 n=texture2D(tDiffuse,vUv+vec2(px.x,0.)).rgb+texture2D(tDiffuse,vUv-vec2(px.x,0.)).rgb+texture2D(tDiffuse,vUv+vec2(0.,px.y)).rgb+texture2D(tDiffuse,vUv-vec2(0.,px.y)).rgb;
     vec3 col=clamp(c+(c*4.-n)*.18,0.,1.);
     vec2 d=vUv-.5; col*=1.-smoothstep(.2,.8,dot(d,d))*.22;
-    gl_FragColor=vec4(col,1.);
+    gl_FragColor=vec4(col*uTint,1.);
   }`
 });
 const raysPass = new ShaderPass({
@@ -1357,7 +1353,7 @@ function frame() {
   const sc = pxScale(); if (galPts.mat) galPts.mat.uniforms.uScale.value = sc;
   if (galPts.mat) { galPts.mat.uniforms.uBright.value = .38 * smooth(4000 * LY, 20000 * LY, camDist); galPts.mesh.visible = galPts.mat.uniforms.uBright.value > .002; }
   glowPlane.visible = glowMat.uniforms.uFade.value > .002; sky.visible = skyMat.uniforms.uFade.value > .002;
-  const solarVis = camDist < SYS_R * 6; nearPlanet = bodies.some(b => b.name !== 'Sol' && camera.position.distanceTo(b.wpos) < b.r * 30); orbitLines.forEach(l => l.visible = showLabels && solarVis && !nearPlanet); astBelt.visible = kuiper.visible = solarVis;
+  const solarVis = camDist < SYS_R * 6; nearPlanet = bodies.some(b => b.name !== 'Sol' && camera.position.distanceTo(b.wpos) < b.r * 30); orbitLines.forEach(l => l.visible = showLabels && solarVis && !nearPlanet); astBelt.visible = kuiper.visible = solarVis && !(mode === 'pilot' && view === 'capacete');
   bgStars.material.uniforms.uOpacity.value = 1 - .75 * smooth(8000 * LY, 40000 * LY, camDist);
   constStars.material.uniforms.uOpacity.value = 1 - smooth(4000 * LY, 9000 * LY, camDist);
   bgStars.material.uniforms.uTime.value = constStars.material.uniforms.uTime.value = simT;
@@ -1372,6 +1368,8 @@ function frame() {
     astroCam.position.subVectors(camera.position, ship.pos).divideScalar(AS); astroCam.quaternion.copy(camera.quaternion);
     astroSun.position.copy(ship.pos).negate().normalize().multiplyScalar(10); }
   gradePass.uniforms.uTime.value = simT;
+  { const want = mode === 'pilot' && view === 'capacete' ? (fpSun > 0 ? 1 : .12) : 0; visorK += (want - visorK) * Math.min(1, dt * 1.2);
+    gradePass.uniforms.uTint.value.set(1 - .25 * visorK, 1 - .45 * visorK, 1 - .78 * visorK); }
   { const sp = V3(0, 0, 0).project(camera); const R = raysPass.uniforms; R.uSun.value.set(sp.x * .5 + .5, sp.y * .5 + .5); R.uAsp.value = camera.aspect;
     const onScr = sp.z < 1 && Math.abs(sp.x) < 1.6 && Math.abs(sp.y) < 1.6 ? 1 - smooth(1, 1.6, Math.max(Math.abs(sp.x), Math.abs(sp.y))) : 0;
     R.uOn.value = onScr * (1 - smooth(SYS_R * 3, SYS_R * 8, camDist)); raysPass.enabled = R.uOn.value > 0; }
