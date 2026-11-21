@@ -62,7 +62,7 @@ body.pilot.fp #helmet{display:block}
 </head>
 <body>
 <div id="labels"></div>
-<div id="helmet"><div class="glass"><div class="tint"></div><div class="fog"></div><div class="glare"></div><div class="glare2"></div></div><div class="rim"></div><div class="data" id="fpData"></div></div>
+<div id="helmet"><div class="glass"><div class="fog"></div><div class="glare"></div><div class="glare2"></div></div><div class="rim"></div><div class="data" id="fpData"></div></div>
 </div>
 <div id="ui">
   <button class="b" id="bTour" aria-label="Passeio automático"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
@@ -1368,7 +1368,7 @@ function frame() {
     astroCam.position.subVectors(camera.position, ship.pos).divideScalar(AS); astroCam.quaternion.copy(camera.quaternion);
     astroSun.position.copy(ship.pos).negate().normalize().multiplyScalar(10); }
   gradePass.uniforms.uTime.value = simT;
-  { const want = mode === 'pilot' && view === 'capacete' ? (fpSun > 0 ? 1 : .12) : 0; visorK += (want - visorK) * Math.min(1, dt * 1.2);
+  { const want = 0; // the visor stays clear, same colours as from the rocket visorK += (want - visorK) * Math.min(1, dt * 1.2);
     gradePass.uniforms.uTint.value.set(1 - .25 * visorK, 1 - .45 * visorK, 1 - .78 * visorK); }
   { const sp = V3(0, 0, 0).project(camera); const R = raysPass.uniforms; R.uSun.value.set(sp.x * .5 + .5, sp.y * .5 + .5); R.uAsp.value = camera.aspect;
     const onScr = sp.z < 1 && Math.abs(sp.x) < 1.6 && Math.abs(sp.y) < 1.6 ? 1 - smooth(1, 1.6, Math.max(Math.abs(sp.x), Math.abs(sp.y))) : 0;
