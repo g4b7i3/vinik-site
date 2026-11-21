@@ -18,7 +18,7 @@ html,body,#globo{margin:0;width:100%;height:100%;background:#000;overflow:hidden
 .b{height:40px;min-width:40px;padding:0 14px;border-radius:20px;border:1px solid rgba(255,255,255,.16);background:rgba(8,12,22,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#dfe6f3;font:300 13px Inter,sans-serif;letter-spacing:.04em;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .b.on{border-color:rgba(255,210,140,.6);color:#ffd28a}
 #topo{position:fixed;left:calc(10px + env(safe-area-inset-left));top:calc(10px + env(safe-area-inset-top));display:flex;gap:8px;z-index:2}
-#alt{position:fixed;left:calc(14px + env(safe-area-inset-left));top:calc(62px + env(safe-area-inset-top));font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(220,228,245,.8);text-shadow:0 0 8px #000;pointer-events:none;z-index:2;white-space:nowrap}
+#alt{position:fixed;left:calc(14px + env(safe-area-inset-left));top:calc(108px + env(safe-area-inset-top));font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(220,228,245,.8);text-shadow:0 0 8px #000;pointer-events:none;z-index:2;white-space:nowrap}
 #lugares{position:fixed;left:0;right:0;bottom:calc(30px + env(safe-area-inset-bottom));display:flex;gap:8px;overflow-x:auto;padding:0 12px;z-index:2;scrollbar-width:none}
 #lugares::-webkit-scrollbar{display:none}
 #lugares .b{flex:none;font-size:12px}
@@ -30,6 +30,11 @@ body.foguete #vel{display:flex}
 #aviso div{max-width:380px;font-size:13px;line-height:1.75;font-weight:300;color:#cdd6e6}
 #aviso b{font-weight:400;color:#fff}
 #aviso a{color:#9cc1ff}
+#camadas{position:fixed;left:calc(10px + env(safe-area-inset-left));top:calc(84px + env(safe-area-inset-top));display:none;flex-wrap:wrap;gap:8px;max-width:330px;padding:12px;border-radius:16px;background:rgba(6,9,16,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);z-index:3}
+#camadas.show{display:flex}
+#camadas .t{width:100%;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(200,210,230,.6);margin-top:2px}
+#camadas .b{font-size:12px;height:34px}
+#topo{flex-wrap:wrap;max-width:calc(100vw - 70px)}
 #veu{position:fixed;inset:0;background:#000;z-index:4;pointer-events:none;transition:opacity 1.6s}
 </style>
 </head>
@@ -39,6 +44,14 @@ body.foguete #vel{display:flex}
   <button class="b" id="espaco">← espaço</button>
   <button class="b" id="modo">foguete</button>
   <button class="b" id="luz" title="Luz do Sol real ou sempre de dia">☀ dia</button>
+  <button class="b" id="bPasseio">▶ passeio</button>
+  <button class="b" id="bCam">camadas</button>
+</div>
+<div id="camadas">
+  <div class="t">imagem</div>
+  <button class="b on" data-img="bing">satélite</button><button class="b" data-img="s2">Sentinel-2</button><button class="b" data-img="noite">Terra à noite</button>
+  <div class="t">3D</div>
+  <button class="b on" id="cG">cidades 3D (Google)</button><button class="b" id="cO">prédios simples</button><button class="b" id="cM">fundo do mar</button>
 </div>
 <div id="alt"></div>
 <div id="lugares"></div>
@@ -73,7 +86,10 @@ const LUGARES = {
     ['Rio de Janeiro', 'Cristo e Baía de Guanabara', -22.95, -43.21, 14000], ['Monte Everest', '8.849 m', 27.988, 86.925, 18000],
     ['Pirâmides de Gizé', 'Egito', 29.976, 31.131, 2500], ['Grand Canyon', 'Estados Unidos', 36.10, -112.11, 25000],
     ['Paris', 'Torre Eiffel', 48.858, 2.294, 3500], ['Nova York', 'Manhattan', 40.75, -73.98, 6000],
-    ['Tóquio', 'Japão', 35.68, 139.76, 9000], ['Amazônia', 'encontro das águas', -3.14, -59.90, 30000]],
+    ['Tóquio', 'Japão', 35.68, 139.76, 9000], ['Amazônia', 'encontro das águas', -3.14, -59.90, 30000],
+    ['Cataratas do Iguaçu', 'Brasil e Argentina', -25.695, -54.437, 5000], ['Machu Picchu', 'Peru', -13.163, -72.545, 2500],
+    ['Monte Fuji', 'Japão', 35.3606, 138.7274, 22000], ['Fiorde de Geiranger', 'Noruega', 62.10, 7.09, 9000],
+    ['Fossa das Marianas', 'o ponto mais fundo dos oceanos', 11.35, 142.2, 400000]],
   lua: [
     ['Apollo 11', 'Mar da Tranquilidade, 1969', 0.674, 23.473, 25000], ['Cratera Tycho', '86 km de diâmetro', -43.31, -11.36, 160000],
     ['Cratera Copérnico', '93 km de diâmetro', 9.62, -20.08, 160000], ['Polo Sul', 'onde a Artemis vai pousar', -89.6, 0, 60000],
@@ -104,10 +120,33 @@ scene.postProcessStages.fxaa.enabled = true;
 if (terra) {
   const inp = document.querySelector('.cesium-geocoder-input'); if (inp) inp.placeholder = 'Buscar qualquer lugar…';
   scene.globe.enableLighting = false; scene.globe.depthTestAgainstTerrain = true;
-  if (window.COSMOS_GOOGLE_KEY) {
-    try { const g = await Cesium.createGooglePhotorealistic3DTileset({ key: window.COSMOS_GOOGLE_KEY }); scene.primitives.add(g); scene.globe.show = false; }
-    catch (e) { console.log(e); }
+  // ion asset IDs from the Asset Depot (the same for every account)
+  const ID = { google: 2275207, osm: 96188, s2: 3954, noite: 3812, mar: 2426648 };
+  const imgLayers = {}; const baseImg = viewer.imageryLayers.get(0); imgLayers.bing = baseImg;
+  async function setImg(k) {
+    if (!imgLayers[k]) { try { imgLayers[k] = viewer.imageryLayers.addImageryProvider(await Cesium.IonImageryProvider.fromAssetId(ID[k])); } catch (e) { dica('não consegui abrir essa imagem agora'); return; } }
+    for (const [n, l] of Object.entries(imgLayers)) l.show = n === k;
+    document.querySelectorAll('[data-img]').forEach(b => b.classList.toggle('on', b.dataset.img === k));
+    if (k !== 'bing' && google && google.show) toggleGoogle(false); // the photo layers only show on the globe, not on Google's 3D city
   }
+  document.querySelectorAll('[data-img]').forEach(b => b.onclick = () => setImg(b.dataset.img));
+  let google = null, osm = null, mar = false;
+  async function toggleGoogle(on) {
+    if (on && !google) { try { google = await Cesium.Cesium3DTileset.fromIonAssetId(ID.google); scene.primitives.add(google); } catch (e) { dica('as cidades 3D do Google não abriram agora'); on = false; } }
+    if (google) google.show = on; scene.globe.show = !on; $('cG').classList.toggle('on', on);
+    if (on && osm) { osm.show = false; $('cO').classList.remove('on'); }
+  }
+  async function toggleOsm(on) {
+    if (on && !osm) { try { osm = await Cesium.Cesium3DTileset.fromIonAssetId(ID.osm); scene.primitives.add(osm); } catch (e) { on = false; } }
+    if (osm) osm.show = on; $('cO').classList.toggle('on', on); if (on && google && google.show) toggleGoogle(false);
+  }
+  $('cG').onclick = () => toggleGoogle(!(google && google.show));
+  $('cO').onclick = () => toggleOsm(!(osm && osm.show));
+  $('cM').onclick = async () => { mar = !mar; if (mar && google && google.show) await toggleGoogle(false);
+    try { scene.setTerrain(new Cesium.Terrain(Cesium.CesiumTerrainProvider.fromIonAssetId(mar ? ID.mar : 1, { requestVertexNormals: true, requestWaterMask: !mar }))); } catch (e) { }
+    $('cM').classList.toggle('on', mar); if (mar) dica('fundo do mar ligado: os oceanos aparecem sem água,<br>com o relevo real do fundo'); };
+  $('bCam').onclick = () => { $('camadas').classList.toggle('show'); $('bCam').classList.toggle('on', $('camadas').classList.contains('show')); };
+  toggleGoogle(true);
 } else {
   if (scene.moon) scene.moon.show = false;
   if (CORPO === 'marte' && scene.skyAtmosphere) { // dusty butterscotch sky
@@ -132,13 +171,29 @@ dica(isTouch ? 'um dedo arrasta · dois dedos aproximam e inclinam<br>ou toque e
 // famous places
 for (const [n, s, la, lo, d] of LUGARES[CORPO]) {
   const b = document.createElement('button'); b.className = 'b'; b.textContent = n; b.title = s;
-  b.onclick = () => { setRocket(false); dica(n + '<br>' + s, 4000);
+  b.onclick = () => { stopTour(); setRocket(false); dica(n + '<br>' + s, 4000);
     cam.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(lo, la, 0), 1), { offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-40), d), duration: 5 }); };
   $('lugares').appendChild(b);
 }
 
+// guided tour: fly to each place, circle it slowly, move on; touching the screen takes the controls back
+const tour = { on: false, i: -1, orbit: null };
+function stopTour() { if (!tour.on) return; tour.on = false; cam.cancelFlight(); if (tour.orbit) { tour.orbit = null; cam.lookAtTransform(Cesium.Matrix4.IDENTITY); } $('bPasseio').classList.remove('on'); $('bPasseio').textContent = '▶ passeio'; }
+function nextStop() {
+  if (!tour.on) return; tour.i = (tour.i + 1) % LUGARES[CORPO].length; const [n, s, la, lo, d] = LUGARES[CORPO][tour.i];
+  if (tour.orbit) { tour.orbit = null; cam.lookAtTransform(Cesium.Matrix4.IDENTITY); }
+  dica(n + '<br>' + s, 6000);
+  const c = Cesium.Cartesian3.fromDegrees(lo, la, 0);
+  cam.flyToBoundingSphere(new Cesium.BoundingSphere(c, 1), { offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-32), d), duration: 9, maximumHeight: terra ? 2.5e6 : undefined,
+    complete: () => { if (tour.on) tour.orbit = { c, d, h: 0, t: 0 }; } });
+}
+$('bPasseio').onclick = () => { if (tour.on) { stopTour(); return; } setRocket(false); tour.on = true; $('bPasseio').classList.add('on'); $('bPasseio').textContent = '■ parar'; nextStop(); };
+viewer.canvas.addEventListener('pointerdown', stopTour); viewer.canvas.addEventListener('wheel', stopTour);
+scene.preRender.addEventListener(() => { const o = tour.orbit; if (!o) return; const dt = 1 / 60; o.t += dt; o.h += dt * .08;
+  cam.lookAt(o.c, new Cesium.HeadingPitchRange(o.h, Cesium.Math.toRadians(-32 + 6 * Math.sin(o.t * .15)), o.d)); if (o.t > 16) nextStop(); });
+
 // sunlight: real (time of day) or always day
-$('luz').style.display = terra ? '' : 'none';
+$('luz').style.display = terra ? '' : 'none'; if (!terra) $('bCam').style.display = 'none';
 $('luz').onclick = () => { const g = scene.globe; g.enableLighting = !g.enableLighting; $('luz').textContent = g.enableLighting ? '☀ hora real' : '☀ dia'; $('luz').classList.toggle('on', g.enableLighting); };
 
 // ground height under the camera, for the altitude readout and the rocket's floor
@@ -156,7 +211,7 @@ function setRocket(on) {
   rocket = on; document.body.classList.toggle('foguete', on); $('modo').classList.toggle('on', on); ctl.enableInputs = !on;
   if (on) { lvl = 6; dica(isTouch ? 'arraste o dedo para virar e subir ou descer<br>+ e − mudam a velocidade' : 'arraste para virar · W e S mudam a velocidade'); }
 }
-$('modo').onclick = () => setRocket(!rocket);
+$('modo').onclick = () => { stopTour(); setRocket(!rocket); };
 const cv = viewer.canvas;
 cv.addEventListener('pointerdown', e => { if (!rocket) return; st.on = true; st.x0 = e.clientX; st.y0 = e.clientY; st.dx = st.dy = 0; });
 cv.addEventListener('pointermove', e => { if (st.on) { st.dx = e.clientX - st.x0; st.dy = e.clientY - st.y0; } });
