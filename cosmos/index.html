@@ -122,6 +122,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 // Real scale spans 2 m to millions of light-years. Depth comes from the logarithmic depth buffer (gl_FragDepth),
 // so clip-space z is pinned to 0: nothing is ever clipped by the near/far planes, which float32 can't resolve at this range.
@@ -1425,13 +1426,15 @@ cv.addEventListener('pointerup', endDrag); cv.addEventListener('pointercancel', 
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const stScene = new THREE.Scene(), stCam = new THREE.PerspectiveCamera(72, 1, .03, 2e5);
 const stG = new THREE.Group(); stScene.add(stG);
+{ const pm = new THREE.PMREMGenerator(renderer); stScene.environment = pm.fromScene(new RoomEnvironment(), .04).texture; pm.dispose(); }
 const stSun = new THREE.DirectionalLight(0xfff2e0, 2.6); stSun.castShadow = true;
 stSun.shadow.mapSize.set(isTouch ? 1024 : 2048, isTouch ? 1024 : 2048); stSun.shadow.bias = -.0004; stSun.shadow.normalBias = .03;
 Object.assign(stSun.shadow.camera, { left: -48, right: 48, top: 48, bottom: -48, near: 1, far: 260 });
 const stCenter = V3(8, 2, 0); stSun.target.position.copy(stCenter); stScene.add(stSun, stSun.target);
-const stHemi = new THREE.HemisphereLight(0x1a1e28, 0x4a6c9c, .6); stScene.add(stHemi); // earthshine from below
+const stHemi = new THREE.HemisphereLight(0x2a2e36, 0x6a7c94, .6); stScene.add(stHemi); // earthshine from below
 stScene.add(new THREE.AmbientLight(0xffffff, .05));
 const stLamps = [[-25, 3.9, 0], [-14, 3.9, 0], [-3, 3.9, 0], [17, 3.4, 0]].map(([x, y, z]) => { const l = new THREE.PointLight(0xffe6c8, 24, 24, 2); l.position.set(x, y, z); stScene.add(l); return l; });
+const stScreens = [[3.2, 1.8, -29.75, 2.4, -2.1], [3.2, 1.8, -29.75, 2.4, 2.1]], stScreenTex = [];
 const st = { on: false, pos: V3(-24, 0, 0), yaw: -Math.PI / 2, pitch: -.05, fall: false, fallT: 0, v: 0, ended: false, walk: 0, theta: 0, inc: 51.6 * D2R, q: new THREE.Quaternion(), w: V3(), up: V3() };
 {
   // ---- materials (procedural textures so nothing extra to download) ----
@@ -1444,7 +1447,7 @@ const st = { on: false, pos: V3(-24, 0, 0), yaw: -Math.PI / 2, pitch: -.05, fall
   const rep = t => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t; };
   const M = {
     panel: new THREE.MeshStandardMaterial({ map: rep(panelTex), roughness: .55, metalness: .05, envMapIntensity: .6 }),
-    floor: new THREE.MeshStandardMaterial({ map: rep(tileTex('#d9d6d0', 'rgba(90,88,84,.45)', 4)), roughness: .35, metalness: 0, envMapIntensity: .8 }),
+    floor: new THREE.MeshStandardMaterial({ map: rep(tileTex('#d9d6d0', 'rgba(90,88,84,.45)', 4)), roughness: .16, metalness: 0, envMapIntensity: .8 }),
     deck: new THREE.MeshStandardMaterial({ map: rep(tileTex('#eadfdc', 'rgba(150,130,128,.5)', 4)), roughness: .4, metalness: 0, envMapIntensity: .7 }),
     glass: new THREE.MeshPhysicalMaterial({ color: 0xdfeaff, roughness: .04, metalness: 0, transparent: true, opacity: .1, envMapIntensity: 1.4, side: THREE.DoubleSide, depthWrite: false }),
     frame: new THREE.MeshStandardMaterial({ color: 0x9aa0a8, roughness: .35, metalness: .8, envMapIntensity: 1 }),
@@ -1458,7 +1461,7 @@ const st = { on: false, pos: V3(-24, 0, 0), yaw: -Math.PI / 2, pitch: -.05, fall
     leaf: new THREE.MeshStandardMaterial({ color: 0x3f6f3a, roughness: .8 }),
     pot: new THREE.MeshStandardMaterial({ color: 0xf1efea, roughness: .5 }),
   };
-  rocket.userData.mats.push(...Object.values(M)); // reflections of the sky, like the rocket
+  M.panel.envMapIntensity = .35; M.floor.envMapIntensity = .55; M.deck.envMapIntensity = .45; M.glass.envMapIntensity = .9; M.frame.envMapIntensity = .8;
   // box with UVs scaled to its real size, so textures keep the same scale everywhere
   const box = (w, h, d, mat, x, y, z, tile = 2.4, shadow = true) => {
     const g = new THREE.BoxGeometry(w, h, d); const uv = g.attributes.uv; const dims = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
@@ -1474,7 +1477,12 @@ const st = { on: false, pos: V3(-24, 0, 0), yaw: -Math.PI / 2, pitch: -.05, fall
     for (let x = -30; x <= 10; x += 4) box(.18, 3.2, .36, M.frame, x, 2.4, z); }
   box(.3, 4.6, 14, M.panel, -30.15, 2.3, 0);
   for (const s of [-1, 1]) box(.3, 4.6, 5.5, M.panel, 10.15, 2.3, s * 4.25); box(.3, 1.6, 3, M.panel, 10.15, 3.8, 0);
-  for (const z of [-4, 0, 4]) box(36, .04, .22, M.light, -10, 4.58, z, 2.4, false);
+  for (let x = -27; x <= 7; x += 4.25) for (const z of [-3.6, 0, 3.6]) box(1.6, .03, .7, M.light, x, 4.59, z, 2.4, false);
+  // handrails under the windows, dark skirting, consoles with live screens on the end wall
+  for (const s of [-1, 1]) { const h = add(new THREE.CylinderGeometry(.03, .03, 40, 10), M.frame, -10, 1.05, s * 6.85); h.rotation.z = Math.PI / 2; for (let x = -29; x <= 9; x += 4) box(.04, .25, .12, M.frame, x, 1, s * 6.92); box(40, .12, .04, M.dark, -10, .06, s * 6.98); }
+  box(.6, .95, 6, M.panel, -29.6, .47, 0); box(.66, .05, 6.06, M.dark, -29.58, .97, 0);
+  stScreens.forEach(([w, h, x, y, z]) => { const c = document.createElement('canvas'); c.width = 1024; c.height = Math.round(1024 * h / w); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    const m = add(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, toneMapped: false }), x, y, z, false); m.rotation.y = Math.PI / 2; box(.08, h + .12, w + .12, M.dark, x - .05, y, z, 2.4, false); stScreenTex.push({ c, t }); });
   // living area: sofas facing the windows, a table, plants
   const sofa = (x, z, rot) => { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rot; stG.add(g);
     for (const [w, h, d, px, py, pz] of [[3, .45, 1, 0, .22, 0], [3, .55, .25, 0, .7, .45], [.25, .6, 1, -1.4, .3, 0], [.25, .6, 1, 1.4, .3, 0]]) { const m = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 3, .08), M.sofa); m.position.set(px, py, pz); m.castShadow = m.receiveShadow = true; g.add(m); } };
@@ -1510,6 +1518,38 @@ const st = { on: false, pos: V3(-24, 0, 0), yaw: -Math.PI / 2, pitch: -.05, fall
   for (const s of [-1, 1]) { const r = box(.1, 6, 10, M.panel, tx, trussY + 4.5, s * 10, 2.4); }
   box(.15, 3, .15, M.frame, -28, 6.2, -5); add(new THREE.SphereGeometry(.9, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), M.panel, -28, 7.7, -5).rotation.x = Math.PI;
 }
+/* ---------- your body, seen in first person (look down: chest, arms, legs, feet) ---------- */
+const stBody = new THREE.Group(); stScene.add(stBody);
+const SB = (() => {
+  const suitTex = canvasTex(256, 256, (g, w) => { g.fillStyle = '#6d7684'; g.fillRect(0, 0, w, w); for (let i = 0; i < 1800; i++) { const v = Math.random() < .5 ? 0 : 255; g.fillStyle = `rgba(${v},${v},${v},${Math.random() * .06})`; g.fillRect(Math.random() * w, Math.random() * w, 1, 1 + Math.random() * 4); } });
+  suitTex.wrapS = suitTex.wrapT = THREE.RepeatWrapping; suitTex.repeat.set(3, 3);
+  const suit = new THREE.MeshStandardMaterial({ map: suitTex, roughness: .9, envMapIntensity: .4 }), seam = new THREE.MeshStandardMaterial({ color: 0x2b3038, roughness: .8 });
+  const shoe = new THREE.MeshStandardMaterial({ color: 0xeeeeea, roughness: .55, envMapIntensity: .5 }), sole = new THREE.MeshStandardMaterial({ color: 0x9a9a96, roughness: .8 });
+  const glove = new THREE.MeshStandardMaterial({ color: 0xd8d8d2, roughness: .7, envMapIntensity: .4 }), patch = new THREE.MeshStandardMaterial({ color: 0x1f5fa8, roughness: .7 });
+  const cap = (r, l) => new THREE.CapsuleGeometry(r, l, 6, 16);
+  const mk = (geo, mat, x, y, z, parent) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; parent.add(m); return m; };
+  const root = new THREE.Group(); root.position.z = .26; stBody.add(root); // the body sits a little behind the eye, so looking down shows it
+  const torso = new THREE.Group(); root.add(torso);
+  mk(cap(.17, .3), suit, 0, 1.25, 0, torso).scale.set(1.15, 1, .72); mk(cap(.15, .1), suit, 0, .96, 0, torso).scale.set(1.15, 1, .78);
+  mk(new THREE.BoxGeometry(.012, .42, .02), seam, 0, 1.2, -.125, torso); // zip
+  mk(new THREE.CircleGeometry(.045, 20), patch, -.1, 1.36, -.128, torso).rotation.y = Math.PI;
+  const limb = (px, py, r1, l1, r2, l2, endGeo, endMat, endY, endZ) => {
+    const a = new THREE.Group(); a.position.set(px, py, 0); torso.add(a); mk(cap(r1, l1), suit, 0, -l1 / 2 - r1 * .5, 0, a);
+    const b = new THREE.Group(); b.position.y = -l1 - r1 * .9; a.add(b); mk(cap(r2, l2), suit, 0, -l2 / 2 - r2 * .5, 0, b);
+    const e = mk(endGeo, endMat, 0, endY, endZ, b); return { a, b, e }; };
+  const legs = [-1, 1].map(s => { const L = limb(s * .1, .9, .075, .34, .062, .34, new RoundedBoxGeometry(.11, .085, .27, 3, .03), shoe, -.46, -.06); mk(new THREE.BoxGeometry(.112, .02, .275), sole, 0, -.045, 0, L.e); return L; });
+  const arms = [-1, 1].map(s => limb(s * .23, 1.43, .056, .25, .049, .23, new RoundedBoxGeometry(.075, .11, .04, 3, .018), glove, -.36, 0));
+  return { root, torso, legs, arms };
+})();
+function poseBody(dt, moving) {
+  const ph = st.walk, w = moving ? 1 : 0; SB.k = (SB.k || 0) + (w - (SB.k || 0)) * Math.min(1, dt * 8); const k = SB.k;
+  const fall = st.fall ? Math.min(1, st.fallT / 1.5) : 0;
+  SB.legs.forEach((L, i) => { const s = i ? -1 : 1, sw = Math.sin(ph + (i ? Math.PI : 0));
+    L.a.rotation.x = sw * .42 * k * (1 - fall) - .25 * fall; L.a.rotation.z = s * -.35 * fall; L.b.rotation.x = -(Math.max(0, -Math.sin(ph + (i ? Math.PI : 0) - .6)) * .7 * k * (1 - fall) + .5 * fall); });
+  SB.arms.forEach((A, i) => { const s = i ? -1 : 1, sw = Math.sin(ph + (i ? 0 : Math.PI));
+    A.a.rotation.x = sw * .32 * k * (1 - fall) + .05 + .25 * fall; A.a.rotation.z = -s * (.08 + 1.15 * fall); A.b.rotation.x = .25 + .2 * k * (1 - fall) + .2 * fall; });
+  SB.torso.position.y = Math.abs(Math.sin(ph)) * .02 * k;
+}
 // walkable floor plan (metres): hall, doors, dome, deck, board
 const stRects = [[-29.4, 9.4, -6.6, 6.6], [9, 11.2, -1.4, 1.4], [22.8, 25, -1.4, 1.4], [24.6, 41.6, -7.6, 7.6], [41.4, 50.2, -.48, .48]];
 const stIn = (x, z) => stRects.some(([x0, x1, z0, z1]) => x >= x0 && x <= x1 && z >= z0 && z <= z1) || Math.hypot(x - 17, z) < 6.5;
@@ -1527,6 +1567,20 @@ function stOrbit(dt) {
 }
 const joy = { id: null, x0: 0, y0: 0, x: 0, y: 0 }, look = { id: null, x: 0, y: 0 };
 const joyEl = document.getElementById('joy'), joyKnob = joyEl.querySelector('i'), plasmaEl = document.getElementById('plasma'), stEndEl = document.getElementById('stEnd');
+let stScreenT = 0;
+function drawScreens() {
+  const [la, lo] = latLonOf(earth, st.w), altKm = (st.w.distanceTo(earth.wpos) - EARTH_R) * 1000;
+  { const { c, t } = stScreenTex[0], g = c.getContext('2d'), W = c.width, H = c.height; g.fillStyle = '#050a12'; g.fillRect(0, 0, W, H);
+    const im = eLo.map.image; if (im) { g.globalAlpha = .85; g.drawImage(im, 20, 60, W - 40, (W - 40) / 2); g.globalAlpha = 1; }
+    const x = 20 + (lo + 180) / 360 * (W - 40), y = 60 + (90 - la) / 180 * (W - 40) / 2;
+    g.strokeStyle = 'rgba(255,190,90,.9)'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, 12, 0, 7); g.stroke(); g.fillStyle = '#ffbe5a'; g.beginPath(); g.arc(x, y, 4, 0, 7); g.fill();
+    g.fillStyle = 'rgba(220,230,245,.85)'; g.font = '300 26px Inter, sans-serif'; g.fillText('POSIÇÃO DA ESTAÇÃO', 22, 40); t.needsUpdate = true; }
+  { const { c, t } = stScreenTex[1], g = c.getContext('2d'), W = c.width, H = c.height; g.fillStyle = '#050a12'; g.fillRect(0, 0, W, H);
+    g.fillStyle = 'rgba(220,230,245,.85)'; g.font = '300 26px Inter, sans-serif'; g.fillText('ÓRBITA', 22, 40);
+    const rows = [['altitude', nf(altKm, 0) + ' km'], ['latitude', Math.abs(la).toFixed(2) + '° ' + (la < 0 ? 'S' : 'N')], ['longitude', Math.abs(lo).toFixed(2) + '° ' + (lo < 0 ? 'O' : 'L')], ['inclinação', '51,6°'], ['volta completa', '8 min']];
+    rows.forEach(([a, b], i) => { g.fillStyle = 'rgba(180,195,215,.6)'; g.font = '300 30px Inter, sans-serif'; g.fillText(a, 40, 120 + i * 92); g.fillStyle = '#f2f5fa'; g.font = '400 52px Inter, sans-serif'; g.fillText(b, 420, 128 + i * 92); });
+    t.needsUpdate = true; }
+}
 function enterStation() {
   st.on = true; st.fall = false; st.ended = false; st.fallT = 0; st.v = 0; st.pos.set(-27.5, 0, 0); st.yaw = -Math.PI / 2; st.pitch = -.05;
   const { p1, p2 } = stOrbit(0); const sd = earth.wpos.clone().negate().normalize(); st.theta = Math.atan2(sd.dot(p2), sd.dot(p1)) - .9; stOrbit(0); // start in daylight, sunrise ahead
@@ -1551,6 +1605,9 @@ function updateStation(dt) {
     st.fallT += dt; const t = st.fallT; st.v = Math.min(15000, 9.8 * t * (1 + t * t * .35));
     st.pos.y -= st.v * dt; st.pos.x += Math.max(0, 1.5 - t * .5) * dt; st.pitch += (-1.05 - st.pitch) * Math.min(1, dt * .5) * (look.id === null ? 1 : 0);
   }
+  // the body follows the feet and turns with the head's yaw only
+  stBody.position.copy(st.pos); stBody.rotation.set(0, st.yaw, 0); poseBody(dt, !st.fall && (joy.id !== null || keys['w'] || keys['s'] || keys['a'] || keys['d'] || keys['ArrowUp'] || keys['ArrowDown']));
+  stScreenT -= dt; if (stScreenT <= 0) { stScreenT = 1; drawScreens(); }
   // camera: same eye in the station scene (metres) and in the solar system (1000 km units)
   const bob = st.fall ? 0 : Math.sin(st.walk) * .028;
   const eye = V3(st.pos.x, st.pos.y + 1.65 + bob, st.pos.z);
