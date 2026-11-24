@@ -211,7 +211,7 @@ const hiLoader = new THREE.TextureLoader();
 const skyTex = tex('sky_milky_way_4k.jpg'); // used only for reflections on the rocket
 function skyTile(f) { const t = tex(f); t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; return t; }
 const skyMat = new THREE.ShaderMaterial({
-  uniforms: { uSkyA: { value: skyTile('sky8k_a.jpg') }, uSkyB: { value: skyTile('sky8k_b.jpg') }, uFade: { value: 1 } },
+  uniforms: { uSkyA: { value: skyTile('sky2k_a.jpg') }, uSkyB: { value: skyTile('sky2k_b.jpg') }, uFade: { value: 1 } }, // light sky first, the sharp one swaps in after the start
   vertexShader: LD_V + `varying vec3 vW; void main(){ vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w;` + LD_VE + `}`,
   fragmentShader: LD_F + `
   uniform sampler2D uSkyA,uSkyB; uniform float uFade; varying vec3 vW;
@@ -1442,7 +1442,7 @@ function frame() {
   { const sat = bodyByName['Saturno']; satU.uC.value.copy(sat.wpos); satU.uN.value.set(0, 1, 0).transformDirection(sat.tilt.matrixWorld);
     const hgt = Math.abs(V3().subVectors(camera.position, sat.wpos).dot(satU.uN.value)); ringMat.uniforms.uFadeNear.value = .08 + .92 * smooth(.003, .6, hgt); }
   updateLabels(dt, camDist);
-  composer.render();
+  if (bhPass.enabled) composer.render(); else directRender();
   // adapt resolution on slow devices
   // keep the native resolution while the phone keeps up; step down a little only if it doesn't
   if (started && simT > 6) { perfN++; perfT += rawDt; if (perfN >= 150) { const avg = perfT / perfN; perfN = 0; perfT = 0; let nd = DPR;
@@ -1450,7 +1450,15 @@ function frame() {
     if (nd !== DPR && simT - (window.__lastRes || 0) > 6) { window.__lastRes = simT; DPR = nd; renderer.setPixelRatio(DPR); composer.setPixelRatio(DPR); onResize(); } } }
   bgStars.material.uniforms.uDpr.value = constStars.material.uniforms.uDpr.value = DPR;
 }
-manager.onLoad = () => {
+function sharpSky() { for (const [k, f] of [['uSkyA', 'sky8k_a.jpg'], ['uSkyB', 'sky8k_b.jpg']]) hiLoader.load('tex/' + f, t => { t.colorSpace = THREE.SRGBColorSpace; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; const old = skyMat.uniforms[k].value; skyMat.uniforms[k].value = t; old.dispose(); }); }
+// clean direct drawing (like NASA's Eyes): no full-screen effects unless the black hole lens is on screen
+function directRender() {
+  renderer.setRenderTarget(null); renderer.autoClear = false; renderer.clear();
+  renderer.render(farScene, farCam); renderer.clearDepth(); renderer.render(scene, camera);
+  if (rocketPass.enabled) { renderer.clearDepth(); renderer.render(rocketScene, rocketCam); }
+  renderer.autoClear = true;
+}
+manager.onLoad = () => { if (!started) setTimeout(sharpSky, 4000);
   if (started) return; started = true;
   refreshWpos();
   camera.position.copy(eclToWorld(-3.2e5, 1.5e5, 4.6e5)); camera.lookAt(0, 0, 0); camera.up.copy(ECL_N);
