@@ -39,11 +39,21 @@ const DB = (() => {
   }
   const wrap = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
 
-  async function put(store, obj) {
-    obj.updatedAt = Date.now();
+  const hook = { change: null };
+  async function putRaw(store, obj) {
     if (memory) { memory[store].set(obj.id, structuredClone(obj)); return obj; }
     await tx(store, 'readwrite', st => st.put(obj));
     return obj;
+  }
+  async function put(store, obj) {
+    obj.updatedAt = Date.now();
+    await putRaw(store, obj);
+    hook.change?.(store, obj.id, false);
+    return obj;
+  }
+  async function delRaw(store, id) {
+    if (memory) { memory[store].delete(id); return; }
+    await tx(store, 'readwrite', st => st.delete(id));
   }
   async function get(store, id) {
     if (memory) return structuredClone(memory[store].get(id));
@@ -60,10 +70,7 @@ const DB = (() => {
     const d = await open();
     return wrap(d.transaction(store).objectStore(store).index('bookId').getAll(bookId));
   }
-  async function del(store, id) {
-    if (memory) { memory[store].delete(id); return; }
-    await tx(store, 'readwrite', st => st.delete(id));
-  }
+  async function del(store, id) { await delRaw(store, id); hook.change?.(store, id, true); }
   async function clearBook(bookId) {
     for (const s of STORES) {
       if (s === 'books' || s === 'meta') continue;
@@ -82,11 +89,10 @@ const DB = (() => {
     for (const s of STORES) {
       if (replace) for (const o of await all(s)) await del(s, o.id);
       for (const o of (data[s] || [])) {
-        if (memory) memory[s].set(o.id, o);
-        else await tx(s, 'readwrite', st => st.put(o));
+        await put(s, o);
       }
     }
   }
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  return { open, put, get, all, byBook, del, clearBook, exportAll, importAll, uid };
+  return { open, put, putRaw, get, all, byBook, del, delRaw, clearBook, exportAll, importAll, uid, hook };
 })();

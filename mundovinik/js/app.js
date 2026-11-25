@@ -60,6 +60,7 @@ const App = {
     const s = await DB.get('meta', 'settings');
     this.settings = s || { id: 'settings', theme: '', lastBook: null };
     this.applyTheme();
+    document.body.dataset.skin = this.settings.skin || 'papel';
     $('#sidetile').innerHTML = azulejo('#fff', 52);
     this.books = (await DB.all('books')).sort((a, b) => (b.lastOpened || 0) - (a.lastOpened || 0));
     if (this.settings.lastBook) this.book = this.books.find(b => b.id === this.settings.lastBook) || null;
@@ -74,6 +75,7 @@ const App = {
     });
     addEventListener('beforeunload', () => { this.views[this.view]?.saveNow?.(); });
     if (!this.books.length) this.ensureDemo();
+    if (typeof Sync !== 'undefined') Sync.start();
   },
   async ensureDemo() { /* sem dados: a biblioteca mostra o convite para criar o primeiro livro */ },
   applyTheme() {
@@ -109,7 +111,7 @@ const App = {
   mark(msg) {
     const el = $('#savestate'); if (!el) return;
     const t = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    el.textContent = msg || 'Salvo neste aparelho às ' + t;
+    el.textContent = msg || (typeof Sync !== 'undefined' && Sync.ativo ? 'Salvo às ' + t + ' · sincronizando' : 'Salvo neste aparelho às ' + t);
   },
   toast(msg, ms = 2600) {
     const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;

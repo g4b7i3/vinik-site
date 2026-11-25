@@ -87,6 +87,7 @@ const Manuscrito = App.views.manuscrito = {
       <button class="btn sm" id="find">${ic('search')} Buscar</button>
       <button class="btn sm" id="imp">${ic('ul')} Importar</button>
       <button class="btn sm" id="exp">${ic('dl')} Exportar</button>
+      <button class="btn sm" id="furos">${ic('search')} Furos</button>
       <button class="btn pri sm" id="foc">${ic('focus')} Modo foco</button>`;
     v.style.overflow = 'hidden';
     v.innerHTML = `<div class="ms ${this.showAside ? '' : 'noaside'} nochaps" id="ms">
@@ -101,6 +102,7 @@ const Manuscrito = App.views.manuscrito = {
           <button class="iconbtn" id="cena" title="Quebra de cena">${ic('star')}</button>
           <button class="iconbtn hidefocus" id="noind" title="Parágrafo sem recuo (citação, carta)">${ic('quote')}</button>
           <button class="iconbtn hidefocus" id="fnote" title="Nota de rodapé">${ic('fn')}</button><span class="sep hidefocus"></span>
+          <button class="iconbtn" id="skin" title="Cenário do editor">${ic('img')}</button>
           <button class="btn sm ghost" id="fsm" title="Letra menor">A−</button><button class="btn sm ghost" id="fbg" title="Letra maior">A+</button>
           <span class="focusbar"><span class="sep"></span><span class="timer" id="timer"></span><button class="btn sm" id="sprint">${ic('clock')} Sprint</button><button class="btn sm" id="exitf">Sair do foco</button></span>
           <span class="count" id="count"></span>
@@ -119,7 +121,7 @@ const Manuscrito = App.views.manuscrito = {
   bind() {
     const ed = $('#ed');
     this.save = debounce(() => this.saveNow(), 900);
-    ed.addEventListener('input', e => { this.autoReplace(e); this.clearMarks(true); this.save(); this.liveCount(); });
+    ed.addEventListener('input', e => { this.lastInput = Date.now(); this.autoReplace(e); this.clearMarks(true); this.save(); this.liveCount(); });
     ed.addEventListener('paste', e => this.paste(e));
     ed.addEventListener('keydown', e => {
       if (e.key === 'Tab') { e.preventDefault(); document.execCommand('insertText', false, '— '); }
@@ -147,6 +149,8 @@ const Manuscrito = App.views.manuscrito = {
     $('#find').onclick = () => this.findReplace();
     $('#imp').onclick = () => this.importMore();
     $('#exp').onclick = () => Exporta.menu();
+    $('#furos').onclick = () => Claude.furos();
+    $('#skin').onclick = e => this.skinMenu(e.currentTarget);
   },
   async addChapter(after) {
     const n = this.chs.filter(c => c.type === 'capitulo').length + 1;
@@ -183,8 +187,9 @@ const Manuscrito = App.views.manuscrito = {
     });
   },
   load(c) {
+    if (this.cur !== c) this.rev = null;
     this.cur = c; App.book.lastChapter = c.id; DB.put('books', App.book);
-    $('#ctitle').value = c.title || '';
+    $('#ctitle').value = c.title || ''; this.savedTitle = c.title;
     $('#ed').innerHTML = c.html || '<p><br></p>';
     this.baseWords = c.words || 0;
     this.lastSnap = Date.now();
@@ -215,9 +220,9 @@ const Manuscrito = App.views.manuscrito = {
     const html = this.cleanHTML();
     const c = this.cur;
     const words = countWords(textOf(html));
-    if (html === c.html && c.title === (c._t ?? c.title) && words === c.words) { return; }
+    if (html === c.html && c.title === this.savedTitle && words === c.words) { return; }
     const delta = words - (c.words || 0);
-    c.html = html; c.words = words; c._t = c.title;
+    c.html = html; c.words = words; this.savedTitle = c.title;
     const save = { ...c }; delete save._t;
     await DB.put('chapters', save);
     if (delta > 0) await App.logWords(delta);
@@ -278,6 +283,17 @@ const Manuscrito = App.views.manuscrito = {
     $('#nok', m).onclick = () => { fn.dataset.note = $('#nt', m).value; m.close(); this.save(); };
     $('#nrm', m).onclick = () => { fn.remove(); this.renumberNotes(); m.close(); this.save(); };
   },
+  skinMenu(btn) {
+    $('.pop')?.remove();
+    const skins = [['papel', 'Papel', '#efede8', '#fffdf8'], ['sepia', 'Sépia', '#e6dcc4', '#f6eedb'], ['noite', 'Noite', '#0c111d', '#151c2e'], ['mar', 'Maré', '#1b6f86', '#fffdf8'], ['cosmos', 'Cosmos', '#090b1a', '#1a1d3a']];
+    const pop = document.createElement('div'); pop.className = 'pop'; pop.style.width = '260px';
+    const r = btn.getBoundingClientRect(), dr = $('#desk').getBoundingClientRect();
+    pop.style.left = Math.max(8, r.left - dr.left - 100) + 'px'; pop.style.top = (r.bottom - dr.top + $('#desk').scrollTop + 6) + 'px';
+    pop.innerHTML = `<b class="small">Cenário do editor</b><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px">${skins.map(([k, l, a, b]) => `<button data-sk="${k}" title="${l}" style="border:2px solid ${(App.settings.skin || 'papel') === k ? 'var(--cobalt)' : 'var(--line)'};border-radius:10px;padding:0;height:52px;background:linear-gradient(135deg,${a} 50%,${b} 50%)"></button>`).join('')}</div><div class="row small muted" style="justify-content:space-between;margin-top:6px">${skins.map(s => `<span>${s[1]}</span>`).join('')}</div>`;
+    $('#desk').style.position = 'relative'; $('#desk').appendChild(pop);
+    $$('[data-sk]', pop).forEach(b => b.onclick = () => { App.settings.skin = b.dataset.sk; document.body.dataset.skin = b.dataset.sk; App.saveSettings(); pop.remove(); });
+    setTimeout(() => addEventListener('mousedown', function f(e) { if (!pop.contains(e.target)) { pop.remove(); removeEventListener('mousedown', f); } }), 10);
+  },
   toggleFocus(on) {
     document.body.classList.toggle('focus', on);
     if (on) { try { document.documentElement.requestFullscreen?.().catch(() => { }); } catch (e) { } $('#ed')?.focus(); }
@@ -302,7 +318,7 @@ const Manuscrito = App.views.manuscrito = {
   /* painel lateral */
   async renderAside() {
     if (!this.showAside || !$('#aside')) return;
-    const tabs = [['notas', 'Capítulo'], ['fichas', 'Fichas'], ['rep', 'Repetições'], ['versoes', 'Versões']];
+    const tabs = [['notas', 'Capítulo'], ['fichas', 'Fichas'], ['rep', 'Repetições'], ['rev', 'Revisão'], ['versoes', 'Versões']];
     $('#aside').innerHTML = `<div class="tabs">${tabs.map(([k, l]) => `<button data-t="${k}" class="${this.asideTab === k ? 'on' : ''}">${l}</button>`).join('')}<button class="iconbtn mobonly" id="asx">${ic('x')}</button></div><div class="body" id="abody"></div>`;
     $$('#aside [data-t]').forEach(b => b.onclick = () => { this.asideTab = b.dataset.t; this.clearMarks(); this.renderAside(); });
     $('#asx') && ($('#asx').onclick = () => $('#asidetog').click());
@@ -311,6 +327,7 @@ const Manuscrito = App.views.manuscrito = {
     if (this.asideTab === 'fichas') await this.asideFichas(body);
     if (this.asideTab === 'rep') this.asideRep(body);
     if (this.asideTab === 'versoes') await this.asideVersoes(body);
+    if (this.asideTab === 'rev') Claude.abaRevisao(body);
   },
   asideNotas(body) {
     const c = this.cur;
@@ -417,8 +434,12 @@ const Manuscrito = App.views.manuscrito = {
     return $$('#ed mark').length;
   },
   clearMarks(fromInput) {
-    const ms = $$('#ed mark'); if (!ms.length) return;
-    if (fromInput) { const s = getSelection(); const inMark = s.anchorNode && s.anchorNode.parentElement?.closest('mark'); if (!inMark) return; }
+    let ms = $$('#ed mark'); if (!ms.length) return;
+    if (fromInput) {
+      const s = getSelection(); const inMark = s.anchorNode && s.anchorNode.parentElement?.closest('mark'); if (!inMark) return;
+      if (inMark.classList.contains('rev')) { inMark.replaceWith(...inMark.childNodes); $('#ed').normalize(); return; }
+      ms = ms.filter(m => !m.classList.contains('rev'));
+    }
     ms.forEach(m => m.replaceWith(...m.childNodes)); $('#ed').normalize();
   },
   async asideVersoes(body) {
