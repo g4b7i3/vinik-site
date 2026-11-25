@@ -48,6 +48,7 @@ App.views.biblioteca = {
           <div class="stat"><b>${books.length}</b><span>${books.length === 1 ? 'livro' : 'livros'} na biblioteca</span></div>
         </div>
       </div>
+      ${last ? '<div id="trilhaBox" style="margin-bottom:8px"></div>' : ''}
       <div class="sectitle"><h2>Livros</h2><span class="muted small">Toque na capa para abrir</span></div>
       <div class="books">
         ${books.map(b => {
@@ -62,6 +63,7 @@ App.views.biblioteca = {
       </div>
     </div>`;
     $('#nb2').onclick = () => this.editBook();
+    if ($('#trilhaBox')) TRILHA.cartao($('#trilhaBox'));
     $('#cont') && ($('#cont').onclick = () => App.openBook(last.id));
     $('#first') && ($('#first').onclick = () => this.editBook());
     $$('[data-open]').forEach(b => b.onclick = () => App.openBook(b.dataset.open));
@@ -86,9 +88,10 @@ App.views.biblioteca = {
         <label class="f">Meta de palavras<input type="number" id="bm" min="0" step="1000" value="${b.goalWords || ''}"></label>
         <label class="f">Data de entrega<input type="date" id="bd" value="${esc(b.deadline || '')}"></label>
       </div>
-      ${isNew ? `<div class="drop-zone" id="dz">Já começou no Word? Solte aqui um <b>.docx</b> ou <b>.txt</b>, ou <button class="btn sm" id="dzb">escolha o arquivo</button>. Os capítulos são separados sozinhos.</div><div id="dzinfo" class="small muted"></div>` : ''}
+      ${isNew ? `<p class="small muted" style="margin:0">Ainda sem ideia? <button class="btn sm ghost" id="bideia">Abrir o gerador de ideias</button></p><div class="drop-zone" id="dz">Já começou no Word? Solte aqui um <b>.docx</b> ou <b>.txt</b>, ou <button class="btn sm" id="dzb">escolha o arquivo</button>. Os capítulos são separados sozinhos.</div><div id="dzinfo" class="small muted"></div>` : ''}
       <div class="acts">${isNew ? '' : '<button class="btn danger" id="bdel" style="margin-right:auto">Excluir livro</button>'}<button class="btn" data-close>Cancelar</button><button class="btn pri" id="bok">${isNew ? 'Criar livro' : 'Salvar'}</button></div>`);
     let imported = null;
+    $('#bideia', m) && ($('#bideia', m).onclick = () => { m.close(); App.go('ideias'); });
     const refreshCover = () => { $('#cvbtn', m).innerHTML = coverHTML({ ...b, title: $('#bt', m).value || 'Título', author: $('#ba', m).value }); };
     $('#bt', m).oninput = refreshCover; $('#ba', m).oninput = refreshCover;
     $$('[data-c]', m).forEach(x => x.onclick = () => { b.color = x.dataset.c; $$('[data-c]', m).forEach(y => y.style.borderColor = y === x ? 'var(--ink)' : 'transparent'); refreshCover(); });
@@ -127,7 +130,8 @@ App.views.biblioteca = {
         App.books.unshift(b);
         const chs = imported && imported.length ? imported : [{ title: 'Capítulo 1', html: '<p><br></p>', words: 0 }];
         for (let i = 0; i < chs.length; i++) await DB.put('chapters', { id: DB.uid(), bookId: b.id, order: i, type: chs[i].type || 'capitulo', title: chs[i].title, html: chs[i].html, words: chs[i].words || 0, status: 'rascunho' });
-        m.close(); App.openBook(b.id);
+        m.close(); await App.openBook(b.id);
+        if (!(imported && imported.length)) setTimeout(() => TRILHA.premissa(), 300);
       } else {
         const i = App.books.findIndex(x => x.id === b.id); App.books[i] = b;
         if (App.book?.id === b.id) App.book = b;

@@ -339,7 +339,7 @@ const Manuscrito = App.views.manuscrito = {
     if (this.asideTab === 'rep') this.asideRep(body);
     if (this.asideTab === 'versoes') await this.asideVersoes(body);
     if (this.asideTab === 'rev') Claude.abaRevisao(body);
-    if (this.asideTab === 'norte') await NorteUI.painel(body);
+    if (this.asideTab === 'norte') { await NorteUI.painel(body); const t = document.createElement('div'); body.prepend(t); TRILHA.cartao(t, true); }
   },
   asideNotas(body) {
     const c = this.cur;

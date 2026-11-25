@@ -296,7 +296,7 @@ const Diagramacao = App.views.diagramacao = {
     $$('#printroot .pg').forEach(p => { p.style.boxShadow = 'none'; p.style.transform = 'none'; });
     setTimeout(() => { try { window.print(); } catch (e) { App.toast('A impressão foi bloqueada aqui; abra pelo seu site.'); } }, 120);
   },
-  printMiolo() { if (!this.pages.length) return App.toast('Espere o miolo terminar de calcular'); this.printDialog(() => this.printPages(this.pages.map(p => p.el), this.result.w, this.result.h)); },
+  printMiolo() { if (!this.pages.length) return App.toast('Espere o miolo terminar de calcular'); App.book.publicado = true; App.saveBook(); this.printDialog(() => this.printPages(this.pages.map(p => p.el), this.result.w, this.result.h)); },
 
   /* capa */
   C() { const L = this.L(); const C = L.cover || (L.cover = {}); const d = { back: '', bg: '#16307a', ink: '#ffffff', spineText: true, guides: true, backImg: '' }; for (const k in d) if (!(k in C)) C[k] = d[k]; return C; },

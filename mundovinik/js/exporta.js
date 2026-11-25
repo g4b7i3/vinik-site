@@ -99,7 +99,7 @@ const Exporta = {
   },
   async epub() {
     const b = App.book, L = Diagramacao.L(), E = b.ebook || {}; const chs = await this.data();
-    App.toast('Montando o EPUB…');
+    App.toast('Montando o EPUB…'); b.publicado = true;
     const X = this.x; const uid = 'urn:uuid:' + (b.epubId || (b.epubId = crypto.randomUUID?.() || DB.uid())); await App.saveBook();
     const page = (title, body, type = '') => `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="pt-BR" lang="pt-BR"><head><meta charset="UTF-8"/><title>${X(title)}</title><link rel="stylesheet" type="text/css" href="style.css"/></head><body${type ? ` epub:type="${type}"` : ''}>${body}</body></html>`;
     const ser = new XMLSerializer();
