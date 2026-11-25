@@ -88,6 +88,7 @@ const Manuscrito = App.views.manuscrito = {
       <button class="btn sm" id="imp">${ic('ul')} Importar</button>
       <button class="btn sm" id="exp">${ic('dl')} Exportar</button>
       <button class="btn sm" id="furos">${ic('search')} Furos</button>
+      <button class="btn sm" id="esp" title="Abrir outra história ao lado para ler enquanto escreve">${ic('book')} Espelho</button>
       <button class="btn pri sm" id="foc">${ic('focus')} Modo foco</button>`;
     v.style.overflow = 'hidden';
     v.innerHTML = `<div class="ms ${this.showAside ? '' : 'noaside'} nochaps" id="ms">
@@ -109,7 +110,9 @@ const Manuscrito = App.views.manuscrito = {
           <span class="count" id="count"></span>
           <button class="iconbtn hidefocus" id="asidetog" title="Painel lateral">${ic('panel')}</button>
         </div>
+        <div class="duo"><div class="refpane" id="refpane" hidden></div><div class="sheetwrap">
         <div class="sheet"><input class="ctitle" id="ctitle" aria-label="Título do capítulo"><div class="editor" id="ed" contenteditable="true" spellcheck="true" lang="pt-BR"></div></div>
+        </div></div>
       </div>
       <aside class="aside" id="aside"></aside>
     </div>`;
@@ -118,6 +121,8 @@ const Manuscrito = App.views.manuscrito = {
     this.bind();
     this.renderList();
     this.load(this.cur);
+    $('#esp').onclick = () => Espelho.alternar();
+    Espelho.montar();
   },
   bind() {
     const ed = $('#ed');
@@ -138,7 +143,7 @@ const Manuscrito = App.views.manuscrito = {
     $('#cena').onmousedown = e => { e.preventDefault(); this.insertBlock('<p class="cena">* * *</p><p><br></p>'); };
     $('#noind').onmousedown = e => { e.preventDefault(); const p = this.curPara(); if (p) { p.classList.toggle('noind'); this.save(); } };
     $('#fnote').onmousedown = async e => { e.preventDefault(); const r = this.saveRange(); const t = await App.ask('Nota de rodapé', '', 'Texto da nota'); if (!t) return; this.restoreRange(r); document.execCommand('insertHTML', false, `<sup class="fnote" contenteditable="false" data-note="${esc(t)}">*</sup>`); this.renumberNotes(); this.save(); };
-    const setF = d => { const fs = Math.max(14, Math.min(28, (App.settings.edFont || 19) + d)); App.settings.edFont = fs; $('#ed').style.setProperty('--efs', fs + 'px'); App.saveSettings(); };
+    const setF = d => { const fs = Math.max(14, Math.min(28, (App.settings.edFont || 19) + d)); App.settings.edFont = fs; $('#ed').style.setProperty('--efs', fs + 'px'); $('.reftxt')?.style.setProperty('--efs', fs + 'px'); App.saveSettings(); };
     $('#fsm').onclick = () => setF(-1); $('#fbg').onclick = () => setF(1);
     $('#addch').onclick = async () => { await this.saveNow(); const c = await this.addChapter(this.cur); this.renderList(); this.load(c); $('#ctitle').select(); };
     $('#asidetog').onclick = () => { this.showAside = !this.showAside; $('#ms').classList.toggle('noaside', !this.showAside); if (this.showAside) this.renderAside(); };

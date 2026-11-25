@@ -118,6 +118,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--cobalt);outline:none}
 /* manuscrito */
 .ms{display:grid;grid-template-columns:250px minmax(0,1fr) 290px;height:100%}
 .ms.noaside{grid-template-columns:250px minmax(0,1fr)}
+.ms.noaside .aside{display:none}
 .chaps{border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;overflow:hidden}
 .chaps .hd{padding:14px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--line)}
 .chaps ol{list-style:none;margin:0;padding:6px;overflow:auto;flex:1}
@@ -293,7 +294,7 @@ body.focus .focusbar{display:flex}
   .top{padding:10px 14px}
   .lib-head{grid-template-columns:1fr}
   .books{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:16px}
-  .ms{grid-template-columns:1fr}
+  .ms,.ms.noaside{grid-template-columns:1fr}
   .ms .chaps{position:fixed;left:0;top:0;bottom:0;width:min(300px,86vw);z-index:40;box-shadow:20px 0 40px -20px rgba(0,0,0,.4)}
   .ms.nochaps .chaps{display:none}
   .sheet{width:100%;margin:0 0 60px;padding:32px 20px 60px;border-radius:0}
@@ -372,3 +373,44 @@ body[data-skin=noite] .editor mark.rep,body[data-skin=cosmos] .editor mark.rep{b
 .tlista li .btn{flex:none}
 @media(max-width:600px){.tlista li{flex-direction:column}}
 a.btn{text-decoration:none;color:inherit}
+
+/* Modo espelho */
+.duo{display:block}
+.refpane[hidden]{display:none!important}
+.desk.esp{overflow:hidden}
+.desk.esp .duo{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.desk.esp .sheetwrap{overflow:auto;min-height:0}
+.desk.esp .sheet{width:calc(100% - 32px);padding:48px clamp(20px,4vw,56px) 80px}
+.refpane{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:var(--panel)}
+.refhd{display:flex;gap:6px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}
+.refhd select{flex:1;min-width:0}
+.refbody{flex:1;overflow:auto;min-height:0}
+.reftxt{font-family:var(--serif);font-size:var(--efs,19px);line-height:1.7;color:var(--ink);padding:28px clamp(18px,3.5vw,44px) 90px;max-width:720px;margin:0 auto;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+.reftxt h2{font-weight:500;font-size:1.5em;text-align:center;margin:0 0 .8em}
+.reftxt h3{font-weight:500;font-size:1.15em;text-align:center;margin:2em 0 1em}
+.reftxt p{margin:0;text-indent:1.5em}
+.reftxt h2+p,.reftxt h3+p,.reftxt p.cena+p,.reftxt p.refnota+p{text-indent:0}
+.reftxt p.cena{text-align:center;text-indent:0;margin:1em 0;letter-spacing:.6em}
+.reftxt .refnota{font-family:var(--ui);font-size:13px;color:var(--mute);text-indent:0;text-align:left;margin-bottom:1.4em}
+.refvazio{padding:28px;max-width:460px;margin:0 auto}
+.refvazio h3{font-family:var(--disp);margin:0 0 8px}
+.refvazio p{color:var(--mute);line-height:1.55}
+.refopcoes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}
+.refopcoes .card,.reflivros .card{text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;font:inherit;color:inherit}
+.refopcoes .card:hover,.reflivros .card:hover{border-color:var(--cobalt)}
+.refopcoes .card b{display:flex;gap:8px;align-items:center}
+.refopcoes .card b svg{width:18px;height:18px;color:var(--cobalt)}
+.refopcoes .card span{font-size:13px;color:var(--mute);line-height:1.45}
+.reflivros{display:grid;gap:8px;margin:12px 0}
+.esptabs{display:flex;border-bottom:1px solid var(--line)}
+.esptabs button{flex:1;border:0;background:none;padding:10px;font-weight:500;color:var(--mute);border-bottom:2px solid transparent}
+.esptabs button.on{color:var(--cobalt);border-color:var(--cobalt)}
+.voltaref{position:fixed;right:14px;bottom:78px;z-index:30;box-shadow:0 8px 20px -8px rgba(0,0,0,.4)}
+@media(max-width:1100px){.desk.esp .sheet{width:100%;margin:0 0 60px;border-radius:0}}
+@media(max-width:780px){
+  .desk.esp .duo{grid-template-columns:1fr}
+  .desk.esp:not(.vermeu) .sheetwrap{display:none}
+  .desk.esp.vermeu .refpane{display:none}
+  .desk.esp:not(.vermeu) .tools{display:none}
+  .refopcoes{grid-template-columns:1fr}
+}

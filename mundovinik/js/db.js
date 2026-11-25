@@ -1,7 +1,7 @@
 /* Mundo Vinik — armazenamento local (IndexedDB), pronto para sincronizar depois */
 const DB = (() => {
-  const NAME = 'mundovinik', VER = 3;
-  const STORES = ['books', 'chapters', 'fichas', 'cards', 'links', 'scenes', 'snapshots', 'log', 'meta', 'ideias', 'ajustes'];
+  const NAME = 'mundovinik', VER = 4;
+  const STORES = ['books', 'chapters', 'fichas', 'cards', 'links', 'scenes', 'snapshots', 'log', 'meta', 'ideias', 'ajustes', 'referencias'];
   let dbp = null;
   let memory = null; // fallback se IndexedDB não existir
 

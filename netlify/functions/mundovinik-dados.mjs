@@ -5,7 +5,7 @@ import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
 
 const COOKIE = "mundo_chave";
-const TIPOS = ["books", "chapters", "fichas", "cards", "links", "scenes", "log", "ideias", "ajustes"];
+const TIPOS = ["books", "chapters", "fichas", "cards", "links", "scenes", "log", "ideias", "ajustes", "referencias"];
 const LIMITE = 5_500_000;
 const CHAVE = /^([a-z]+)\/([\w:.-]{1,80})$/;
 

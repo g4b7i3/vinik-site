@@ -25,3 +25,9 @@ Opcional: `CLAUDE_MODELO` troca o modelo (padrão `claude-sonnet-5-5`).
 - `mundovinik/js/norte.js` e `oficio.js`: sugestões de elenco, roteiro do personagem, estruturas, viradas, gêneros, técnicas e Salve o gato. As ideias são resumidas com palavras próprias e trazem a fonte (McKee, Truby, Vogler, Snyder, Othon M. Garcia e outros).
 - `mundovinik/js/ideias.js`: gerador de histórias (sorteio local ou com o Claude); ideias guardadas sincronizam entre aparelhos.
 - Banco de palavras: tirado do dicionário analógico do Vinik. **Não fica neste repositório** (é público). O arquivo `banco-palavras.json.gz` é carregado pelo app (Biblioteca → Banco de palavras) e guardado no Netlify Blobs, chave `banco`, atrás da senha.
+
+## Modo espelho (Manuscrito → Espelho)
+
+Abre uma história de referência ao lado do capítulo, só para leitura. No celular, alterna entre "Referência" e "Meu texto".
+A história pode vir do Claude (a partir de uma ideia, gênero e tamanho), de texto colado, de arquivo (.docx, .epub, .txt, .md) ou de outro livro seu do app.
+As referências ficam na gaveta "referencias" e sincronizam entre aparelhos; o lugar onde você parou de ler fica guardado em cada aparelho.
