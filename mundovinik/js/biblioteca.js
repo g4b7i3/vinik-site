@@ -7,7 +7,7 @@ App.views.biblioteca = {
       <button class="iconbtn" id="thm" title="Tema claro ou escuro">${ic('moon')}</button>
       <button class="btn sm" id="bkexp">${ic('dl')} Backup</button>
       <button class="btn sm" id="bkimp">${ic('ul')} Restaurar</button>
-      <button class="btn pri sm" id="nb">${ic('plus')} Novo livro</button>${Sync.ativo ? `<a class="btn sm ghost" href="sair" title="Sair deste aparelho">Sair</a>` : ''}`;
+      <button class="btn pri sm" id="nb">${ic('plus')} Novo livro</button>${location.pathname.startsWith("/mundovinik") ? `<a class="btn sm ghost" href="nova-senha.html">Trocar senha</a><a class="btn sm ghost" href="sair" title="Sair deste aparelho">Sair</a>` : ''}`;
     $('#nb').onclick = () => this.editBook();
     $('#bkexp').onclick = () => this.backup();
     $('#bkimp').onclick = () => this.restore();

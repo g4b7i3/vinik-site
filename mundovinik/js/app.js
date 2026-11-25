@@ -76,6 +76,7 @@ const App = {
     addEventListener('beforeunload', () => { this.views[this.view]?.saveNow?.(); });
     if (!this.books.length) this.ensureDemo();
     if (typeof Sync !== 'undefined') Sync.start();
+    if (location.search.includes('senha=ok')) { this.toast('Senha salva. Este aparelho fica liberado por 10 anos.', 4000); try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) { } }
   },
   async ensureDemo() { /* sem dados: a biblioteca mostra o convite para criar o primeiro livro */ },
   applyTheme() {

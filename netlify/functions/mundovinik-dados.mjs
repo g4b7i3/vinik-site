@@ -4,23 +4,23 @@
 import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
 
-const RESUMO = "6a0c1b45e2b2421b2acf13c5fe03d2c24cf3b521dfc8ace9717936d7e9682ea5";
 const COOKIE = "mundo_chave";
 const TIPOS = ["books", "chapters", "fichas", "cards", "links", "scenes", "log"];
 const LIMITE = 5_500_000;
 const CHAVE = /^([a-z]+)\/([\w:.-]{1,80})$/;
 
 const json = (d, status = 200) => new Response(JSON.stringify(d), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
-function autorizado(req) {
+async function autorizado(req, loja) {
   const m = (req.headers.get("cookie") || "").match(new RegExp("(?:^|;\\s*)" + COOKIE + "=([a-f0-9]{64})"));
-  return !!m && createHash("sha256").update(m[1]).digest("hex") === RESUMO;
+  const acesso = m && (await loja.get("acesso", { type: "json" }));
+  return !!acesso && createHash("sha256").update(m[1]).digest("hex") === acesso.resumo;
 }
 const valida = (k) => { const m = CHAVE.exec(String(k)); return m && TIPOS.includes(m[1]) ? m : null; };
 
 export default async (req) => {
-  if (!autorizado(req)) return json({ erro: "acesso restrito" }, 401);
-  const op = new URL(req.url).searchParams.get("op");
   const loja = getStore({ name: "mundovinik", consistency: "strong" });
+  if (!(await autorizado(req, loja))) return json({ erro: "acesso restrito" }, 401);
+  const op = new URL(req.url).searchParams.get("op");
 
   if (op === "indice" && req.method === "GET") {
     return json({ indice: (await loja.get("indice", { type: "json" })) || {} });

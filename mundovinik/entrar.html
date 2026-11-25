@@ -33,12 +33,13 @@
   <svg width="44" height="44" viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="6" fill="#2346a8"/><path d="M20 6c3 6 8 8 14 8-6 0-11 2-14 8-3-6-8-8-14-8 6 0 11-2 14-8zm0 16c3 6 8 8 14 8M20 22c-3 6-8 8-14 8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/></svg>
   <div><h1>Mundo Vinik</h1><p style="margin-top:8px">Seus livros, fichas e enredos. Digite a senha uma vez neste aparelho; ele lembra por 10 anos.</p></div>
   <form method="post" action="entrar">
-    <label for="senha">Senha (a mesma do Estúdio)</label>
+    <label for="senha">Senha</label>
     <input id="senha" name="senha" type="password" autocomplete="current-password" required autofocus>
     <input type="hidden" name="volta" id="volta" value="/mundovinik/">
     <div class="erro" id="erro" role="alert"></div>
     <button type="submit">Entrar</button>
   </form>
+  <p class="small" style="font-size:13px">Esqueceu a senha? Peça para o Claude apagar a senha guardada no site; o app volta a pedir uma senha nova.</p>
 </main>
 <script>
   const q = new URLSearchParams(location.search);
