@@ -34,7 +34,7 @@ const ICON = {
   link: '<path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/>',
   moon: '<path d="M20 14A8 8 0 0110 4a8 8 0 1010 10z"/>', book: '<path d="M4 4h7a3 3 0 013 3v13a2 2 0 00-2-2H4zM20 4h-6M20 4v14h-6"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
-  scene: '<path d="M4 6h16M4 6l2 4h12l2-4M6 10v9h12v-9"/>', fn: '<path d="M8 4h6M11 4v16M8 20h6M17 7h3"/>'
+  scene: '<path d="M4 6h16M4 6l2 4h12l2-4M6 10v9h12v-9"/>', spark: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>', lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>', dice: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r="1.2" fill="currentColor"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/>', fn: '<path d="M8 4h6M11 4v16M8 20h6M17 7h3"/>'
 };
 const ic = (n, cls = '') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n] || ''}</svg>`;
 
@@ -54,7 +54,7 @@ const App = {
   views: {},
   nav: [
     ['biblioteca', 'Biblioteca', 'lib'], ['manuscrito', 'Manuscrito', 'pen'], ['universo', 'Universo', 'globe'],
-    ['enredo', 'Enredo', 'web'], ['diagramacao', 'Diagramação', 'layout'], ['progresso', 'Progresso', 'chart']
+    ['enredo', 'Enredo', 'web'], ['diagramacao', 'Diagramação', 'layout'], ['ideias', 'Ideias', 'spark'], ['progresso', 'Progresso', 'chart']
   ],
   async start() {
     const s = await DB.get('meta', 'settings');
@@ -92,7 +92,7 @@ const App = {
   async go(v) {
     const cur = this.views[this.view];
     if (cur?.leave) await cur.leave();
-    if (v !== 'biblioteca' && v !== 'progresso' && !this.book) { this.toast('Crie ou abra um livro primeiro'); v = 'biblioteca'; }
+    if (v !== 'biblioteca' && v !== 'progresso' && v !== 'ideias' && !this.book) { this.toast('Crie ou abra um livro primeiro'); v = 'biblioteca'; }
     this.view = v;
     if (location.hash.slice(1) !== v) try { history.replaceState(null, '', '#' + v); } catch (e) { }
     document.body.classList.remove('focus');

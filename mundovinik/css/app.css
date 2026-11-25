@@ -324,3 +324,33 @@ body[data-skin=cosmos] .sheet .ctitle{color:#f0eefa}
 body[data-skin=noite] .editor mark.rep,body[data-skin=cosmos] .editor mark.rep{background:rgba(232,85,58,.3)}
 .aside .tabs{overflow-x:auto}.aside .tabs button{font-size:12.5px;padding:12px 8px;white-space:nowrap;flex:1 0 auto}
 @media(max-width:780px){.sheet .ctitle{font-size:23px}}
+
+/* Norte */
+.fonte{display:block;font-size:12px;color:var(--mute);margin-top:4px;font-style:italic}
+.fonte::before{content:'— '}
+.ncard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--panel2)}
+.ideias{white-space:pre-wrap;font-size:14px;line-height:1.5;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.chipon{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.gpick.on{border-color:var(--cobalt);background:var(--cobalt-l)}
+.sugbox{border:1px solid var(--cobalt);background:var(--cobalt-l);border-radius:14px;padding:14px 16px;margin-bottom:20px}
+.suggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:10px}
+.sug{background:var(--panel);border-radius:10px;padding:12px;border:1px solid var(--line)}
+.sug p{margin:4px 0 0;font-size:14px}
+.pcard.guia{border-style:dashed;border-top-style:solid;background:var(--panel2)}
+.pcard.guia .pb p{font-style:italic}
+.pcard.virada{box-shadow:0 0 0 2px var(--coral)}
+.fhint{font-size:12px;color:var(--mute);margin:-2px 0 4px;grid-column:1/-1}
+.perguntas{display:flex;flex-direction:column;gap:6px}
+.perguntas .q{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--panel2)}
+.aside{overflow:hidden}
+.aside .tabs{position:static;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;flex:none}
+.aside .tabs button{flex:none;padding:10px 4px;font-size:13px;border-bottom:2px solid transparent}
+.aside .tabs .iconbtn{grid-column:3;justify-self:end}
+.aside .body{overflow:auto;flex:1;min-height:0}
+
+/* Ideias */
+.ideiagrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.peca{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.peca textarea{border:0;background:none;padding:4px 0;min-height:52px;font-size:16px;resize:none}
+.peca.travada{border-color:var(--cobalt);background:var(--cobalt-l)}
+.peca.travada [data-trava]{color:var(--cobalt)}

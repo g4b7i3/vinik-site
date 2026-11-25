@@ -20,3 +20,8 @@ Opcional: `CLAUDE_MODELO` troca o modelo (padrão `claude-sonnet-5-5`).
 ## Trocar ou recuperar a senha
 - Trocar: Biblioteca → Trocar senha (pede a atual).
 - Esqueceu: apague a chave `acesso` da loja `mundovinik` no Netlify Blobs (painel da Netlify → Blobs, ou peça ao Claude). O app volta a abrir na tela de criar senha. Os livros não são apagados.
+
+## Norte, técnicas, ideias e banco de palavras
+- `mundovinik/js/norte.js` e `oficio.js`: sugestões de elenco, roteiro do personagem, estruturas, viradas, gêneros, técnicas e Salve o gato. As ideias são resumidas com palavras próprias e trazem a fonte (McKee, Truby, Vogler, Snyder, Othon M. Garcia e outros).
+- `mundovinik/js/ideias.js`: gerador de histórias (sorteio local ou com o Claude); ideias guardadas sincronizam entre aparelhos.
+- Banco de palavras: tirado do dicionário analógico do Vinik. **Não fica neste repositório** (é público). O arquivo `banco-palavras.json.gz` é carregado pelo app (Biblioteca → Banco de palavras) e guardado no Netlify Blobs, chave `banco`, atrás da senha.

@@ -5,7 +5,7 @@ import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
 
 const COOKIE = "mundo_chave";
-const TIPOS = ["books", "chapters", "fichas", "cards", "links", "scenes", "log"];
+const TIPOS = ["books", "chapters", "fichas", "cards", "links", "scenes", "log", "ideias"];
 const LIMITE = 5_500_000;
 const CHAVE = /^([a-z]+)\/([\w:.-]{1,80})$/;
 
@@ -56,6 +56,20 @@ export default async (req) => {
     }
     await loja.setJSON("indice", indice);
     return json({ ok: true, em: Date.now() });
+  }
+  // banco de palavras (tirado do dicionário analógico do Vinik; fica só aqui, atrás da senha)
+  if (op === "banco" && req.method === "GET") {
+    const dado = await loja.get("banco", { type: "arrayBuffer" });
+    if (!dado) return json({ erro: "sem banco" }, 404);
+    return new Response(dado, { headers: { "Content-Type": "application/gzip", "Cache-Control": "no-store" } });
+  }
+  if (op === "banco" && req.method === "PUT") {
+    const dado = await req.arrayBuffer();
+    if (dado.byteLength > LIMITE) return json({ erro: "grande demais" }, 413);
+    const b = new Uint8Array(dado);
+    if (b[0] !== 0x1f || b[1] !== 0x8b) return json({ erro: "precisa ser o arquivo .json.gz" }, 400);
+    await loja.set("banco", dado);
+    return json({ ok: true });
   }
   return json({ erro: "operação inválida" }, 400);
 };

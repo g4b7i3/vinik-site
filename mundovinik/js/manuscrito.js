@@ -76,7 +76,7 @@ const Importa = {
 };
 
 const Manuscrito = App.views.manuscrito = {
-  chs: [], cur: null, asideTab: 'notas', showAside: innerWidth > 1100, lastSnap: 0, sprint: null,
+  chs: [], cur: null, asideTab: 'norte', showAside: innerWidth > 1100, lastSnap: 0, sprint: null,
   async render(v, top) {
     if (innerWidth <= 1100) this.showAside = false;
     this.chs = await App.chapters();
@@ -101,7 +101,8 @@ const Manuscrito = App.views.manuscrito = {
           <button class="iconbtn" data-cmd="italic" title="Itálico (Ctrl+I)">${ic('ital')}</button>
           <button class="iconbtn" id="cena" title="Quebra de cena">${ic('star')}</button>
           <button class="iconbtn hidefocus" id="noind" title="Parágrafo sem recuo (citação, carta)">${ic('quote')}</button>
-          <button class="iconbtn hidefocus" id="fnote" title="Nota de rodapé">${ic('fn')}</button><span class="sep hidefocus"></span>
+          <button class="iconbtn hidefocus" id="fnote" title="Nota de rodapé">${ic('fn')}</button>
+          <button class="iconbtn" id="trocar" title="Trocar palavra (selecione a palavra)">${ic('book')}</button><span class="sep hidefocus"></span>
           <button class="iconbtn" id="skin" title="Cenário do editor">${ic('img')}</button>
           <button class="btn sm ghost" id="fsm" title="Letra menor">A−</button><button class="btn sm ghost" id="fbg" title="Letra maior">A+</button>
           <span class="focusbar"><span class="sep"></span><span class="timer" id="timer"></span><button class="btn sm" id="sprint">${ic('clock')} Sprint</button><button class="btn sm" id="exitf">Sair do foco</button></span>
@@ -130,7 +131,7 @@ const Manuscrito = App.views.manuscrito = {
       const fn = e.target.closest('.fnote');
       if (fn) this.editNote(fn);
       const mk = e.target.closest('mark.rep');
-      if (mk) this.synPop(mk);
+      if (mk) Banco.pop(mk, mk.textContent, t => { mk.replaceWith(document.createTextNode(t)); $('#ed').normalize(); this.save(); this.liveCount(); });
     });
     $('#ctitle').oninput = () => { this.cur.title = $('#ctitle').value; this.save(); this.renderList(); };
     $$('[data-cmd]').forEach(b => b.onmousedown = e => { e.preventDefault(); document.execCommand(b.dataset.cmd); this.save(); });
@@ -150,6 +151,16 @@ const Manuscrito = App.views.manuscrito = {
     $('#imp').onclick = () => this.importMore();
     $('#exp').onclick = () => Exporta.menu();
     $('#furos').onclick = () => Claude.furos();
+    $('#trocar').onmousedown = e => {
+      e.preventDefault();
+      const s = getSelection(); if (!s.rangeCount || !$('#ed').contains(s.anchorNode)) return App.toast('Selecione uma palavra no texto');
+      let r = s.getRangeAt(0);
+      if (r.collapsed) { s.modify?.('move', 'backward', 'word'); s.modify?.('extend', 'forward', 'word'); r = s.getRangeAt(0); }
+      const w = String(s).trim().replace(/[.,;:!?…"“”'’()\-—]+$/g, ''); if (!w || w.split(/\s+/).length > 3) return App.toast('Selecione uma palavra');
+      const rr = r.cloneRange(); const rect = rr.getBoundingClientRect();
+      const alvo = { getBoundingClientRect: () => rect };
+      Banco.pop(alvo, w, t => { const sel = getSelection(); sel.removeAllRanges(); sel.addRange(rr); document.execCommand('insertText', false, t + (String(rr).endsWith(' ') ? ' ' : '')); this.save(); });
+    };
     $('#skin').onclick = e => this.skinMenu(e.currentTarget);
   },
   async addChapter(after) {
@@ -318,7 +329,7 @@ const Manuscrito = App.views.manuscrito = {
   /* painel lateral */
   async renderAside() {
     if (!this.showAside || !$('#aside')) return;
-    const tabs = [['notas', 'Capítulo'], ['fichas', 'Fichas'], ['rep', 'Repetições'], ['rev', 'Revisão'], ['versoes', 'Versões']];
+    const tabs = [['norte', 'Norte'], ['notas', 'Capítulo'], ['fichas', 'Fichas'], ['rep', 'Palavras'], ['rev', 'Revisão'], ['versoes', 'Versões']];
     $('#aside').innerHTML = `<div class="tabs">${tabs.map(([k, l]) => `<button data-t="${k}" class="${this.asideTab === k ? 'on' : ''}">${l}</button>`).join('')}<button class="iconbtn mobonly" id="asx">${ic('x')}</button></div><div class="body" id="abody"></div>`;
     $$('#aside [data-t]').forEach(b => b.onclick = () => { this.asideTab = b.dataset.t; this.clearMarks(); this.renderAside(); });
     $('#asx') && ($('#asx').onclick = () => $('#asidetog').click());
@@ -328,6 +339,7 @@ const Manuscrito = App.views.manuscrito = {
     if (this.asideTab === 'rep') this.asideRep(body);
     if (this.asideTab === 'versoes') await this.asideVersoes(body);
     if (this.asideTab === 'rev') Claude.abaRevisao(body);
+    if (this.asideTab === 'norte') await NorteUI.painel(body);
   },
   asideNotas(body) {
     const c = this.cur;
@@ -335,10 +347,14 @@ const Manuscrito = App.views.manuscrito = {
       <label class="f">Estado<select id="cstat">${['rascunho', 'pronto', 'revisado'].map(s => `<option ${c.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></label></div>
       <label class="f">Sinopse do capítulo<textarea id="csyn" placeholder="O que acontece aqui, em duas linhas">${esc(c.synopsis || '')}</textarea></label>
       <div class="grid2"><label class="f">Ponto de vista<input type="text" id="cpov" value="${esc(c.pov || '')}"></label><label class="f">Cenário<input type="text" id="cset" value="${esc(c.setting || '')}"></label></div>
+      <div class="ncard"><b class="small">Bússola da cena</b>
+        <label class="f" style="margin-top:6px">O que o personagem quer nesta cena<input type="text" id="cquer" value="${esc(c.cenaQuer || '')}" placeholder="um objetivo que dá para ver"></label>
+        <label class="f">O que muda até o fim<input type="text" id="cvira" value="${esc(c.cenaVira || '')}" placeholder="de confiança para suspeita, de vivo para morto…"></label>
+        <span class="fonte">Cena: objetivo, conflito, desastre (Swain). Toda cena vira um valor (McKee, Story: "Design de cena").</span></div>
       <label class="f">Notas do autor<textarea id="cnot" style="min-height:120px">${esc(c.notes || '')}</textarea></label>
       <div class="row"><button class="btn sm" id="cup">${ic('up')} Subir</button><button class="btn sm" id="cdn">${ic('down')} Descer</button><button class="btn sm" id="cdup">Duplicar</button><button class="btn sm danger" id="cdel">${ic('trash')} Excluir</button></div>
       <p class="small muted">Prólogo, epílogo, interlúdio e extras não entram na numeração dos capítulos. Atalhos: “--” vira travessão, “- ” no começo do parágrafo vira travessão de fala, Tab insere travessão, “...” vira reticências.</p>`;
-    const upd = debounce(async () => { c.type = $('#ctype').value; c.status = $('#cstat').value; c.synopsis = $('#csyn').value; c.pov = $('#cpov').value; c.setting = $('#cset').value; c.notes = $('#cnot').value; const s = { ...c }; delete s._t; await DB.put('chapters', s); this.renderList(); App.mark(); }, 500);
+    const upd = debounce(async () => { c.type = $('#ctype').value; c.status = $('#cstat').value; c.synopsis = $('#csyn').value; c.pov = $('#cpov').value; c.setting = $('#cset').value; c.cenaQuer = $('#cquer').value; c.cenaVira = $('#cvira').value; c.notes = $('#cnot').value; const s = { ...c }; delete s._t; await DB.put('chapters', s); this.renderList(); App.mark(); }, 500);
     $$('#abody select,#abody input,#abody textarea').forEach(el => el.oninput = el.onchange = upd);
     const move = async d => { const i = this.chs.indexOf(c), j = i + d; if (j < 0 || j >= this.chs.length) return; [this.chs[i], this.chs[j]] = [this.chs[j], this.chs[i]]; this.chs.forEach((x, k) => x.order = k); for (const x of this.chs) await DB.put('chapters', x); this.renderList(); };
     $('#cup').onclick = () => move(-1); $('#cdn').onclick = () => move(1);
@@ -383,7 +399,9 @@ const Manuscrito = App.views.manuscrito = {
     const low = text.toLowerCase();
     const mul = MULETAS.map(w => ({ w, total: (low.match(new RegExp('(?<![\\p{L}])' + w + '(?![\\p{L}])', 'gu')) || []).length })).filter(x => x.total);
     const mente = toks.filter(w => w.length > 6 && w.endsWith('mente') && !['mente', 'semente', 'demente', 'clemente'].includes(w));
-    return { near: near.slice(0, 25), freq, mul, mente, total: toks.length };
+    const vc = {}; toks.forEach(w => { if (OFICIO.VAGAS[w]) vc[w] = (vc[w] || 0) + 1; });
+    const vagas = Object.entries(vc).map(([w, total]) => ({ w, total })).sort((a, b) => b.total - a.total);
+    return { near: near.slice(0, 25), freq, mul, mente, vagas, total: toks.length };
   },
   synOf(w) { return SINONIMOS[w.toLowerCase()] || null; },
   synPop(mk) {
@@ -414,10 +432,13 @@ const Manuscrito = App.views.manuscrito = {
       ${a.mul.length ? `<b class="small">Muletas</b><div class="replist">${list(a.mul)}</div>` : ''}
       <div class="chip">Advérbios em -mente: <b>${a.mente.length}</b>${a.total ? ' · 1 a cada ' + Math.round(a.total / Math.max(1, a.mente.length)) + ' palavras' : ''}</div>
       ${a.mente.length ? `<div class="replist">${list([...new Set(a.mente)].map(w => ({ w, total: a.mente.filter(x => x === w).length })))}</div>` : ''}
+      ${a.vagas.length ? `<b class="small">Palavras gerais</b><p class="small muted" style="margin:0">Dê nome aos bois: a palavra específica é mais concreta e precisa que a geral. Toque numa marcação no texto para ver trocas do seu banco.<span class="fonte">Othon M. Garcia, Comunicação em prosa moderna</span></p><div class="replist">${list(a.vagas)}</div>` : ''}
       <b class="small">Mais usadas no capítulo</b><div class="replist">${list(a.freq)}</div>
+      <button class="btn sm" id="bancoBt">${ic('book')} ${Banco.dados ? 'Banco de palavras carregado' : 'Carregar banco de palavras'}</button>
       <button class="btn sm" id="clr">Limpar marcações</button>`;
     $$('#abody [data-w]').forEach(b => b.onclick = () => { $$('#abody [data-w]').forEach(x => x.classList.toggle('on', x === b)); this.highlight(b.dataset.w); });
     $('#clr').onclick = () => { this.clearMarks(); $$('#abody [data-w]').forEach(x => x.classList.remove('on')); };
+    $('#bancoBt').onclick = async () => { if (!Banco.dados && !(await Banco.carregar())) { await Banco.subir(); } else App.toast('Banco pronto: toque numa palavra marcada ou selecione uma e use o botão do livro na barra'); this.renderAside(); };
   },
   highlight(word, cls = 'rep') {
     this.clearMarks();

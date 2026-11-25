@@ -1,7 +1,7 @@
 /* Universo: fichário de personagens, lugares, objetos, grupos */
 const UNIV_KINDS = { personagem: 'Personagem', lugar: 'Lugar', objeto: 'Objeto', grupo: 'Grupo ou família', criatura: 'Criatura', lore: 'História e regras do mundo' };
 const UNIV_FIELDS = {
-  personagem: ['Idade', 'Aparência', 'Cor dos olhos', 'Cabelo', 'Personalidade', 'O que quer', 'O que teme', 'Segredo', 'Jeito de falar'],
+  personagem: ['Idade', 'Aparência', 'Cor dos olhos', 'O que quer', 'O que precisa (e não sabe)', 'Ferida / fantasma', 'A mentira em que acredita', 'Contradição', 'Sob pressão', 'Como fala', 'Segredo'],
   lugar: ['Onde fica', 'Clima', 'Cheiros e sons', 'Quem vive ali', 'Importância na história'],
   objeto: ['Dono', 'Aparência', 'Origem', 'Poder ou função'],
   grupo: ['Líder', 'Membros', 'Objetivo', 'Símbolo'],
@@ -16,11 +16,12 @@ const Universo = App.views.universo = {
   countIn(lowText, name) { const n = name.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); return (lowText.match(new RegExp('(?<![\\p{L}])' + n + '(?![\\p{L}])', 'gu')) || []).length; },
   async render(v, top) {
     this.fichas = (await DB.byBook('fichas', App.book.id)).sort((a, b) => a.name.localeCompare(b.name));
-    top.innerHTML = `<h2>Universo</h2><input type="search" id="uq" placeholder="Buscar por nome, apelido, texto" style="max-width:280px" value="${esc(this.q)}"><button class="btn pri sm" id="unew">${ic('plus')} Nova ficha</button>`;
+    top.innerHTML = `<h2>Universo</h2><input type="search" id="uq" placeholder="Buscar por nome, apelido, texto" style="max-width:280px" value="${esc(this.q)}"><button class="btn sm" id="unew">${ic('plus')} Nova ficha</button><button class="btn pri sm" id="uguia">${ic('plus')} Criar personagem com guia</button>`;
     v.style.overflow = 'hidden';
     v.innerHTML = `<div class="u-wrap ${this.sel ? '' : 'closed'}" id="uw" style="height:100%"><div class="u-list pad" id="ul"></div><div class="u-edit ${this.sel ? '' : 'hide'}" id="ue"></div></div>`;
     $('#uq').oninput = e => { this.q = e.target.value; this.renderList(); };
     $('#unew').onclick = () => this.newFicha();
+    $('#uguia').onclick = () => NorteUI.criarPersonagem('', f => { this.sel = f.id; App.go('universo'); });
     this.renderList();
     if (this.sel) { const f = this.fichas.find(x => x.id === this.sel); f ? this.edit(f) : this.close(); }
   },
@@ -31,12 +32,15 @@ const Universo = App.views.universo = {
     const counts = {}; this.fichas.forEach(f => counts[f.kind] = (counts[f.kind] || 0) + 1);
     const groups = {};
     list.forEach(f => { const g = (f.tags || '').split(',')[0].trim() || UNIV_KINDS[f.kind]; (groups[g] = groups[g] || []).push(f); });
-    $('#ul').innerHTML = `<div class="row" style="margin-bottom:18px"><div class="seg" style="flex-wrap:wrap">${[['todos', 'Tudo', this.fichas.length], ...Object.entries(UNIV_KINDS).filter(([k]) => counts[k]).map(([k, l]) => [k, l.split(' ')[0], counts[k]])].map(([k, l, n]) => `<button data-k="${k}" class="${this.filter === k ? 'on' : ''}">${l} <span style="opacity:.6">${n}</span></button>`).join('')}</div></div>
-      ${!this.fichas.length ? `<div class="empty"><h3>O fichário está vazio</h3><p>Cada personagem, lugar ou objeto ganha uma página com retrato e os campos que você quiser. Depois, enquanto escreve, ela fica a um toque no painel lateral do Manuscrito.</p><button class="btn pri" id="ufirst">${ic('plus')} Criar a primeira ficha</button></div>` : ''}
+    $('#ul').innerHTML = (this.q || this.filter !== 'todos' ? '' : NorteUI.sugestoesHTML(this.fichas)) + `<div class="row" style="margin-bottom:18px"><div class="seg" style="flex-wrap:wrap">${[['todos', 'Tudo', this.fichas.length], ...Object.entries(UNIV_KINDS).filter(([k]) => counts[k]).map(([k, l]) => [k, l.split(' ')[0], counts[k]])].map(([k, l, n]) => `<button data-k="${k}" class="${this.filter === k ? 'on' : ''}">${l} <span style="opacity:.6">${n}</span></button>`).join('')}</div></div>
+      ${!this.fichas.length ? `<div class="empty"><h3>O fichário está vazio</h3><p>Cada personagem, lugar ou objeto ganha uma página com retrato e os campos que você quiser. Depois, enquanto escreve, ela fica a um toque no painel lateral do Manuscrito.</p><button class="btn pri" id="ufirst">${ic('plus')} Criar o protagonista com guia</button></div>` : ''}
       ${Object.entries(groups).map(([g, fs]) => `<div class="sectitle" style="margin-top:8px"><h3>${esc(g)}</h3><span class="muted small">${fs.length}</span></div><div class="fgrid">${fs.map(f => `<button class="fcard ${this.sel === f.id ? 'on' : ''}" data-id="${f.id}"><div class="pic">${f.img ? `<img src="${f.img}" alt="">` : esc((f.name || '?')[0])}</div><div class="info"><b>${esc(f.name)}</b><small>${esc(f.role || UNIV_KINDS[f.kind])}</small></div></button>`).join('')}</div>`).join('')}`;
     $$('#ul [data-k]').forEach(b => b.onclick = () => { this.filter = b.dataset.k; this.renderList(); });
     $$('#ul [data-id]').forEach(b => b.onclick = () => this.edit(this.fichas.find(f => f.id === b.dataset.id)));
-    $('#ufirst') && ($('#ufirst').onclick = () => this.newFicha());
+    $('#ufirst') && ($('#ufirst').onclick = () => NorteUI.criarPersonagem('protagonista', f => { this.sel = f.id; App.go('universo'); }));
+    $$('#ul [data-criar]').forEach(b => b.onclick = () => NorteUI.criarPersonagem(b.dataset.criar, f => { this.sel = f.id; App.go('universo'); }));
+    $$('#ul [data-abrir]').forEach(b => b.onclick = () => this.edit(this.fichas.find(f => f.id === b.dataset.abrir)));
+    $$('#ul [data-disp]').forEach(b => b.onclick = async () => { App.book.sugDispensadas = [...(App.book.sugDispensadas || []), b.dataset.disp]; await App.saveBook(); this.renderList(); });
   },
   async newFicha(kind = 'personagem') {
     const k = this.filter !== 'todos' ? this.filter : kind;
@@ -54,10 +58,12 @@ const Universo = App.views.universo = {
       <button class="portrait" id="fpic" title="Trocar retrato">${f.img ? `<img src="${f.img}" alt="">` : `<span>${ic('img')}<br><span class="small">Pôr retrato</span></span>`}</button>
       <input type="text" id="fname" value="${esc(f.name)}" style="font-family:var(--disp);font-size:24px;font-weight:600;border-color:transparent;padding:4px 0" aria-label="Nome">
       <div class="grid2"><label class="f">Papel na história<input type="text" id="frole" value="${esc(f.role || '')}" placeholder="protagonista, mentor, cidade natal"></label><label class="f">Apelidos (separe por vírgula)<input type="text" id="falias" value="${esc(f.aliases || '')}"></label></div>
+      ${f.kind === 'personagem' ? `<label class="f">Função na história<select id="fpapel"><option value="">— ainda não sei</option>${Object.entries(NORTE.PAPEIS).map(([k, p]) => `<option value="${k}" ${f.papel === k ? 'selected' : ''}>${esc(p.nome)}</option>`).join('')}</select></label><p class="small muted" id="fpapeld" style="margin:-6px 0 0">${f.papel && NORTE.PAPEIS[f.papel] ? esc(NORTE.PAPEIS[f.papel].desc) + NorteUI.fonte(NORTE.PAPEIS[f.papel].fonte) : ''}</p>` : ''}
       <label class="f">Grupo ou etiqueta<input type="text" id="ftags" value="${esc(f.tags || '')}" placeholder="família Silva, Santene, núcleo do porto"></label>
       <label class="f">Resumo<textarea id="fsum" style="min-height:110px">${esc(f.summary || '')}</textarea></label>
-      <div><b class="small">Campos</b><div id="ffields" style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${(f.fields || []).map((x, i) => `<div class="fieldrow"><input type="text" data-fk="${i}" value="${esc(x.k)}" style="font-weight:600;font-size:14px"><textarea data-fv="${i}" style="min-height:40px;font-size:15px">${esc(x.v)}</textarea><button class="iconbtn" data-fd="${i}" title="Tirar campo">${ic('x')}</button></div>`).join('')}</div>
+      <div><b class="small">Campos</b><div id="ffields" style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${(f.fields || []).map((x, i) => { const r = NORTE.ROTEIRO.find(q => q.k === x.k); const d = NORTE.dicaCampo(x.k); return `<div class="fieldrow"><input type="text" data-fk="${i}" value="${esc(x.k)}" style="font-weight:600;font-size:14px"><textarea data-fv="${i}" style="min-height:40px;font-size:15px" placeholder="${esc(r ? r.p : '')}">${esc(x.v)}</textarea><button class="iconbtn" data-fd="${i}" title="Tirar campo">${ic('x')}</button>${r || d ? `<div class="fhint">${esc(r ? r.dica : d.t)} — ${esc(r ? r.fonte : d.f)}</div>` : ''}</div>`; }).join('')}</div>
         <button class="btn sm" id="faddf" style="margin-top:8px">${ic('plus')} Campo</button></div>
+      ${f.kind === 'personagem' ? `<div class="ncard"><div class="row" style="justify-content:space-between"><b class="small">Perguntas para aprofundar</b><button class="btn sm ghost" id="fqmais">Outras</button></div><div class="perguntas" id="fqs" style="margin-top:8px"></div><span class="fonte">Responda as que acenderem algo; "+ campo" guarda a pergunta na ficha.</span></div>` : ''}
       ${f.kind === 'personagem' ? `<label class="f">Sai de cena (morre, parte) no capítulo<select id="fexit"><option value="">— continua na história</option>${chs.map(c => `<option value="${c.id}" ${f.exitChapter === c.id ? 'selected' : ''}>${esc(c.title)}</option>`).join('')}</select></label>` : ''}
       <div id="fapp"></div>
       <div class="row" style="justify-content:space-between"><button class="btn sm danger" id="fdel">${ic('trash')} Excluir ficha</button><span class="small muted" id="fsaved"></span></div>
@@ -66,6 +72,7 @@ const Universo = App.views.universo = {
       f.kind = $('#fkind').value; f.name = $('#fname').value.trim() || 'Sem nome'; f.role = $('#frole').value; f.aliases = $('#falias').value; f.tags = $('#ftags').value; f.summary = $('#fsum').value;
       f.fields = $$('#ffields .fieldrow').map(r => ({ k: $('[data-fk]', r).value, v: $('[data-fv]', r).value }));
       if ($('#fexit')) f.exitChapter = $('#fexit').value;
+      if ($('#fpapel')) f.papel = $('#fpapel').value;
     };
     const save = debounce(async () => { collect(); await DB.put('fichas', f); if ($('#fsaved')) $('#fsaved').textContent = 'Salvo'; if ($('#ul')) this.renderListLight(f); }, 500);
     this.saveNow = () => save.flush();
@@ -76,6 +83,11 @@ const Universo = App.views.universo = {
     $('#faddf').onclick = async () => { collect(); f.fields.push({ k: 'Novo campo', v: '' }); await DB.put('fichas', f); this.edit(f); setTimeout(() => $$('#ffields [data-fk]').at(-1)?.select(), 30); };
     $$('[data-fd]').forEach(b => b.onclick = async () => { collect(); f.fields.splice(+b.dataset.fd, 1); await DB.put('fichas', f); this.edit(f); });
     $('#fdel').onclick = async () => { if (!await App.confirm(`Excluir a ficha "${f.name}"?`, 'Excluir')) return; await DB.del('fichas', f.id); this.fichas = this.fichas.filter(x => x !== f); this.close(); };
+    if ($('#fqs')) {
+      const qs = () => { $('#fqs').innerHTML = NORTE.sorteia(NORTE.PERGUNTAS, 3).map(q => `<div class="q"><span>${esc(q)}</span><button class="btn sm ghost" data-qf="${esc(q)}">+ campo</button></div>`).join(''); $$('#fqs [data-qf]').forEach(b => b.onclick = async () => { collect(); f.fields.push({ k: b.dataset.qf, v: '' }); await DB.put('fichas', f); this.edit(f); }); };
+      qs(); $('#fqmais').onclick = qs;
+    }
+    $('#fpapel') && $('#fpapel').addEventListener('change', () => { const p = NORTE.PAPEIS[$('#fpapel').value]; $('#fpapeld').innerHTML = p ? esc(p.desc) + NorteUI.fonte(p.fonte) : ''; });
     this.appearances(f, chs);
   },
   renderListLight(f) { const c = $(`#ul [data-id="${f.id}"]`); if (c) { $('b', c).textContent = f.name; $('small', c).textContent = f.role || UNIV_KINDS[f.kind]; if (!f.img) $('.pic', c).textContent = (f.name || '?')[0]; } },

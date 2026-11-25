@@ -1,7 +1,7 @@
 /* Sincronização entre aparelhos: tudo fica no aparelho e vai para a nuvem do site quando há internet.
    Vale o que foi mexido por último. Versões (snapshots) e ajustes ficam só em cada aparelho. */
 const Sync = {
-  TIPOS: ['books', 'chapters', 'fichas', 'cards', 'links', 'scenes', 'log'],
+  TIPOS: ['books', 'chapters', 'fichas', 'cards', 'links', 'scenes', 'log', 'ideias'],
   API: 'api/dados',
   ativo: false, enviando: false, ultimo: 0,
   pend() { try { return JSON.parse(localStorage.getItem('mv_pend') || '{}'); } catch (e) { return {}; } },

@@ -5,11 +5,13 @@ App.views.biblioteca = {
   async render(v, top) {
     top.innerHTML = `<h2>Biblioteca</h2>
       <button class="iconbtn" id="thm" title="Tema claro ou escuro">${ic('moon')}</button>
+      <button class="btn sm" id="bkbanco">${ic('book')} Banco de palavras</button>
       <button class="btn sm" id="bkexp">${ic('dl')} Backup</button>
       <button class="btn sm" id="bkimp">${ic('ul')} Restaurar</button>
       <button class="btn pri sm" id="nb">${ic('plus')} Novo livro</button>${location.pathname.startsWith("/mundovinik") ? `<a class="btn sm ghost" href="nova-senha.html">Trocar senha</a><a class="btn sm ghost" href="sair" title="Sair deste aparelho">Sair</a>` : ''}`;
     $('#nb').onclick = () => this.editBook();
     $('#bkexp').onclick = () => this.backup();
+    $('#bkbanco').onclick = async () => { const d = await Banco.carregar(); if (d && !(await App.confirm('O banco de palavras já está carregado (' + nf(Object.keys(d.idx).length) + ' palavras). Trocar pelo arquivo novo?', 'Trocar', false))) return; await Banco.subir(); };
     $('#bkimp').onclick = () => this.restore();
     $('#thm').onclick = async () => {
       const cur = App.settings.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -80,7 +82,7 @@ App.views.biblioteca = {
         </div>
       </div>
       <div class="grid3">
-        <label class="f">Gênero<input type="text" id="bg" value="${esc(b.genre || '')}" placeholder="romance, novela, conto"></label>
+        <label class="f">Gênero (o app se ajusta)<select id="bgid"><option value="">— nenhum</option>${OFICIO.GENEROS.map(g => `<option value="${g.id}" ${b.generoId === g.id ? 'selected' : ''}>${esc(g.nome)}</option>`).join('')}</select></label>
         <label class="f">Meta de palavras<input type="number" id="bm" min="0" step="1000" value="${b.goalWords || ''}"></label>
         <label class="f">Data de entrega<input type="date" id="bd" value="${esc(b.deadline || '')}"></label>
       </div>
@@ -118,7 +120,7 @@ App.views.biblioteca = {
     $('#bok', m).onclick = async () => {
       b.title = $('#bt', m).value.trim() || 'Sem título';
       b.subtitle = $('#bs', m).value.trim(); b.author = $('#ba', m).value.trim();
-      b.genre = $('#bg', m).value.trim(); b.goalWords = +$('#bm', m).value || 0; b.deadline = $('#bd', m).value;
+      b.generoId = $('#bgid', m).value || null; b.genre = b.generoId ? OFICIO.generoDe(b).nome : ''; b.goalWords = +$('#bm', m).value || 0; b.deadline = $('#bd', m).value;
       b.lastOpened = Date.now();
       await DB.put('books', b);
       if (isNew) {

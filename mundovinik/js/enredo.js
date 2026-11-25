@@ -25,7 +25,7 @@ App.views.enredo = {
     this.links = await DB.byBook('links', App.book.id);
     this.view = App.book.boardView || { x: 40, y: 40, z: 1 };
     v.innerHTML = `<div class="board" id="board">
-      <div class="boardtools"><button class="btn sm pri" id="bnew">${ic('plus')} Card</button><button class="btn sm" id="bfich">${ic('globe')} Trazer fichas</button>
+      <div class="boardtools"><button class="btn sm pri" id="bnew">${ic('plus')} Card</button><button class="btn sm" id="bfich">${ic('globe')} Trazer fichas</button><button class="btn sm" id="best">${ic('layout')} Estruturas</button><button class="btn sm" id="bvir">${ic('star')} Virada</button><button class="btn sm" id="bchk">${ic('search')} Checar</button>
         <button class="btn sm" id="zout" aria-label="Diminuir zoom">−</button><button class="btn sm" id="zin" aria-label="Aumentar zoom">+</button><button class="btn sm" id="zfit">Ver tudo</button></div>
       <div class="legend"><b>Ligações</b><div class="small muted" style="margin:2px 0 6px">Arraste a bolinha coral de um card até outro. A cor marcada abaixo é a que será usada.</div>
         <div id="rels"></div><button class="btn sm ghost" id="addrel">${ic('plus')} Tipo de ligação</button></div>
@@ -47,7 +47,7 @@ App.views.enredo = {
   cardHTML(c) {
     const f = c.fichaId && this.fichas.find(x => x.id === c.fichaId);
     const img = c.img || f?.img;
-    return `<div class="pcard ${this.sel === c.id ? 'sel' : ''}" data-c="${c.id}" style="left:${c.x}px;top:${c.y}px;--cc:${c.color || '#2346a8'}">${img ? `<div class="pimg"><img src="${img}" alt=""></div>` : ''}<div class="pb"><b>${esc(c.title || f?.name || 'Sem título')}</b>${c.text || f?.summary ? `<p>${esc(c.text || f?.summary)}</p>` : ''}${f ? `<span class="chip" style="margin-top:6px;font-size:11px">${esc(UNIV_KINDS[f.kind] || 'Ficha')}</span>` : ''}</div><span class="dot" data-dot="${c.id}" title="Arraste até outro card para ligar"></span></div>`;
+    return `<div class="pcard ${this.sel === c.id ? 'sel' : ''} ${c.guia ? 'guia' : ''} ${c.virada ? 'virada' : ''}" data-c="${c.id}" style="left:${c.x}px;top:${c.y}px;--cc:${c.color || '#2346a8'}">${img ? `<div class="pimg"><img src="${img}" alt=""></div>` : ''}<div class="pb"><b>${esc(c.title || f?.name || 'Sem título')}</b>${c.text || f?.summary ? `<p>${esc(c.text || f?.summary)}</p>` : ''}${f ? `<span class="chip" style="margin-top:6px;font-size:11px">${esc(UNIV_KINDS[f.kind] || 'Ficha')}</span>` : ''}</div><span class="dot" data-dot="${c.id}" title="Arraste até outro card para ligar"></span></div>`;
   },
   renderCards() { $('#cardsl').innerHTML = this.cards.map(c => this.cardHTML(c)).join(''); this.renderWires(); },
   center(c) { const el = $(`[data-c="${c.id}"]`); const w = el?.offsetWidth || 210, h = el?.offsetHeight || 80; return { x: c.x + w / 2, y: c.y + h / 2, w, h }; },
@@ -116,6 +116,9 @@ App.views.enredo = {
     $('#zfit').onclick = () => this.fit();
     $('#bnew').onclick = () => this.newCard();
     $('#bfich').onclick = () => this.bringFichas();
+    $('#best').onclick = () => NorteUI.estruturas(this);
+    $('#bvir').onclick = () => NorteUI.virada(this);
+    $('#bchk').onclick = () => NorteUI.checar(this);
   },
   select(id) { this.sel = id; $$('.pcard').forEach(c => c.classList.toggle('sel', c.dataset.c === id)); },
   fit() {
@@ -132,7 +135,7 @@ App.views.enredo = {
     const c = { id: DB.uid(), bookId: App.book.id, title: '', text: '', color: CARD_COLORS[this.cards.length % CARD_COLORS.length], x: Math.round((r.width / 2 - this.view.x) / this.view.z - 105 + (Math.random() * 60 - 30)), y: Math.round((r.height / 2 - this.view.y) / this.view.z - 50 + (Math.random() * 60 - 30)), ...extra };
     this.cards.push(c); await DB.put('cards', c);
     $('.board .empty')?.remove();
-    this.renderCards(); if (!extra.fichaId) this.editCard(c);
+    this.renderCards(); if (!extra.fichaId && !extra.virada) this.editCard(c);
     return c;
   },
   async bringFichas() {
@@ -159,7 +162,7 @@ App.views.enredo = {
     $('#cimg', m).onclick = async () => { const f = await App.pickFile('image/*'); if (!f) return; c.img = await App.shrinkImage(f, 600); App.toast('Imagem pronta; toque em Salvar'); };
     $('#crmimg', m) && ($('#crmimg', m).onclick = () => { delete c.img; App.toast('Imagem tirada; toque em Salvar'); });
     $('#copenf', m) && ($('#copenf', m).onclick = () => { m.close(); Universo.sel = c.fichaId; App.go('universo'); });
-    $('#cok', m).onclick = async () => { c.title = $('#ct', m).value; c.text = $('#cx', m).value; c.fichaId = $('#cf', m).value || null; await DB.put('cards', c); m.close(); this.renderCards(); };
+    $('#cok', m).onclick = async () => { if (c.guia && ($('#ct', m).value !== c.title || $('#cx', m).value !== c.text)) c.guia = false; c.title = $('#ct', m).value; c.text = $('#cx', m).value; c.fichaId = $('#cf', m).value || null; await DB.put('cards', c); m.close(); this.renderCards(); };
     $('#cdel', m).onclick = async () => {
       m.close(); await DB.del('cards', c.id); this.cards = this.cards.filter(x => x !== c);
       for (const l of this.links.filter(l => l.from === c.id || l.to === c.id)) await DB.del('links', l.id);
@@ -185,7 +188,7 @@ App.views.enredo = {
     const chs = await App.chapters();
     const chars = this.fichas.filter(f => f.kind === 'personagem').map(f => f.name).sort();
     const places = this.fichas.filter(f => f.kind === 'lugar').map(f => f.name).sort();
-    v.innerHTML = `<div class="pad"><div class="row" style="justify-content:space-between;margin-bottom:14px"><p class="muted" style="margin:0;max-width:62ch">A escaleta é o livro cena a cena: quem conta, onde, o que está em jogo. Serve para ver o ritmo e os furos antes de escrever.</p>
+    v.innerHTML = `<div class="pad"><div class="row" style="justify-content:space-between;margin-bottom:14px"><p class="muted" style="margin:0;max-width:62ch">A escaleta é o livro cena a cena: quem conta, onde, o que está em jogo. Em cada cena alguém quer algo, encontra resistência e sai dela diferente.<span class="fonte">Swain: cena e sequela; McKee, Story: "Design de cena"</span></p>
       <div class="row"><button class="btn sm" id="sfrom">Criar a partir dos capítulos</button><button class="btn pri sm" id="snew">${ic('plus')} Cena</button></div></div>
       <datalist id="dlpov">${chars.map(n => `<option value="${esc(n)}">`).join('')}</datalist><datalist id="dlpl">${places.map(n => `<option value="${esc(n)}">`).join('')}</datalist>
       ${scenes.length ? `<div class="card" style="padding:6px;overflow-x:auto"><table class="scenes" style="min-width:900px"><thead><tr><th style="width:36px">#</th><th>Cena</th><th>Capítulo</th><th>Ponto de vista</th><th>Lugar</th><th>O que está em jogo</th><th>Estado</th><th style="width:90px"></th></tr></thead><tbody>

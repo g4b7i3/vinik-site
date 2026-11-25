@@ -133,7 +133,8 @@ No máximo 25 itens, os mais graves primeiro. Se não achar nada, responda [].`,
       let n = 0;
       const livro = chs.slice(0, fim).map(c => `### ${c.type === 'capitulo' ? 'Capítulo ' + (++n) + ': ' : ''}${c.title}\n${this.textoCap(c.html)}`).join('\n\n');
       const fich = fichas.map(f => `- ${f.name} (${UNIV_KINDS[f.kind] || f.kind}${f.role ? ', ' + f.role : ''})${f.aliases ? ' · também chamado: ' + f.aliases : ''}${f.summary ? ': ' + f.summary : ''}${(f.fields || []).filter(x => x.v).map(x => ` · ${x.k}: ${x.v}`).join('')}`).join('\n');
-      return `LIVRO: ${b.title}${b.author ? ', de ' + b.author : ''}\n\nFICHAS DO UNIVERSO:\n${fich || '(nenhuma)'}\n\nTEXTO:\n${livro}`;
+      const g = OFICIO.generoDe(b);
+      return `LIVRO: ${b.title}${b.author ? ', de ' + b.author : ''}${g ? '\nGÊNERO: ' + g.nome + '. O leitor espera: ' + g.cenas.join('; ') : ''}\n\nFICHAS DO UNIVERSO:\n${fich || '(nenhuma)'}\n\nTEXTO:\n${livro}`;
     };
     const custo = () => { const t = montar().length; $('#fcusto', m).textContent = t > 480000 ? 'O livro passa do limite de leitura de uma vez; use "Só até o capítulo aberto".' : `cerca de ${nf(Math.round(t / 3.6 / 1000))} mil tokens de leitura`; };
     $$('input[name=fesc]', m).forEach(i => i.onchange = custo); custo();
