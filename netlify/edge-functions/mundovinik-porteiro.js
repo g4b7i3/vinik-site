@@ -8,7 +8,7 @@ const ITERACOES = 120000;
 const COOKIE = "mundo_chave";
 const DEZ_ANOS = 315360000;
 const BASE = "/mundovinik";
-const LIVRES = [BASE + "/entrar.html", BASE + "/nova-senha.html", BASE + "/manifest.json", BASE + "/icon.svg", BASE + "/sw.js"];
+const LIVRES = [BASE + "/entrar.html", BASE + "/nova-senha.html", BASE + "/manifest.json", BASE + "/icon.svg", BASE + "/sw.js", BASE + "/icons/icon-192.png", BASE + "/icons/icon-512.png", BASE + "/icons/maskable-512.png", BASE + "/icons/apple-touch-icon.png", BASE + "/icons/favicon-32.png"];
 
 const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 const sha256 = async (t) => hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)));

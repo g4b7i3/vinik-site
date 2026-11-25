@@ -1,1 +1,20 @@
-{"name":"Mundo Vinik","short_name":"Mundo Vinik","start_url":"./index.html","display":"standalone","background_color":"#efede8","theme_color":"#16307a","lang":"pt-BR","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
+{
+  "id": "/mundovinik/",
+  "name": "Mundo Vinik",
+  "short_name": "Mundo Vinik",
+  "description": "Escrever, organizar e publicar livros.",
+  "start_url": "/mundovinik/",
+  "scope": "/mundovinik/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
+  "background_color": "#efede8",
+  "theme_color": "#16307a",
+  "lang": "pt-BR",
+  "categories": ["productivity", "books"],
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

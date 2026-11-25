@@ -59,6 +59,7 @@ const App = {
   async start() {
     const s = await DB.get('meta', 'settings');
     this.settings = s || { id: 'settings', theme: '', lastBook: null };
+    await this.carregarAjustes();
     this.applyTheme();
     document.body.dataset.skin = this.settings.skin || 'papel';
     $('#sidetile').innerHTML = azulejo('#fff', 52);
@@ -84,6 +85,9 @@ const App = {
     if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
   },
   async saveSettings() { await DB.put('meta', this.settings); },
+  /* ajustes que valem em todos os aparelhos (vão para a nuvem) */
+  async carregarAjustes() { const a = await DB.get('ajustes', 'geral'); if (a && this.settings) this.settings.dailyGoal = a.dailyGoal || 0; },
+  async salvarAjustes() { await DB.put('ajustes', { id: 'geral', dailyGoal: this.settings.dailyGoal || 0 }); await this.saveSettings(); },
   renderNav() {
     $('#nav').innerHTML = this.nav.map(([k, l, i]) => `<button data-v="${k}" class="${this.view === k ? 'on' : ''}">${ic(i)}<span>${l}</span></button>`).join('');
     $$('#nav button').forEach(b => b.onclick = () => this.go(b.dataset.v));

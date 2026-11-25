@@ -1,7 +1,7 @@
 /* Sincronização entre aparelhos: tudo fica no aparelho e vai para a nuvem do site quando há internet.
    Vale o que foi mexido por último. Versões (snapshots) e ajustes ficam só em cada aparelho. */
 const Sync = {
-  TIPOS: ['books', 'chapters', 'fichas', 'cards', 'links', 'scenes', 'log', 'ideias'],
+  TIPOS: ['books', 'chapters', 'fichas', 'cards', 'links', 'scenes', 'log', 'ideias', 'ajustes'],
   API: 'api/dados',
   ativo: false, enviando: false, ultimo: 0,
   pend() { try { return JSON.parse(localStorage.getItem('mv_pend') || '{}'); } catch (e) { return {}; } },
@@ -62,6 +62,7 @@ const Sync = {
     App.books = (await DB.all('books')).sort((a, b) => (b.lastOpened || 0) - (a.lastOpened || 0));
     if (App.book) App.book = App.books.find(b => b.id === App.book.id) || App.books[0] || null;
     else if (App.books.length) App.book = App.books[0];
+    await App.carregarAjustes();
     const v = App.view;
     if (v === 'manuscrito' && Manuscrito.cur) {
       const cur = Manuscrito.cur;

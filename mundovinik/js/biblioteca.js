@@ -8,8 +8,8 @@ App.views.biblioteca = {
       <button class="btn sm" id="bkbanco">${ic('book')} Banco de palavras</button>
       <button class="btn sm" id="bkexp">${ic('dl')} Backup</button>
       <button class="btn sm" id="bkimp">${ic('ul')} Restaurar</button>
-      <button class="btn pri sm" id="nb">${ic('plus')} Novo livro</button>${location.pathname.startsWith("/mundovinik") ? `<a class="btn sm ghost" href="nova-senha.html">Trocar senha</a><a class="btn sm ghost" href="sair" title="Sair deste aparelho">Sair</a>` : ''}`;
-    $('#nb').onclick = () => this.editBook();
+      <button class="btn pri sm" id="nb">${ic('plus')} Novo livro</button>${Instalar.botao()}${location.pathname.startsWith("/mundovinik") ? `<a class="btn sm ghost" href="nova-senha.html">Trocar senha</a><a class="btn sm ghost" href="sair" title="Sair deste aparelho">Sair</a>` : ''}`;
+    $('#nb').onclick = () => this.editBook(); Instalar.ligar(top);
     $('#bkexp').onclick = () => this.backup();
     $('#bkbanco').onclick = async () => { const d = await Banco.carregar(); if (d && !(await App.confirm('O banco de palavras já está carregado (' + nf(Object.keys(d.idx).length) + ' palavras). Trocar pelo arquivo novo?', 'Trocar', false))) return; await Banco.subir(); };
     $('#bkimp').onclick = () => this.restore();
@@ -160,7 +160,7 @@ App.views.biblioteca = {
 App.views.progresso = {
   async render(v, top) {
     top.innerHTML = `<h2>Progresso</h2><label class="f" style="flex-direction:row;align-items:center;gap:8px">Meta diária<input type="number" id="dg" style="width:110px" min="0" step="50" value="${App.settings.dailyGoal || ''}" placeholder="ex.: 800"></label>`;
-    $('#dg').onchange = async e => { App.settings.dailyGoal = +e.target.value || 0; await App.saveSettings(); App.go('progresso'); };
+    $('#dg').onchange = async e => { App.settings.dailyGoal = +e.target.value || 0; await App.salvarAjustes(); App.go('progresso'); };
     const goal = App.settings.dailyGoal || 0;
     const logs = await DB.all('log');
     const byDay = {}; logs.forEach(l => byDay[l.date] = (byDay[l.date] || 0) + l.words);
