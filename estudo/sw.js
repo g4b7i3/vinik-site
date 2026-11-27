@@ -1,11 +1,11 @@
 /* Estúdio: guarda o app para abrir sem internet. Os livros ficam no IndexedDB, não aqui. */
-const VERSAO = 'estudio-v6';
+const VERSAO = 'estudio-v7';
 const BASE = new URL('./', self.location).pathname; // /estudo/
 const ARQUIVOS = ['', 'estudio.css', 'estudio.js', 'apps.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/apple-touch-icon.png', 'icons/logo-vinik.png', 'icons/badge-96.png',
   'lexico/', 'lexico/style.css', 'lexico/livros.css', 'lexico/livros.js',
   'lexico/conteudo.js', 'lexico/academia.js', 'lexico/app.js', 'lexico/fontes.json',
-  'microciclo/', 'estudos/', 'estudos/estudos.css', 'estudos/banco.js', 'estudos/app.js', 'estudos/manifest.webmanifest', 'icons/estudos-192.png', 'quiz/', 'quiz/catalogo-base.json', 'quiz/countries.json', 'quiz/capas.json', 'quiz/assets/world.svg'].map(a => BASE + a);
+  'microciclo/', 'quiz/', 'quiz/catalogo-base.json', 'quiz/countries.json', 'quiz/capas.json', 'quiz/assets/world.svg'].map(a => BASE + a);
 const LIVRES = [BASE + 'entrar', BASE + 'sair'];
 
 self.addEventListener('install', e => {

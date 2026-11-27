@@ -30,7 +30,8 @@ Copie os dois valores para `SAL` e `RESUMO` em `netlify/edge-functions/estudo-po
 - O que avisar fica no próprio painel (vale para todos os aparelhos). As metas usadas nas médias são as mesmas do Dia típico; se mudar uma, mude nos dois arquivos.
 
 ## Estudos (vinikautor.com.br/estudos-vinik)
-- O endereço `/estudos-vinik` leva a `estudo/estudos/`, dentro do Estúdio, com a mesma senha.
-- `estudo/estudos/banco.js` tem os livros, os capítulos e as questões. O `id` de uma questão nunca deve mudar: é ele que guarda o histórico de revisões. Para acrescentar questões, use ids novos.
-- O progresso (quando cada questão volta, acertos, sequência de dias) fica no aparelho e sincroniza pela mesma função do Microciclo (`/estudo/api/estado?app=estudos`, loja `estudio`, chave `estudos`). Não usa os bancos do Radar nem da Nexos.
-- Instala como app próprio ("Estudos") pelo `estudo/estudos/manifest.webmanifest`; o porteiro libera esse manifesto sem senha para o celular conseguir instalar.
+- App separado do Estúdio, na pasta `estudos-vinik/`, com **senha própria** (a do Estúdio não abre o Estudos e vice-versa). O card no Estúdio só leva até lá.
+- `netlify/edge-functions/estudos-porteiro.js` pede a senha; o aparelho fica liberado por 10 anos, como no Estúdio.
+- `estudos-vinik/banco.js` tem os livros, os capítulos e as questões. O `id` de uma questão nunca deve mudar: é ele que guarda o histórico de revisões. Para acrescentar questões, use ids novos.
+- O progresso fica no aparelho e sincroniza por `netlify/functions/estudos-estado.mjs` (Netlify Blobs deste site, loja `estudos`, chave `progresso`). Não usa os bancos do Radar nem da Nexos.
+- Para trocar a senha do Estudos: gere `SAL` e `RESUMO` com o comando da seção "Como trocar a senha" e cole em `estudos-porteiro.js` (SAL e RESUMO) e em `estudos-estado.mjs` (só o RESUMO).

@@ -1,13 +1,13 @@
 /* Estudos do Vinik: banco de questões com revisão espaçada.
    O progresso fica no aparelho (localStorage) e sincroniza pelo Netlify Blobs do próprio site
-   (loja "estudio", chave "estudos"), a mesma função do Microciclo. */
+   (loja "estudos", chave "progresso"), pela função netlify/functions/estudos-estado.mjs. */
 (function () {
   'use strict';
   const LIVROS = window.ESTUDOS_LIVROS || [];
   const QUESTOES = window.ESTUDOS_QUESTOES || [];
   const POR_ID = Object.fromEntries(QUESTOES.map(q => [q.id, q]));
   const CHAVE = 'estudos-vinik-v1';
-  const API = '../api/estado?app=estudos';
+  const API = 'api/estado';
   const $ = s => document.querySelector(s);
   const tela = $('#tela');
 
@@ -38,7 +38,7 @@
     enviando = true;
     try {
       const r = await fetch(API, { method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado: S }) });
-      if (r.status === 401) sinc('Salvo neste aparelho · entre de novo no Estúdio para sincronizar');
+      if (r.status === 401) sinc('Salvo neste aparelho · entre de novo para sincronizar');
       else if (!r.ok) throw 0;
       else sinc('Sincronizado');
     } catch (_) { sinc('Salvo neste aparelho · sincroniza quando houver internet'); }
@@ -63,7 +63,7 @@
   async function puxar() {
     try {
       const r = await fetch(API, { credentials: 'same-origin', cache: 'no-store' });
-      if (r.status === 401) { sinc('Salvo neste aparelho · entre de novo no Estúdio para sincronizar'); return; }
+      if (r.status === 401) { sinc('Salvo neste aparelho · entre de novo para sincronizar'); return; }
       if (!r.ok) throw 0;
       const d = await r.json();
       const antes = JSON.stringify(S);
@@ -239,7 +239,7 @@
         <p>Nas questões abertas, escreva antes de ver a resposta. Tirar a informação da memória com as próprias palavras fixa muito mais do que reler.</p>
         <p>As questões novas aparecem misturadas às revisões e de capítulos diferentes, de propósito.</p></section>
       <section class="bloco"><p class="rotulo">Cópia de segurança</p>
-        <p class="apagado pequeno" style="margin-bottom:12px">O progresso sincroniza sozinho entre os aparelhos em que você entrou no Estúdio. Se quiser uma cópia fora do site:</p>
+        <p class="apagado pequeno" style="margin-bottom:12px">O progresso sincroniza sozinho entre os aparelhos em que você entrou com a senha. Se quiser uma cópia fora do site:</p>
         <div class="acoes"><button class="botao fantasma" data-acao="baixar">Baixar cópia</button>
         <label class="botao fantasma">Restaurar cópia<input type="file" accept=".json,application/json" id="restaurar" hidden></label></div>
         <div class="acoes" style="margin-top:18px"><button class="link perigo" data-acao="zerar">Apagar todo o progresso</button></div></section>`;
@@ -389,5 +389,5 @@
   $('#data').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
   mostrar('hoje');
   puxar();
-  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('../sw.js', { scope: '../' }).catch(() => {});
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {});
 })();

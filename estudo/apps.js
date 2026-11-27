@@ -24,10 +24,10 @@ window.ESTUDIO_APPS = [
     id: 'estudos',
     nome: 'Estudos',
     linha: 'Questões dos livros que estou lendo, com revisão espaçada para não esquecer.',
-    url: 'estudos/',
+    url: '/estudos-vinik/',
     cor: '#7a6bb0',
     marca: 'E.',
-    interno: true
+    interno: false
   },
   {
     id: 'microciclo',
