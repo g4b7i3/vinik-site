@@ -1739,7 +1739,7 @@ function directRender() {
   if (st.on) { renderer.clearDepth(); renderer.render(stScene, stCam); }
   renderer.autoClear = true;
 }
-manager.onLoad = () => { if (!started) { setTimeout(sharpSky, 4000); setTimeout(() => loadRealClouds().catch(() => {}), 1500); }
+manager.onLoad = () => { if (!started) { setTimeout(sharpSky, 4000); /* sem as nuvens do dia: a foto do satélite chega em baixa resolução no celular e fica quadriculada; usa o mapa de nuvens em alta */ }
   if (started) return; started = true;
   refreshWpos();
   camera.position.copy(eclToWorld(-3.2e5, 1.5e5, 4.6e5)); camera.lookAt(0, 0, 0); camera.up.copy(ECL_N);
