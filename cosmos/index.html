@@ -54,6 +54,12 @@ body.pilot.fp #helmet{display:block}
 #helmet .ret{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border:1px solid rgba(255,210,150,.28);border-radius:50%}
 #helmet .ret::after{content:'';position:absolute;left:8px;top:8px;width:2px;height:2px;background:rgba(255,210,150,.5);border-radius:50%}
 #helmet .data{display:none;position:absolute;left:50%;bottom:17%;transform:translateX(-50%);font:300 11px/1.7 'Inter',sans-serif;letter-spacing:.14em;color:rgba(255,214,160,.62);text-align:center;text-transform:uppercase;text-shadow:0 0 6px rgba(255,170,90,.25);white-space:nowrap}
+#olhar{position:fixed;right:calc(80px + env(safe-area-inset-right));bottom:calc(22px + env(safe-area-inset-bottom));display:none;grid-template-columns:repeat(3,64px);gap:6px;padding:10px;border-radius:18px;background:rgba(8,11,18,.78);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);z-index:6}
+#olhar.show{display:grid}
+#olhar .t{grid-column:1/-1;font:500 10px/1 'Inter',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:rgba(200,210,230,.55);padding:4px 2px 6px}
+#olhar button{height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#e8ecf3;font:400 12px/1.1 'Inter',sans-serif;cursor:pointer;padding:0 4px}
+#olhar button.on{border-color:rgba(255,210,140,.6);color:#ffd28a}
+#olhar button.livre{grid-column:1/-1}
 #bar{width:4px;height:120px;border-radius:2px;background:rgba(255,255,255,.12);position:relative;overflow:hidden}
 #bar i{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(#ffb36b,#7fb2ff);height:0}
 #hint{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%);font-size:11px;letter-spacing:.08em;color:rgba(210,220,240,.85);text-align:center;line-height:1.7;opacity:0;transition:opacity 1s;pointer-events:none;max-width:70vw;text-shadow:0 0 8px #000}
@@ -97,9 +103,17 @@ body.pilot.fp #helmet{display:block}
 <div id="plasma"></div>
 <div id="stEnd"><div id="stWhere"></div><button class="b" id="stLand">pousar aqui</button><button class="b" id="stAgain">voltar à estação</button></div>
 <div id="hud">
+  <button class="b" id="bOlho" aria-label="Olhar ao redor"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
   <button class="b" id="up">+</button>
   <div id="bar"><i></i></div>
   <button class="b" id="dn">−</button>
+</div>
+<div id="olhar"><div class="t">olhar para</div>
+  <button data-v="cimaesq">↖</button><button data-v="cima">cima</button><button data-v="cimadir">↗</button>
+  <button data-v="esq">esquerda</button><button data-v="frente" class="on">frente</button><button data-v="dir">direita</button>
+  <button data-v="baixoesq">↙</button><button data-v="baixo">baixo</button><button data-v="baixodir">↘</button>
+  <button data-v="tras" class="livre">trás</button>
+  <button data-v="livre" class="livre">livre · arraste o dedo para olhar</button>
 </div>
 <div id="hint"></div>
 <button id="pouso"></button>
@@ -1178,16 +1192,28 @@ const speedOf = l => speedK(l) * Math.min(shipNear[0], 3e6 * LY);
 let auto = null, autoCool = 0, keyCool = 0;
 const keys = {};
 function setAuto(L) { auto = L; flashHint('piloto automático: ' + L.name.toLowerCase()); }
+// olhar ao redor sem virar o foguete: vistas prontas (frente, lados, trás, cima, baixo) ou livre, arrastando o dedo
+const OLHAR = { frente: [0, 0], esq: [1.5708, 0], dir: [-1.5708, 0], tras: [3.1416, 0], cima: [0, 1.15], baixo: [0, -1.15], cimaesq: [.8, .6], cimadir: [-.8, .6], baixoesq: [.8, -.6], baixodir: [-.8, -.6] };
+const olhar = { y: 0, p: 0, ty: 0, tp: 0, livre: false, q: new THREE.Quaternion(), e: new THREE.Euler(0, 0, 0, 'YXZ') };
+function setOlhar(v) {
+  olhar.livre = v === 'livre';
+  if (!olhar.livre) { const a = OLHAR[v] || OLHAR.frente; olhar.ty = a[0]; olhar.tp = a[1]; }
+  document.querySelectorAll('#olhar button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  $('bOlho').classList.toggle('on', v !== 'frente');
+  flashHint(olhar.livre ? 'arraste o dedo para olhar ao redor<br>o foguete segue reto · para pilotar, escolha frente' : v === 'frente' ? 'olhando para a frente' : 'olhando ' + ({ esq: 'para a esquerda', dir: 'para a direita', tras: 'para trás', cima: 'para cima', baixo: 'para baixo' }[v] || 'na diagonal'), 2200);
+}
 let view = 'nave', fpT = 0, fpSun = 0, visorK = 0; const helmetEl = document.getElementById('helmet'); const _fpQ = new THREE.Quaternion(), _fpE = new THREE.Euler(); const fpData = document.getElementById('fpData');
 const nf = (x, d = 0) => x.toLocaleString('pt-BR', { maximumFractionDigits: d, minimumFractionDigits: d });
 function fmtSpeed(v) { const kms = v * 1000; if (v / LY >= .1) { const l = v / LY; return 'velocidade ' + nf(l, l < 10 ? 1 : 0) + ' anos-luz por segundo'; } if (kms >= 299792) { const c = kms / 299792.458; return 'velocidade ' + nf(c, c < 10 ? 1 : 0) + '× a da luz'; } return 'velocidade ' + nf(kms, kms < 10 ? 2 : 0) + ' km/s'; }
 function fmtDist(d) { const km = d * 1000; if (d > LY * .05) return nf(d / LY, d / LY < 10 ? 2 : 0) + ' anos-luz'; if (km >= 1e6) return nf(km / 1e6, 1) + ' milhões de km'; if (km >= 1e4) return nf(km / 1e3, 0) + ' mil km'; return nf(km, km < 10 ? 2 : 0) + ' km'; }
+// joystick do foguete: folga de 14 px para o dedo tremer sem virar, curso de 130 px e curva suave (movimentos pequenos viram pouco)
+const eixoStick = (d) => { const a = Math.min(1, Math.max(0, Math.abs(d) - 14) / 116); return -Math.sign(d) * Math.pow(a, 1.6); };
 function updatePilot(dt) {
   // steering input
   let ty = (keys.ArrowLeft || keys.a ? 1 : 0) - (keys.ArrowRight || keys.d ? 1 : 0);
   let tp = (keys.ArrowUp ? 1 : 0) - (keys.ArrowDown ? 1 : 0);
   let tr = (keys.q ? 1 : 0) - (keys.e ? 1 : 0);
-  if (stick.on) { ty = clamp(-stick.dx / 90, -1, 1); tp = clamp(-stick.dy / 90, -1, 1); }
+  if (stick.on) { ty = eixoStick(stick.dx); tp = eixoStick(stick.dy); }
   if (ty || tp || tr) auto = null;
   const k = 1 - Math.exp(-dt * 5);
   ship.yaw += (ty * 1.1 - ship.yaw) * k; ship.pitch += (tp * 1.0 - ship.pitch) * k; ship.roll += (tr * 1.4 + ty * .5 - ship.roll) * k;
@@ -1234,22 +1260,27 @@ function updatePilot(dt) {
     A.head.rotation.y = Math.sin(t * .23) * .12; A.head.rotation.x = Math.sin(t * .31) * .05;
     A.body.rotation.z = Math.sin(t * .2) * .05; A.body.rotation.x = Math.sin(t * .17) * .04;
     const lv = ship.level / MAXL; A.jetMat.opacity = .05 + lv * .4; A.jets.forEach(j => j.scale.set(1, .4 + lv * 2.2 * (1 + (Math.random() - .5) * .15), 1)); }
+  { // olhar: vira só a câmera, pelo caminho mais curto
+    let dy = olhar.ty - olhar.y; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); const kk = 1 - Math.exp(-dt * 4);
+    olhar.y += dy * kk; olhar.p += (olhar.tp - olhar.p) * kk; olhar.q.setFromEuler(olhar.e.set(olhar.p, olhar.y, 0, 'YXZ')); }
   if (fp) { // inside the helmet: the head lags a little behind the ship and moves with the breathing
     ship.camQ.slerp(ship.q, 1 - Math.exp(-dt * 7));
     const br = Math.sin(simT * 2 * Math.PI / 4.6), sw = Math.sin(simT * .53) * .5 + Math.sin(simT * .29);
     camera.position.copy(ship.pos);
-    camera.quaternion.copy(ship.camQ).multiply(_fpQ.setFromEuler(_fpE.set(br * .0035, sw * .0025, sw * .0015)));
+    camera.quaternion.copy(ship.camQ).multiply(olhar.q).multiply(_fpQ.setFromEuler(_fpE.set(br * .0035, sw * .0025, sw * .0015)));
     fpT -= dt; if (fpT <= 0) { fpT = .25; { const f = V3(0, 0, -1).applyQuaternion(camera.quaternion), sd = ship.pos.clone().negate(); const sv = sd.length() < 60 * AU && f.angleTo(sd) < .7 ? 1 : 0; fpSun = sv; } fpData.innerHTML = fmtSpeed(v) + '<br>' + (shipNear[0] > LY ? 'distância do Sol · ' + fmtDist(ship.pos.length()) : shipNear[1] ? shipNear[1].name + ' · ' + fmtDist(shipNear[0]) : 'Sagitário A* · ' + fmtDist(shipNear[0])); }
   } else if (view === 'astronauta') {
     ship.camQ.slerp(ship.q, 1 - Math.exp(-dt * 3));
+    const oq = ship.camQ.clone().multiply(olhar.q);
     camera.position.copy(ship.pos).add(V3(0, .75 * AS, 3.6 * AS).applyQuaternion(ship.camQ));
-    camera.quaternion.copy(ship.camQ).multiply(new THREE.Quaternion().setFromAxisAngle(V3(1, 0, 0), -.16));
+    camera.quaternion.copy(oq).multiply(new THREE.Quaternion().setFromAxisAngle(V3(1, 0, 0), -.16));
   } else {
   // chase camera
   ship.camQ.slerp(ship.q, 1 - Math.exp(-dt * 4));
+  const oq = ship.camQ.clone().multiply(olhar.q); // a câmera fica atrás do foguete e só vira a cabeça
   ship.camOff.set(0, .058 * RS, .23 * RS).applyQuaternion(ship.camQ);
   camera.position.copy(ship.pos).add(ship.camOff);
-  camera.quaternion.copy(ship.camQ).multiply(new THREE.Quaternion().setFromAxisAngle(V3(1, 0, 0), -.17));
+  camera.quaternion.copy(oq).multiply(new THREE.Quaternion().setFromAxisAngle(V3(1, 0, 0), -.17));
   }
   { const f = fp ? 72 : 55; if (Math.abs(camera.fov - f) > .01) { camera.fov += (f - camera.fov) * Math.min(1, dt * 4); camera.updateProjectionMatrix(); } }
   // speed dust
@@ -1345,7 +1376,7 @@ function setFocus(b, dist) {
   flashHint(b.name, 1800);
 }
 function enterExplore() {
-  if (!controls) { camera.up.copy(ECL_N); controls = new OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = .09; controls.enablePan = false; controls.rotateSpeed = .55; controls.zoomSpeed = 1.1; }
+  if (!controls) { camera.up.copy(ECL_N); controls = new OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = .09; controls.enablePan = false; controls.rotateSpeed = isTouch ? .38 : .5; controls.zoomSpeed = .9; }
   camera.up.copy(ECL_N); controls.enabled = true;
   const far = camera.position.length() > SYS_R;
   const b = far ? bodyByName['Terra'] : nearestBody();
@@ -1366,7 +1397,7 @@ function updateExplore(dt) {
   } else { const d = b.wpos.clone().sub(exp.last); camera.position.add(d); controls.target.add(d); } // ride along with the planet
   exp.last.copy(b.wpos);
   // the farther out, the faster each pinch zooms, so a few gestures go from a planet to the galaxies
-  const zd = camera.position.distanceTo(controls.target); controls.zoomSpeed = 1.1 + 2.6 * clamp(Math.log10(Math.max(zd, 1) / SYS_R) / 8, 0, 1);
+  const zd = camera.position.distanceTo(controls.target); controls.zoomSpeed = .9 + 1.9 * clamp(Math.log10(Math.max(zd, 1) / SYS_R) / 8, 0, 1);
   controls.update();
 }
 
@@ -1380,14 +1411,15 @@ function setMode(m) {
   if (mode === 'station' && m !== 'station') leaveStation();
   mode = m; document.body.classList.toggle('pilot', m === 'pilot'); document.body.classList.toggle('explore', m === 'explore'); $('bMode').classList.toggle('on', m === 'pilot');
   $('bTour').classList.toggle('on', m === 'tour'); if (controls) controls.enabled = m === 'explore';
-  rocket.visible = m === 'pilot' && view === 'nave'; dust.visible = m === 'pilot'; astro.visible = m === 'pilot' && view === 'astronauta'; if (m !== 'pilot') document.getElementById('pouso').style.display = 'none';
+  rocket.visible = m === 'pilot' && view === 'nave'; dust.visible = m === 'pilot'; astro.visible = m === 'pilot' && view === 'astronauta'; if (m !== 'pilot') { document.getElementById('pouso').style.display = 'none'; $('olhar').classList.remove('show'); }
   if (m === 'pilot') {
+    olhar.y = olhar.p = olhar.ty = olhar.tp = 0; olhar.livre = false; document.querySelectorAll('#olhar button').forEach(b => b.classList.toggle('on', b.dataset.v === 'frente')); $('bOlho').classList.remove('on');
     ship.q.copy(camera.quaternion); ship.camQ.copy(camera.quaternion);
     ship.pos.copy(camera.position).add(V3(0, -.058 * RS, -.23 * RS).applyQuaternion(camera.quaternion));
     const near = Math.min(...bodies.map(b => ship.pos.distanceTo(b.wpos) - b.r));
     ship.level = 11; shipNear = nearestSurface(ship.pos);
     auto = null;
-    flashHint(isTouch ? 'arraste o dedo para pilotar<br>+ e − mudam a velocidade<br>toque num nome para ir até ele<br>o capacete põe você dentro do traje de astronauta' : 'arraste com o mouse ou use as setas para pilotar<br>W e S mudam a velocidade · Q e E giram<br>clique num nome para ir até ele<br>o capacete põe você dentro do traje de astronauta', 7000);
+    flashHint(isTouch ? 'arraste o dedo para pilotar<br>+ e − mudam a velocidade<br>toque num nome para ir até ele<br>o olho deixa você olhar para os lados' : 'arraste com o mouse ou use as setas para pilotar<br>W e S mudam a velocidade · Q e E giram<br>clique num nome para ir até ele<br>o olho, ou o botão direito do mouse, deixa você olhar ao redor', 7000);
   } else if (m === 'station') { enterStation();
   } else if (m === 'explore') { camera.fov = 55; camera.updateProjectionMatrix(); enterExplore(); } else { camera.fov = 55; camera.updateProjectionMatrix(); lookYaw = lookPitch = 0; startWP(); }
 }
@@ -1401,6 +1433,10 @@ $('bTour').onclick = () => { if (mode !== 'tour') setMode('tour'); };
 $('bLab').onclick = () => { showLabels = !showLabels; $('bLab').classList.toggle('on', showLabels); orbitLines.forEach(l => l.visible = showLabels); };
 $('bFs').onclick = () => { const d = document; try { if (d.fullscreenElement) d.exitFullscreen(); else d.documentElement.requestFullscreen().catch(() => { }); } catch (e) { } };
 $('bInfo').onclick = () => $('info').classList.add('show');
+$('bOlho').addEventListener('pointerdown', e => e.stopPropagation());
+$('bOlho').onclick = () => $('olhar').classList.toggle('show');
+$('olhar').addEventListener('pointerdown', e => e.stopPropagation());
+$('olhar').querySelectorAll('button').forEach(b => b.onclick = () => { setOlhar(b.dataset.v); if (b.dataset.v !== 'livre') $('olhar').classList.remove('show'); });
 $('info').onclick = () => $('info').classList.remove('show');
 let speedRep;
 function bumpSpeed(d) { ship.level = clamp(ship.level + d, 0, MAXL); }
@@ -1414,13 +1450,15 @@ addEventListener('keyup', e => { keys[e.key.length === 1 ? e.key.toLowerCase() :
 // pointer: joystick in pilot mode, gentle look-around in tour mode
 const stick = { on: false, x0: 0, y0: 0, dx: 0, dy: 0, lx: 0, ly: 0 };
 const cv = renderer.domElement;
-cv.addEventListener('pointerdown', e => { if (mode === 'station') return; if (mode === 'tour' && started) { setMode('explore'); poke(); return; } if (mode === 'explore') { poke(); return; } cv.setPointerCapture(e.pointerId); stick.on = mode === 'pilot'; dragging = true; stick.x0 = stick.lx = e.clientX; stick.y0 = stick.ly = e.clientY; stick.dx = stick.dy = 0; poke(); });
+cv.addEventListener('pointerdown', e => { if (mode === 'station') return; if (mode === 'tour' && started) { setMode('explore'); poke(); return; } if (mode === 'explore') { poke(); return; } cv.setPointerCapture(e.pointerId); $('olhar').classList.remove('show'); stick.on = mode === 'pilot' && !olhar.livre && e.button !== 2; dragging = true; if (stick.on && e.pointerType !== 'mouse') { joyEl.style.display = 'block'; joyEl.style.left = (e.clientX - 55) + 'px'; joyEl.style.top = (e.clientY - 55) + 'px'; joyKnob.style.transform = ''; } stick.x0 = stick.lx = e.clientX; stick.y0 = stick.ly = e.clientY; stick.dx = stick.dy = 0; poke(); });
 cv.addEventListener('pointermove', e => {
   poke(); if (!dragging || mode === 'station') return;
-  if (mode === 'pilot') { stick.dx = e.clientX - stick.x0; stick.dy = e.clientY - stick.y0; }
+  if (mode === 'pilot' && !stick.on) { olhar.ty -= (e.clientX - stick.lx) * .005; olhar.tp = clamp(olhar.tp - (e.clientY - stick.ly) * .004, -1.4, 1.4); stick.lx = e.clientX; stick.ly = e.clientY; }
+  else if (mode === 'pilot') { stick.dx = e.clientX - stick.x0; stick.dy = e.clientY - stick.y0; const m = Math.hypot(stick.dx, stick.dy), k = m > 45 ? 45 / m : 1; joyKnob.style.transform = `translate(${stick.dx * k}px,${stick.dy * k}px)`; }
   else { lookYaw = clamp(lookYaw + (e.clientX - stick.lx) * .003, -1, 1); lookPitch = clamp(lookPitch + (e.clientY - stick.ly) * .003, -.7, .7); stick.lx = e.clientX; stick.ly = e.clientY; }
 });
-const endDrag = () => { stick.on = false; dragging = false; stick.dx = stick.dy = 0; };
+cv.addEventListener('contextmenu', e => { if (mode === 'pilot') e.preventDefault(); }); // botão direito do mouse: olhar ao redor
+const endDrag = () => { if (mode !== 'station') joyEl.style.display = 'none'; stick.on = false; dragging = false; stick.dx = stick.dy = 0; };
 cv.addEventListener('pointerup', endDrag); cv.addEventListener('pointercancel', endDrag);
 /* ---------- Modo Estação: a big house in low orbit, walked in first person, with a diving board over the Earth ---------- */
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -1634,7 +1672,7 @@ cv.addEventListener('pointerdown', e => { if (mode !== 'station') return; cv.set
   else if (look.id === null) { look.id = e.pointerId; look.x = e.clientX; look.y = e.clientY; } });
 cv.addEventListener('pointermove', e => { if (mode !== 'station') return;
   if (e.pointerId === joy.id) { joy.x = e.clientX; joy.y = e.clientY; const dx = clamp(joy.x - joy.x0, -45, 45), dy = clamp(joy.y - joy.y0, -45, 45); joyKnob.style.transform = `translate(${dx}px,${dy}px)`; }
-  else if (e.pointerId === look.id) { st.yaw -= (e.clientX - look.x) * .0042; st.pitch = clamp(st.pitch - (e.clientY - look.y) * .0042, -1.5, 1.5); look.x = e.clientX; look.y = e.clientY; } });
+  else if (e.pointerId === look.id) { const sens = e.pointerType === 'mouse' ? .0038 : .0032; st.yaw -= (e.clientX - look.x) * sens; st.pitch = clamp(st.pitch - (e.clientY - look.y) * sens, -1.5, 1.5); look.x = e.clientX; look.y = e.clientY; } });
 const stUp = e => { if (e.pointerId === joy.id) { joy.id = null; joyEl.style.display = 'none'; } if (e.pointerId === look.id) look.id = null; };
 cv.addEventListener('pointerup', stUp); cv.addEventListener('pointercancel', stUp);
 document.getElementById('stAgain').onclick = () => enterStation();
