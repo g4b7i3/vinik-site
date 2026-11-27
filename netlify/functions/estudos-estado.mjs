@@ -5,7 +5,7 @@
 import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
 
-const RESUMO = "373f9b8eba424ceaac64c6e02cb2e533cc0cfb61fae9571307e82a83c42c3269";
+const RESUMO = "b30c0a3d2636488d6cf94cb4808450c1703f6b91a35a14e9bd5161f18416dab4";
 const COOKIE = "estudos_chave";
 const LIMITE = 2_000_000; // bytes
 

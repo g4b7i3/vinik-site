@@ -1,9 +1,9 @@
 // Porteiro do app Estudos (vinikautor.com.br/estudos-vinik): senha própria, separada da do Estúdio.
 // A senha não está aqui: só um resumo dela (PBKDF2 + SHA-256), que não dá para reverter.
 // Para trocar a senha, veja ESTUDO-LEIA.md (seção Estudos).
-const SAL = "de53263a921f1f26e8cf229d5d1317ed";
+const SAL = "2ec865081b14c4d2b1e61d8ea0fd4c9e";
 const ITERACOES = 120000;
-const RESUMO = "373f9b8eba424ceaac64c6e02cb2e533cc0cfb61fae9571307e82a83c42c3269";
+const RESUMO = "b30c0a3d2636488d6cf94cb4808450c1703f6b91a35a14e9bd5161f18416dab4";
 const COOKIE = "estudos_chave";
 const DEZ_ANOS = 315360000; // segundos
 const BASE = "/estudos-vinik";
