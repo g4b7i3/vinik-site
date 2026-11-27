@@ -128,3 +128,13 @@ textarea{width:100%;min-height:130px;margin-top:16px;border-radius:14px;border:1
 .abas button.ativa{color:var(--tinta);background:var(--papel2)}
 @media (min-width:820px){.abas{left:50%;right:auto;transform:translateX(-50%);bottom:16px;width:520px;border:1px solid var(--borda);border-radius:18px;box-shadow:var(--sombra);padding:6px}}
 .tabela tr:first-child td{border-top:0}
+
+.veredito.meio{color:var(--barro2)}
+.explica b{font-weight:700}
+details{margin-top:12px;font-size:14px}
+details summary{cursor:pointer;color:var(--barro2);font-weight:600;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details.referencia p{margin-top:8px;padding:13px 15px;border-radius:14px;border:1px dashed var(--borda);line-height:1.55;font-size:14.5px}
+details.trocar{text-align:center}
+details.trocar .notas{text-align:left}
+#acoes-aberta{align-items:center;flex-direction:column}

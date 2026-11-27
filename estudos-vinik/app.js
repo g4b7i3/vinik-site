@@ -271,7 +271,8 @@
       corpo = `<div class="opcoes">${s.ordem.map((k, j) => `<button class="opcao" data-op="${k}"><span class="letra">${'ABCDEF'[j]}</span><span>${esc(q.op[k])}</span></button>`).join('')}</div><div id="depois"></div>`;
     } else {
       corpo = `<textarea id="resp" placeholder="Escreva com as suas palavras antes de ver a resposta">${''}</textarea>
-        <div class="acoes"><button class="botao largo" data-acao="revelar">Ver a resposta</button></div><div id="depois"></div>`;
+        <div class="acoes" id="acoes-aberta"><button class="botao largo" data-acao="corrigir">Corrigir</button>
+        <button class="link" data-acao="revelar">Só ver a resposta</button></div><div id="depois"></div>`;
     }
     tela.innerHTML = `<div class="sessao-topo"><button class="fechar" data-acao="sair" aria-label="Sair da sessão">×</button>
         <div class="trilho"><i style="width:${Math.round(100 * s.i / s.fila.length)}%"></i></div><span class="contagem">${s.i + 1}/${s.fila.length}</span></div>
@@ -293,13 +294,50 @@
       (certa ? botoesNota(true) : `<div class="acoes"><button class="botao largo" data-nota="0">Continuar</button></div>`);
     $('#depois').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-  function revelar() {
+  function revelar(aviso) {
     const q = sessao.fila[sessao.i], t = $('#resp').value.trim();
     sessao.resp = t;
     $('#resp').readOnly = true;
-    tela.querySelector('[data-acao="revelar"]').parentNode.remove();
-    $('#depois').innerHTML = `<div class="explica"><p class="rotulo">Resposta</p>${esc(q.r)}</div>` + botoesNota(false) +
-      `<p class="dica-nota">Compare com o que você escreveu e seja honesto: é isso que decide quando ela volta.</p>`;
+    const ac = $('#acoes-aberta'); if (ac) ac.remove();
+    $('#depois').innerHTML = (aviso ? `<p class="dica-nota" style="margin-top:14px">${esc(aviso)}</p>` : '') +
+      `<div class="explica"><p class="rotulo">Resposta</p>${esc(q.r)}</div>` + botoesNota(false) +
+      `<p class="dica-nota">Compare com o que você escreveu: é isso que decide quando ela volta.</p>`;
+    $('#depois').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  async function corrigir() {
+    const s = sessao, q = s.fila[s.i], t = $('#resp').value.trim();
+    if (!t) { $('#resp').focus(); $('#resp').placeholder = 'Escreva alguma coisa antes, mesmo que seja só o que lembrar'; return; }
+    const b = tela.querySelector('[data-acao="corrigir"]');
+    b.disabled = true; b.textContent = 'Corrigindo…';
+    $('#resp').readOnly = true;
+    let o = null;
+    try {
+      const ctl = new AbortController(); const tempo = setTimeout(() => ctl.abort(), 30000);
+      const r = await fetch('api/corrigir', { method: 'POST', credentials: 'same-origin', signal: ctl.signal,
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pergunta: q.p, referencia: q.r, resposta: t }) });
+      clearTimeout(tempo);
+      o = await r.json().catch(() => null);
+      if (!r.ok) o = { erro: (o && o.erro) || r.status };
+    } catch (_) { o = { erro: 'rede' }; }
+    if (sessao !== s || s.fila[s.i] !== q) return; // saiu da questão enquanto corrigia
+    if (!o || o.erro !== undefined) {
+      const msg = o && o.erro === 'sem-chave' ? 'A correção automática ainda não está ligada no site. Compare você mesmo desta vez.'
+        : o && o.erro === 'rede' ? 'Sem internet agora, então não deu para corrigir. Compare você mesmo.'
+        : 'Não consegui corrigir agora. Compare você mesmo desta vez.';
+      $('#resp').readOnly = false; revelar(msg); return;
+    }
+    s.resp = t;
+    const ac = $('#acoes-aberta'); if (ac) ac.remove();
+    const nomes = ['Errei', 'Difícil', 'Bom', 'Fácil'];
+    const vered = ['Não foi dessa vez.', 'Acertou em parte.', 'Certo.', 'Certo e completo.'][o.nota];
+    s.sugerida = o.nota;
+    $('#depois').innerHTML = `<div class="explica"><p class="veredito ${o.nota >= 2 ? 'ok' : o.nota === 1 ? 'meio' : 'nao'}">${vered}</p>
+        ${o.acertou ? `<p><b>Acertou:</b> ${esc(o.acertou)}</p>` : ''}
+        ${o.faltou ? `<p style="margin-top:6px"><b>Faltou:</b> ${esc(o.faltou)}</p>` : ''}
+        ${o.dica ? `<p style="margin-top:6px" class="apagado">${esc(o.dica)}</p>` : ''}</div>
+      <details class="referencia"><summary>Ver a resposta completa</summary><p>${esc(q.r)}</p></details>
+      <div class="acoes"><button class="botao largo" data-nota="${o.nota}">Continuar · ${nomes[o.nota]}, ${previsao(q.id, o.nota)}</button></div>
+      <details class="trocar"><summary>Discorda da nota?</summary>${botoesNota(false)}</details>`;
     $('#depois').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
   function previsao(id, nota) {
@@ -366,6 +404,7 @@
       iniciar(embaralhar(ds), 'As que mais escapam');
     }
     else if (a === 'revelar') revelar();
+    else if (a === 'corrigir') corrigir();
     else if (a === 'sair') sair();
     else if (a === 'baixar') {
       const blob = new Blob([JSON.stringify(S, null, 1)], { type: 'application/json' });
@@ -379,8 +418,9 @@
   });
   document.addEventListener('keydown', e => {
     if (!sessao || e.target.tagName === 'TEXTAREA') return;
-    const notas = tela.querySelectorAll('[data-nota]');
-    if (notas.length && /^[1-4]$/.test(e.key)) { const b = [...notas][+e.key - 1]; if (b) b.click(); }
+    const notas = [...tela.querySelectorAll('.notas [data-nota]')].filter(b => b.offsetParent);
+    if (notas.length && /^[1-4]$/.test(e.key)) { const b = notas[+e.key - 1]; if (b) b.click(); }
+    else if (e.key === 'Enter') { const b = tela.querySelector('.acoes [data-nota]'); if (b) b.click(); }
     else if (!notas.length && /^[1-6]$/.test(e.key)) { const b = tela.querySelectorAll('.opcao')[+e.key - 1]; if (b && !b.disabled) b.click(); }
   });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { if (!sessao) mostrar(abaAtual); puxar(); } });

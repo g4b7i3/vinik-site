@@ -1,5 +1,5 @@
 /* Estudos: guarda o app para abrir sem internet. O progresso fica no localStorage e na nuvem, não aqui. */
-const VERSAO = 'estudos-v1';
+const VERSAO = 'estudos-v2';
 const BASE = new URL('./', self.location).pathname; // /estudos-vinik/
 const ARQUIVOS = ['', 'estudos.css', 'banco.js', 'app.js', 'manifest.webmanifest', 'icons/192.png', 'icons/180.png'].map(a => BASE + a);
 const LIVRES = [BASE + 'entrar', BASE + 'sair'];

@@ -34,4 +34,5 @@ Copie os dois valores para `SAL` e `RESUMO` em `netlify/edge-functions/estudo-po
 - `netlify/edge-functions/estudos-porteiro.js` pede a senha; o aparelho fica liberado por 10 anos, como no Estúdio.
 - `estudos-vinik/banco.js` tem os livros, os capítulos e as questões. O `id` de uma questão nunca deve mudar: é ele que guarda o histórico de revisões. Para acrescentar questões, use ids novos.
 - O progresso fica no aparelho e sincroniza por `netlify/functions/estudos-estado.mjs` (Netlify Blobs deste site, loja `estudos`, chave `progresso`). Não usa os bancos do Radar nem da Nexos.
-- Para trocar a senha do Estudos: gere `SAL` e `RESUMO` com o comando da seção "Como trocar a senha" e cole em `estudos-porteiro.js` (SAL e RESUMO) e em `estudos-estado.mjs` (só o RESUMO).
+- Correção automática das questões abertas: `netlify/edge-functions/estudos-corrigir.js` manda a pergunta, a resposta de referência e a sua resposta para a API do Claude e devolve a nota. Usa a variável `ANTHROPIC_API_KEY` da Netlify (a mesma do revisor do Mundo Vinik). Opcional: `ESTUDOS_MODELO` para trocar o modelo. Sem a chave, o app volta a mostrar a resposta para você comparar.
+- Para trocar a senha do Estudos: gere `SAL` e `RESUMO` com o comando da seção "Como trocar a senha" e cole em `estudos-porteiro.js` (SAL e RESUMO) e em `estudos-estado.mjs` e `estudos-corrigir.js` (só o RESUMO).
