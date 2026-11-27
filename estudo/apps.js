@@ -21,6 +21,15 @@ window.ESTUDIO_APPS = [
     interno: true
   },
   {
+    id: 'estudos',
+    nome: 'Estudos',
+    linha: 'Questões dos livros que estou lendo, com revisão espaçada para não esquecer.',
+    url: 'estudos/',
+    cor: '#7a6bb0',
+    marca: 'E.',
+    interno: true
+  },
+  {
     id: 'microciclo',
     nome: 'Microciclo',
     linha: 'Agenda do dia, semana em blocos, projetos, leitura e escrita.',

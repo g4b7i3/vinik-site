@@ -8,7 +8,7 @@ const COOKIE = "estudo_chave";
 const DEZ_ANOS = 315360000; // segundos
 const BASE = "/estudo";
 // arquivos que precisam abrir sem senha: tela de entrar, ícone e manifesto (para instalar) e o service worker
-const LIVRES = [BASE + "/entrar.html", BASE + "/manifest.webmanifest", BASE + "/icons/", BASE + "/sw.js"];
+const LIVRES = [BASE + "/entrar.html", BASE + "/manifest.webmanifest", BASE + "/estudos/manifest.webmanifest", BASE + "/icons/", BASE + "/sw.js"];
 
 const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 const sha256 = async (txt) => hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt)));

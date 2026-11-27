@@ -1,0 +1,18 @@
+{
+  "id": "/estudo/estudos/",
+  "name": "Estudos do Vinik",
+  "short_name": "Estudos",
+  "description": "Questões dos livros que o Vinik lê, com revisão espaçada.",
+  "lang": "pt-BR",
+  "start_url": "/estudo/estudos/",
+  "scope": "/estudo/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f5f2",
+  "theme_color": "#f6f5f2",
+  "icons": [
+    { "src": "/estudo/icons/estudos-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/estudo/icons/estudos-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/estudo/icons/estudos-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

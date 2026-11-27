@@ -28,3 +28,9 @@ Copie os dois valores para `SAL` e `RESUMO` em `netlify/edge-functions/estudo-po
 - `netlify/functions/estudo-push.mjs` guarda os aparelhos (loja `estudio`, chave `push-assinaturas`) e manda o aviso de teste. As chaves VAPID são criadas sozinhas no primeiro uso (chave `push-vapid`).
 - `netlify/functions/estudo-avisos.mjs` roda a cada 5 minutos: avisa o começo de cada bloco da semana, lembra de registrar o dia no horário escolhido, manda a média da semana no domingo às 20h e a média do mês no dia 1 às 8h. Só lê o painel; não altera nada.
 - O que avisar fica no próprio painel (vale para todos os aparelhos). As metas usadas nas médias são as mesmas do Dia típico; se mudar uma, mude nos dois arquivos.
+
+## Estudos (vinikautor.com.br/estudos-vinik)
+- O endereço `/estudos-vinik` leva a `estudo/estudos/`, dentro do Estúdio, com a mesma senha.
+- `estudo/estudos/banco.js` tem os livros, os capítulos e as questões. O `id` de uma questão nunca deve mudar: é ele que guarda o histórico de revisões. Para acrescentar questões, use ids novos.
+- O progresso (quando cada questão volta, acertos, sequência de dias) fica no aparelho e sincroniza pela mesma função do Microciclo (`/estudo/api/estado?app=estudos`, loja `estudio`, chave `estudos`). Não usa os bancos do Radar nem da Nexos.
+- Instala como app próprio ("Estudos") pelo `estudo/estudos/manifest.webmanifest`; o porteiro libera esse manifesto sem senha para o celular conseguir instalar.

@@ -9,6 +9,16 @@
   to = "/.netlify/functions/substack"
   status = 200
 
+# app Estudos (dentro do Estúdio, com a mesma senha)
+[[redirects]]
+  from = "/estudos-vinik"
+  to = "/estudo/estudos/"
+  status = 301
+[[redirects]]
+  from = "/estudos-vinik/*"
+  to = "/estudo/estudos/"
+  status = 301
+
 [[redirects]]
   from = "/*"
   to = "/404.html"
