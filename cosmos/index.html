@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Cosmos</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cosmos">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" href="icone-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
 <style>
@@ -1431,7 +1438,23 @@ $('modos').querySelectorAll('button').forEach(b => b.onclick = () => { $('modos'
 $('stExit').onclick = () => setMode('tour');
 $('bTour').onclick = () => { if (mode !== 'tour') setMode('tour'); };
 $('bLab').onclick = () => { showLabels = !showLabels; $('bLab').classList.toggle('on', showLabels); orbitLines.forEach(l => l.visible = showLabels); };
-$('bFs').onclick = () => { const d = document; try { if (d.fullscreenElement) d.exitFullscreen(); else d.documentElement.requestFullscreen().catch(() => { }); } catch (e) { } };
+// tela cheia: no iPhone o Safari não deixa um site entrar em tela cheia (só vídeos); instalado na tela de início, já abre sem barras
+const telaApp = () => matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches || navigator.standalone === true;
+const podeFs = () => !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+if (telaApp()) $('bFs').style.display = 'none';
+$('bFs').onclick = () => {
+  const d = document, el = d.documentElement;
+  if (!podeFs()) {
+    flashHint(/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform))
+      ? 'o iPhone não deixa sites abrirem em tela cheia<br>toque em compartilhar ⬆︎ e em adicionar à tela de início<br>abrindo pelo ícone, fica em tela cheia'
+      : 'este navegador não abre em tela cheia', 7000);
+    return;
+  }
+  try {
+    if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+    else { const r = (el.requestFullscreen || el.webkitRequestFullscreen).call(el); if (r && r.catch) r.catch(() => { }); }
+  } catch (e) { }
+};
 $('bInfo').onclick = () => $('info').classList.add('show');
 $('bOlho').addEventListener('pointerdown', e => e.stopPropagation());
 $('bOlho').onclick = () => $('olhar').classList.toggle('show');
