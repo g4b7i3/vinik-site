@@ -11,6 +11,31 @@
   const $ = s => document.querySelector(s);
   const tela = $('#tela');
 
+  /* ---------------- instalar ---------------- */
+  const instalado = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const UA = navigator.userAgent;
+  const ehIOS = /iphone|ipad|ipod/i.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const ehSamsung = /SamsungBrowser/i.test(UA);
+  const ehCelular = ehIOS || /android|mobile/i.test(UA);
+  let pedidoInstalar = null;
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); pedidoInstalar = e; if (abaAtual === 'hoje' && !sessao) telaHoje(); });
+  window.addEventListener('appinstalled', () => { pedidoInstalar = null; if (abaAtual === 'hoje' && !sessao) telaHoje(); });
+  function comoInstalar() {
+    if (ehIOS) return 'No Safari, toque em Compartilhar (o quadrado com a seta para cima) e depois em "Adicionar à Tela de Início". No iPhone só o Safari instala apps assim.';
+    if (ehSamsung) return 'Toque no ícone de instalar (a setinha para baixo) na barra de endereço. Se ele não aparecer, abra o menu ≡ e escolha "Adicionar página a" → "Tela inicial".';
+    if (ehCelular) return 'No Chrome, abra o menu ⋮ (canto de cima) e toque em "Instalar app" ou "Adicionar à tela inicial".';
+    return 'No Chrome ou no Edge, clique no ícone de instalar no fim da barra de endereço, ou abra o menu ⋮ e escolha "Instalar Estudos do Vinik".';
+  }
+  function blocoInstalar() {
+    if (instalado()) return '';
+    try { if (localStorage.getItem('estudos-esconder-instalar') === '1') return ''; } catch (_) {}
+    return `<section class="bloco"><p class="rotulo">Instalar</p>
+      <p>Instale o Estudos ${ehCelular ? 'no celular' : 'no computador'}: ele ganha ícone próprio, abre em tela cheia e funciona sem internet.</p>
+      <div class="acoes"><button class="botao" data-acao="instalar">Instalar o app</button>
+      <button class="link" data-acao="esconder-instalar">Agora não</button></div>
+      <p class="apagado pequeno" id="como-instalar" style="margin-top:12px" hidden>${esc(comoInstalar())}</p></section>`;
+  }
+
   /* ---------------- datas ---------------- */
   const hojeStr = () => isoDia(new Date());
   function isoDia(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
@@ -174,6 +199,7 @@
       <div class="feito"><b>${hoje.feitas}</b><span>${hoje.feitas === 1 ? 'resposta' : 'respostas'} · ${Math.round(100 * hoje.acertos / hoje.feitas)}% de acerto</span></div></section>`;
     if (lendo.length) html += `<section class="bloco"><p class="rotulo">Lendo agora</p><p>${lendo.map(esc).join(' · ')}</p>
       <div class="acoes"><button class="link" data-ir="livros">Estudar por capítulo</button></div></section>`;
+    html += blocoInstalar();
     tela.innerHTML = html;
   }
 
@@ -238,6 +264,8 @@
         <p>Cada questão nova entra na revisão do dia. Depois de responder, você diz como foi: <b>Errei</b> traz a questão de volta no fim da sessão e amanhã; <b>Difícil</b>, <b>Bom</b> e <b>Fácil</b> empurram a próxima revisão para cada vez mais longe (1, 3, 7, 18, 45 dias…), sempre perto do ponto em que você estaria esquecendo.</p>
         <p>Nas questões abertas, escreva antes de ver a resposta. Tirar a informação da memória com as próprias palavras fixa muito mais do que reler.</p>
         <p>As questões novas aparecem misturadas às revisões e de capítulos diferentes, de propósito.</p></section>
+      ${instalado() ? '' : `<section class="bloco"><p class="rotulo">Instalar</p><p class="apagado pequeno" style="margin-bottom:12px">${esc(comoInstalar())}</p>
+        <div class="acoes"><button class="botao fantasma" data-acao="instalar">Instalar o app</button></div></section>`}
       <section class="bloco"><p class="rotulo">Cópia de segurança</p>
         <p class="apagado pequeno" style="margin-bottom:12px">O progresso sincroniza sozinho entre os aparelhos em que você entrou com a senha. Se quiser uma cópia fora do site:</p>
         <div class="acoes"><button class="botao fantasma" data-acao="baixar">Baixar cópia</button>
@@ -403,6 +431,11 @@
       const ds = QUESTOES.filter(q => S.cartoes[q.id] && (S.cartoes[q.id].lapsos || 0) > 0).sort((x, y) => S.cartoes[y.id].lapsos - S.cartoes[x.id].lapsos).slice(0, 8);
       iniciar(embaralhar(ds), 'As que mais escapam');
     }
+    else if (a === 'instalar') {
+      if (pedidoInstalar) { pedidoInstalar.prompt(); pedidoInstalar.userChoice.finally(() => { pedidoInstalar = null; telaHoje(); }); }
+      else { const c = $('#como-instalar'); if (c) c.hidden = false; }
+    }
+    else if (a === 'esconder-instalar') { try { localStorage.setItem('estudos-esconder-instalar', '1'); } catch (_) {} telaHoje(); }
     else if (a === 'revelar') revelar();
     else if (a === 'corrigir') corrigir();
     else if (a === 'sair') sair();
